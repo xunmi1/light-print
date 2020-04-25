@@ -23,11 +23,12 @@ const createStyleNode = (style: string) => {
   return node;
 };
 
+const NodeFilterType = window.NodeFilter.SHOW_ELEMENT;
 /** 复制需要打印的 DOM 元素的所有样式 */
 const cloneDocumentStyle = (printDocument: Document, dom: Node) => {
-  const originIterator = window.document.createNodeIterator(dom, NodeFilter.SHOW_ELEMENT);
-  const printIterator = printDocument.createNodeIterator(printDocument.body, NodeFilter.SHOW_ELEMENT);
   cloneStyle(printDocument.body, window.document.body);
+  const originIterator = window.document.createNodeIterator(dom, NodeFilterType);
+  const printIterator = printDocument.createNodeIterator(printDocument.body, NodeFilterType);
 
   let node = printIterator.nextNode();
   while (node) {
@@ -67,7 +68,7 @@ const performPrint = (container: HTMLIFrameElement) =>
     };
   });
 
-const print = <T extends Node>(target: T, options: PrintOptions = {}) =>
+const print = <T extends Node | string = string>(target: T, options: PrintOptions = {}) =>
   new Promise((resolve, reject) => {
     const dom = getNode(target);
     const container = createContainer(options);
