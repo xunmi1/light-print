@@ -1,0 +1,29 @@
+{
+  "name": "light-print",
+  "version": "0.1.0",
+  "description": "A lightweight print tool for the browser",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "rimraf dist && tsc -p tsconfig.json",
+    "lint": "prettier --write --parser typescript \"src/**/*.ts\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xunmi1/light-print.git"
+  },
+  "sideEffects": false,
+  "keywords": ["print", "browser print"],
+  "author": "xunmi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xunmi1/light-print/issues"
+  },
+  "homepage": "https://github.com/xunmi1/light-print#readme",
+  "devDependencies": {
+    "rimraf": "^3.0.2",
+    "typescript": "^3.8.3",
+    "prettier": "^2.0.5"
+  }
+}
