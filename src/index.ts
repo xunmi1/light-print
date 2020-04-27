@@ -48,7 +48,7 @@ const getNode = (target: unknown): Node => {
 };
 
 const performPrint = (container: HTMLIFrameElement) =>
-  new Promise((resolve, reject) => {
+  new Promise<void>((resolve, reject) => {
     container.focus();
     const contentWindow = container.contentWindow;
     if (!contentWindow) return reject(new Error('Not found window'));
@@ -69,7 +69,7 @@ const performPrint = (container: HTMLIFrameElement) =>
   });
 
 const lightPrint = <T extends Node | string = string>(target: T, options: PrintOptions = {}) =>
-  new Promise((resolve, reject) => {
+  new Promise<void>((resolve, reject) => {
     const dom = getNode(target);
     const container = createContainer(options);
     appendNode(window.document.body, container);

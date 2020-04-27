@@ -1,5 +1,5 @@
 /*!
- * light-print v0.1.0
+ * light-print v1.0.0
  * (c) 2020 xunmi
  * Released under the MIT License.
  */
