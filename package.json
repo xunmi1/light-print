@@ -4,9 +4,7 @@
   "description": "A lightweight print tool for the browser",
   "main": "dist/light-print.umd.js",
   "module": "dist/light-print.esm.js",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist", "types/index.d.ts"],
   "types": "types/index.d.ts",
   "scripts": {
     "build": "npm run rollup && npm run build:types",
