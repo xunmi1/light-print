@@ -68,13 +68,13 @@ const performPrint = (container: HTMLIFrameElement) =>
     };
   });
 
-const print = <T extends Node | string = string>(target: T, options: PrintOptions = {}) =>
+const lightPrint = <T extends Node | string = string>(target: T, options: PrintOptions = {}) =>
   new Promise((resolve, reject) => {
     const dom = getNode(target);
     const container = createContainer(options);
     appendNode(window.document.body, container);
     container.addEventListener('load', () => {
-      const printDocument = container.contentWindow ? container.contentWindow.document : container.contentDocument;
+      const printDocument = container.contentWindow?.document ?? container.contentDocument;
       if (!printDocument) return reject(new Error('Not found document'));
       printDocument.body.style.zoom = String(options.zoom ?? 1);
       if (options.mediaPrintStyle) {
@@ -87,4 +87,4 @@ const print = <T extends Node | string = string>(target: T, options: PrintOption
     });
   });
 
-export default print;
+export default lightPrint;

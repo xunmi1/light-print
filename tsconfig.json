@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "esnext",
+    "target": "es5",
     "module": "esnext",
     "strict": true,
     "noUnusedLocals": true,
@@ -9,12 +9,12 @@
     "strictPropertyInitialization": false,
     "suppressImplicitAnyIndexErrors": true,
     "declaration": true,
+    "declarationDir": "./types",
     "removeComments": true,
     "sourceMap": false,
     "outDir": "./dist",
     "baseUrl": "./",
-    "incremental": true,
     "lib": ["esnext", "dom"]
   },
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/*"]
 }
