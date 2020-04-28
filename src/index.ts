@@ -1,4 +1,4 @@
-import { isIE, appendNode, importNode, removeNode, cloneStyle, isNode } from './utils';
+import { isIE, appendNode, importNode, removeNode, cloneStyle, isNode, setProperty } from './utils';
 
 interface Options {
   documentTitle: string;
@@ -47,6 +47,11 @@ const getNode = (target: unknown): Node => {
   throw new Error('Invalid HTML element');
 };
 
+/** reset html zoom */
+const setDocumentZoom = (document: Document, zoom: number | string = 1) => {
+  setProperty(document.documentElement, 'zoom', zoom);
+};
+
 const performPrint = (container: HTMLIFrameElement) =>
   new Promise<void>((resolve, reject) => {
     container.focus();
@@ -61,8 +66,10 @@ const performPrint = (container: HTMLIFrameElement) =>
     } else {
       contentWindow.print();
     }
+
     contentWindow.onafterprint = () => {
       resolve();
+      /** destroy dom */
       contentWindow.close();
       removeNode(container);
     };
@@ -76,13 +83,15 @@ const lightPrint = <T extends Node | string = string>(target: T, options: PrintO
     container.addEventListener('load', () => {
       const printDocument = container.contentWindow?.document ?? container.contentDocument;
       if (!printDocument) return reject(new Error('Not found document'));
-      printDocument.body.style.zoom = String(options.zoom ?? 1);
+
+      setDocumentZoom(printDocument, options.zoom);
       if (options.mediaPrintStyle) {
         const styleNode = createStyleNode(options.mediaPrintStyle);
         appendNode(printDocument.head, styleNode);
       }
       appendNode(printDocument.body, importNode(printDocument, dom));
       cloneDocumentStyle(printDocument, dom);
+      /** run print handler */
       performPrint(container).then(resolve).catch(reject);
     });
   });

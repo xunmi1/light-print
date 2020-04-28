@@ -1,5 +1,5 @@
 /*!
- * light-print v1.0.0
+ * light-print v1.0.1
  * (c) 2020 xunmi
  * Released under the MIT License.
  */
@@ -17,6 +17,15 @@ const removeNode = (node) => _optionalChain([node, 'access', _ => _.parentNode, 
 const cloneStyle = (target, origin) => {
   const style = window.getComputedStyle(origin, null);
   target.setAttribute('style', style.cssText);
+};
+
+const setProperty = (
+  target,
+  propertyName,
+  value,
+  priority
+) => {
+  target.style.setProperty(propertyName, String(value), priority);
 };
 
 function _nullishCoalesce(lhs, rhsFn) { if (lhs != null) { return lhs; } else { return rhsFn(); } } function _optionalChain$1(ops) { let lastAccessLHS = undefined; let value = ops[0]; let i = 1; while (i < ops.length) { const op = ops[i]; const fn = ops[i + 1]; i += 2; if ((op === 'optionalAccess' || op === 'optionalCall') && value == null) { return undefined; } if (op === 'access' || op === 'optionalAccess') { lastAccessLHS = value; value = fn(value); } else if (op === 'call' || op === 'optionalCall') { value = fn((...args) => value.call(lastAccessLHS, ...args)); lastAccessLHS = undefined; } } return value; }
@@ -67,6 +76,11 @@ const getNode = (target) => {
   throw new Error('Invalid HTML element');
 };
 
+/** reset html zoom */
+const setDocumentZoom = (document, zoom = 1) => {
+  setProperty(document.documentElement, 'zoom', zoom);
+};
+
 const performPrint = (container) =>
   new Promise((resolve, reject) => {
     container.focus();
@@ -81,8 +95,10 @@ const performPrint = (container) =>
     } else {
       contentWindow.print();
     }
+
     contentWindow.onafterprint = () => {
       resolve();
+      /** destroy dom */
       contentWindow.close();
       removeNode(container);
     };
@@ -96,13 +112,15 @@ const lightPrint = (target, options = {}) =>
     container.addEventListener('load', () => {
       const printDocument = _nullishCoalesce(_optionalChain$1([container, 'access', _ => _.contentWindow, 'optionalAccess', _2 => _2.document]), () => ( container.contentDocument));
       if (!printDocument) return reject(new Error('Not found document'));
-      printDocument.body.style.zoom = String(_nullishCoalesce(options.zoom, () => ( 1)));
+
+      setDocumentZoom(printDocument, options.zoom);
       if (options.mediaPrintStyle) {
         const styleNode = createStyleNode(options.mediaPrintStyle);
         appendNode(printDocument.head, styleNode);
       }
       appendNode(printDocument.body, importNode(printDocument, dom));
       cloneDocumentStyle(printDocument, dom);
+      /** run print handler */
       performPrint(container).then(resolve).catch(reject);
     });
   });

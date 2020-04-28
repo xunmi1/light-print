@@ -12,3 +12,12 @@ export const cloneStyle = <T extends Element>(target: T, origin: T) => {
   const style = window.getComputedStyle(origin, null);
   target.setAttribute('style', style.cssText);
 };
+
+export const setProperty = <T extends ElementCSSInlineStyle>(
+  target: T,
+  propertyName: string,
+  value: number | string,
+  priority?: string | null
+) => {
+  target.style.setProperty(propertyName, String(value), priority);
+};
