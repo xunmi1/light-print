@@ -1,0 +1,9 @@
+language: node_js
+sudo: required
+cache: npm
+node_js:
+  - lts/*
+install:
+  - npm install
+script:
+  - npm run build
