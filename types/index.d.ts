@@ -4,5 +4,5 @@ interface Options {
     zoom: number | string;
 }
 export declare type PrintOptions = Partial<Options>;
-declare const lightPrint: <T extends string | Node = string>(target: T, options?: Partial<Options>) => Promise<void>;
+declare const lightPrint: <T extends string | Node>(containerOrSelector: T, options?: Partial<Options>) => Promise<void>;
 export default lightPrint;

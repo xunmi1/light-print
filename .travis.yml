@@ -1,5 +1,5 @@
 language: node_js
-sudo: required
+sudo: false
 cache: npm
 node_js:
   - lts/*

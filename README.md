@@ -9,7 +9,7 @@
 A lightweight print tool for the browser
 
 ### install
-```bash
+```npm
 npm install light-print
 ```
 
@@ -29,4 +29,8 @@ documentTitle?: string,
 mediaPrintStyle?: string,
 // page zoom
 zoom?: number | string,
+
+// returns a Promise object that is fulfilled when exiting the print window
+// note: didn't judge whether it has been printed
+return: Promise<void>
 ```

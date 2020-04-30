@@ -1,4 +1,15 @@
-import { isIE, appendNode, importNode, removeNode, cloneStyle, isNode, setProperty } from './utils';
+import {
+  isIE,
+  appendNode,
+  importNode,
+  removeNode,
+  createNodeIterator,
+  getNode,
+  cloneStyle,
+  getDocument,
+  setProperty,
+  bindOnceEvent,
+} from './utils';
 
 interface Options {
   documentTitle: string;
@@ -8,27 +19,26 @@ interface Options {
 
 export type PrintOptions = Partial<Options>;
 
-const createContainer = (options: PrintOptions): HTMLIFrameElement => {
-  const { documentTitle } = options;
+const createContainer = (documentTitle: PrintOptions['documentTitle']): HTMLIFrameElement => {
   const container = window.document.createElement('iframe');
-  container.setAttribute('style', ' position: absolute; height: 0; width: 0; visibility: hidden;');
+  const hidden = 'position: absolute; height: 0; width: 0; visibility: hidden;';
+  container.setAttribute('style', hidden);
   const title = documentTitle ?? window.document.title;
   container.setAttribute('srcdoc', `<html><head><title>${title}</title></head></html>`);
   return container;
 };
 
-const createStyleNode = (style: string) => {
+const createStyleNode = (style: string): HTMLStyleElement => {
   const node = window.document.createElement('style');
   node.innerHTML = `@media print {${style}}`;
   return node;
 };
 
-const NodeFilterType = window.NodeFilter.SHOW_ELEMENT;
 /** 复制需要打印的 DOM 元素的所有样式 */
 const cloneDocumentStyle = (printDocument: Document, dom: Node) => {
-  cloneStyle(printDocument.body, window.document.body);
-  const originIterator = window.document.createNodeIterator(dom, NodeFilterType);
-  const printIterator = printDocument.createNodeIterator(printDocument.body, NodeFilterType);
+  const originIterator = createNodeIterator(dom);
+  // start from `body`
+  const printIterator = createNodeIterator(printDocument.body);
 
   let node = printIterator.nextNode();
   while (node) {
@@ -38,22 +48,22 @@ const cloneDocumentStyle = (printDocument: Document, dom: Node) => {
   }
 };
 
-const getNode = (target: unknown): Node => {
-  if (isNode(target)) return target;
-  if (typeof target === 'string') {
-    const dom = window.document.querySelector(target);
-    if (dom) return dom;
-  }
-  throw new Error('Invalid HTML element');
-};
-
 /** reset html zoom */
 const setDocumentZoom = (document: Document, zoom: number | string = 1) => {
   setProperty(document.documentElement, 'zoom', zoom);
 };
 
+const loadContainer = <T extends Node | string = string>(title: PrintOptions['documentTitle']) =>
+  new Promise<HTMLIFrameElement>((resolve, reject) => {
+    const container = createContainer(title);
+    appendNode(window.document.body, container);
+    bindOnceEvent(container, 'load', () => resolve(container));
+    bindOnceEvent(container, 'error', () => reject(new Error('Failed to load document')));
+  });
+
 const performPrint = (container: HTMLIFrameElement) =>
   new Promise<void>((resolve, reject) => {
+    // required for IE
     container.focus();
     const contentWindow = container.contentWindow;
     if (!contentWindow) return reject(new Error('Not found window'));
@@ -67,33 +77,33 @@ const performPrint = (container: HTMLIFrameElement) =>
       contentWindow.print();
     }
 
-    contentWindow.onafterprint = () => {
+    bindOnceEvent(contentWindow, 'afterprint', () => {
       resolve();
-      /** destroy dom */
+      /** destroy window */
       contentWindow.close();
       removeNode(container);
-    };
-  });
-
-const lightPrint = <T extends Node | string = string>(target: T, options: PrintOptions = {}) =>
-  new Promise<void>((resolve, reject) => {
-    const dom = getNode(target);
-    const container = createContainer(options);
-    appendNode(window.document.body, container);
-    container.addEventListener('load', () => {
-      const printDocument = container.contentWindow?.document ?? container.contentDocument;
-      if (!printDocument) return reject(new Error('Not found document'));
-
-      setDocumentZoom(printDocument, options.zoom);
-      if (options.mediaPrintStyle) {
-        const styleNode = createStyleNode(options.mediaPrintStyle);
-        appendNode(printDocument.head, styleNode);
-      }
-      appendNode(printDocument.body, importNode(printDocument, dom));
-      cloneDocumentStyle(printDocument, dom);
-      /** run print handler */
-      performPrint(container).then(resolve).catch(reject);
     });
   });
+
+const lightPrint = async <T extends Node | string>(containerOrSelector: T, options: PrintOptions = {}) => {
+  const dom = getNode(containerOrSelector);
+  if (!dom) throw new Error('Invalid HTML element');
+
+  const container = await loadContainer(options.documentTitle);
+  const printDocument = getDocument(container);
+  if (!printDocument) throw new Error('Not found document');
+
+  setDocumentZoom(printDocument, options.zoom);
+
+  if (options.mediaPrintStyle) {
+    const styleNode = createStyleNode(options.mediaPrintStyle);
+    appendNode(printDocument.head, styleNode);
+  }
+
+  appendNode(printDocument.body, importNode(printDocument, dom));
+  cloneDocumentStyle(printDocument, dom);
+  /** run print handler */
+  await performPrint(container);
+};
 
 export default lightPrint;
