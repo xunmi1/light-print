@@ -9,8 +9,16 @@
 A lightweight print tool for the browser
 
 ### install
-```npm
+
+#### NPM
+```bash
 npm install light-print
+# or
+yarn add light-print
+```
+#### CDN
+```html
+<script src="https://cdn.jsdelivr.net/npm/light-print@1/dist/light-print.umd.min.js"></script>
 ```
 
 ### usage
