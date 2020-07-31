@@ -6,8 +6,7 @@ import pkg from '../package.json';
 const RUNTIME_CONTEXT = 'window';
 
 const currentYear = new Date().getFullYear();
-const banner =
-  `/*!
+const banner = `/*!
  * ${pkg.name} v${pkg.version}
  * (c) ${currentYear > 2020 ? '2020-' : ''}${currentYear} ${pkg.author}
  * Released under the MIT License.
@@ -30,9 +29,5 @@ const output = outputFileList.map(({ name, format, min }) => {
 export default {
   context: RUNTIME_CONTEXT,
   output,
-  plugins: [
-    json({ namedExports: false }),
-    resolve(),
-  ],
+  plugins: [json({ namedExports: false }), resolve()],
 };
-
