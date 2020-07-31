@@ -11,13 +11,11 @@ import {
   bindOnceEvent,
 } from './utils';
 
-interface Options {
-  documentTitle: string;
-  mediaPrintStyle: string;
-  zoom: number | string;
+export interface PrintOptions {
+  documentTitle?: string;
+  mediaPrintStyle?: string;
+  zoom?: number | string;
 }
-
-export type PrintOptions = Partial<Options>;
 
 const createContainer = (documentTitle: PrintOptions['documentTitle']): HTMLIFrameElement => {
   const container = window.document.createElement('iframe');
@@ -34,7 +32,9 @@ const createStyleNode = (style: string): HTMLStyleElement => {
   return node;
 };
 
-/** 复制需要打印的 DOM 元素的所有样式 */
+/**
+ * Copy all styles of DOM elements that need to be printed
+ */
 const cloneDocumentStyle = (printDocument: Document, dom: Node) => {
   const originIterator = createNodeIterator(dom);
   // start from `body`
@@ -48,7 +48,9 @@ const cloneDocumentStyle = (printDocument: Document, dom: Node) => {
   }
 };
 
-/** reset html zoom */
+/**
+ * Reset html zoom
+ */
 const setDocumentZoom = (document: Document, zoom: number | string = 1) => {
   setProperty(document.documentElement, 'zoom', zoom);
 };
