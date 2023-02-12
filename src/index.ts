@@ -55,7 +55,7 @@ const setDocumentZoom = (document: Document, zoom: number | string = 1) => {
   setProperty(document.documentElement, 'zoom', zoom);
 };
 
-const loadContainer = <T extends Node | string = string>(title: PrintOptions['documentTitle']) =>
+const loadContainer = (title: PrintOptions['documentTitle']) =>
   new Promise<HTMLIFrameElement>((resolve, reject) => {
     const container = createContainer(title);
     appendNode(window.document.body, container);
@@ -68,7 +68,10 @@ const performPrint = (container: HTMLIFrameElement) =>
     // required for IE
     container.focus();
     const contentWindow = container.contentWindow;
-    if (!contentWindow) return reject(new Error('Not found window'));
+    if (!contentWindow) {
+      reject(new Error('Not found window'));
+      return;
+    }
     if (isIE()) {
       try {
         contentWindow.document.execCommand('print', false);

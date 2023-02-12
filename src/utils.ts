@@ -16,7 +16,13 @@ export const createNodeIterator = (root: Node, filter?: NodeFilter) =>
 /** clone element style */
 export const cloneStyle = <T extends Element>(target: T, origin: T) => {
   const style = window.getComputedStyle(origin, null);
-  target.setAttribute('style', style.cssText);
+  let styleText = '';
+  for (let index = 0; index < style.length; index++) {
+    const value = style.getPropertyValue(style[index]);
+    if (value) styleText += `${style[index]}:${value};`;
+  }
+
+  target.setAttribute('style', styleText);
 };
 
 export const setProperty = <T extends ElementCSSInlineStyle>(
