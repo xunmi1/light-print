@@ -90,25 +90,26 @@ const performPrint = (container: HTMLIFrameElement) =>
     });
   });
 
-const lightPrint = async <T extends Node | string>(containerOrSelector: T, options: PrintOptions = {}) => {
+const lightPrint = <T extends Node | string>(containerOrSelector: T, options: PrintOptions = {}) => {
   const dom = getNode(containerOrSelector);
   if (!dom) throw new Error('Invalid HTML element');
 
-  const container = await loadContainer(options.documentTitle);
-  const printDocument = getDocument(container);
-  if (!printDocument) throw new Error('Not found document');
+  return loadContainer(options.documentTitle).then(container => {
+    const printDocument = getDocument(container);
+    if (!printDocument) throw new Error('Not found document');
 
-  setDocumentZoom(printDocument, options.zoom);
+    setDocumentZoom(printDocument, options.zoom);
 
-  if (options.mediaPrintStyle) {
-    const styleNode = createStyleNode(options.mediaPrintStyle);
-    appendNode(printDocument.head, styleNode);
-  }
+    if (options.mediaPrintStyle) {
+      const styleNode = createStyleNode(options.mediaPrintStyle);
+      appendNode(printDocument.head, styleNode);
+    }
 
-  appendNode(printDocument.body, importNode(printDocument, dom));
-  cloneDocumentStyle(printDocument, dom);
-  /** run print handler */
-  await performPrint(container);
+    appendNode(printDocument.body, importNode(printDocument, dom));
+    cloneDocumentStyle(printDocument, dom);
+    /** run print handler */
+    return performPrint(container);
+  });
 };
 
 export default lightPrint;
