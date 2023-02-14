@@ -5,32 +5,23 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Use Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: '12.x'
-
-      - name: Cache modules
-        uses: actions/cache@v2
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          # not recommended to cache `node_modules`, as it can break across Node versions
-          path: ~/.npm
-          key: ${{ runner.OS }}-node-${{ hashFiles('**/package.json') }}
-          restore-keys: |
-            ${{ runner.OS }}-node-
+          node-version: 16
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: build
+      - name: Run build
         run: npm run build
