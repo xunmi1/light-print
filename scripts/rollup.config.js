@@ -1,7 +1,10 @@
+// @ts-check
 import json from '@rollup/plugin-json';
-import resolve from '@rollup/plugin-node-resolve';
-import { terser } from 'rollup-plugin-terser';
-import pkg from '../package.json';
+import terser from '@rollup/plugin-terser';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+const pkg = require('../package.json');
 
 const RUNTIME_CONTEXT = 'window';
 
@@ -13,21 +16,30 @@ const banner = `/*!
  */
 `;
 
+/**
+ * @type {{ name?: string; format: import('rollup').ModuleFormat, min?: boolean }[]}
+ */
 const outputFileList = [
-  { name: 'LightPrint', format: 'umd' },
-  { name: 'LightPrint', format: 'umd', min: true },
+  { name: 'lightPrint', format: 'umd' },
+  { name: 'lightPrint', format: 'umd', min: true },
   { format: 'esm' },
   { format: 'esm', min: true },
 ];
 
+/**
+ * @type {import('rollup').OutputOptions[]}
+ */
 const output = outputFileList.map(({ name, format, min }) => {
-  const file = `dist/${pkg.name}.${format}${min ? '.min' : ''}.js`;
+  const file = `dist/${pkg.name}${min ? '.min' : ''}${format === 'umd' ? '.cjs' : '.js'}`;
   const plugins = min ? [terser()] : [];
   return { name, format, banner, file, sourcemap: false, plugins };
 });
 
+/**
+ * @type {import('rollup').RollupOptions}
+ */
 export default {
   context: RUNTIME_CONTEXT,
   output,
-  plugins: [json({ namedExports: false }), resolve()],
+  plugins: [json({ namedExports: false })],
 };

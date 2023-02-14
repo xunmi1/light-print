@@ -2,13 +2,23 @@
   "name": "light-print",
   "version": "1.2.0",
   "description": "A lightweight print tool for the browser",
-  "main": "dist/light-print.umd.js",
-  "module": "dist/light-print.esm.js",
+  "type": "module",
+  "main": "dist/light-print.cjs",
+  "module": "dist/light-print.js",
+  "types": "types/index.d.ts",
+  "unpkg": "dist/light-print.min.cjs",
+  "jsdelivr": "dist/light-print.min.cjs",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./dist/light-print.js",
+      "require": "./dist/light-print.cjs"
+    }
+  },
   "files": [
     "dist",
     "types/index.d.ts"
   ],
-  "types": "types/index.d.ts",
   "scripts": {
     "build": "npm run lint && npm run build-ts && npm run build-rollup && rimraf .cache",
     "build-ts": "rimraf types && tsc -p tsconfig.json --outDir .cache",
@@ -32,14 +42,16 @@
   },
   "homepage": "https://github.com/xunmi1/light-print#readme",
   "devDependencies": {
-    "@rollup/plugin-json": "^4.1.0",
-    "@rollup/plugin-node-resolve": "^8.4.0",
-    "@xunmi/prettier-config": "^1.0.1",
-    "prettier": "^2.0.5",
-    "rimraf": "^3.0.2",
-    "rollup": "^2.23.0",
-    "rollup-plugin-terser": "^6.1.0",
-    "typescript": "^3.9.7"
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-terser": "^0.4.0",
+    "@xunmi/prettier-config": "^1.0.2",
+    "prettier": "^2.8.4",
+    "rimraf": "^4.1.2",
+    "rollup": "^3.15.0",
+    "typescript": "^4.9.5"
+  },
+  "engines": {
+    "node": ">=14.16"
   },
   "prettier": "@xunmi/prettier-config"
 }

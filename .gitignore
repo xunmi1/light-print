@@ -11,9 +11,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Package
-package-lock.json
-
 # Test
 coverage
 __snapshots__
