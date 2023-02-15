@@ -23,8 +23,7 @@
     "build": "npm run lint && npm run build-ts && npm run build-rollup && rimraf .cache",
     "build-ts": "rimraf types && tsc -p tsconfig.json --outDir .cache",
     "build-rollup": "rimraf dist && rollup -c scripts/rollup.config.js  -i .cache/index.js",
-    "lint": "prettier --write --parser typescript \"**/*.ts\"",
-    "release": "npm test && npm run build && npm publish"
+    "lint": "prettier --write --parser typescript \"**/*.ts\""
   },
   "repository": {
     "type": "git",
@@ -42,7 +41,6 @@
   },
   "homepage": "https://github.com/xunmi1/light-print#readme",
   "devDependencies": {
-    "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-terser": "^0.4.0",
     "@xunmi/prettier-config": "^1.0.2",
     "prettier": "^2.8.4",

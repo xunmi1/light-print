@@ -1,5 +1,4 @@
 // @ts-check
-import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
 import { createRequire } from 'node:module';
 
@@ -22,8 +21,8 @@ const banner = `/*!
 const outputFileList = [
   { name: 'lightPrint', format: 'umd' },
   { name: 'lightPrint', format: 'umd', min: true },
-  { format: 'esm' },
-  { format: 'esm', min: true },
+  { format: 'es' },
+  { format: 'es', min: true },
 ];
 
 /**
@@ -41,5 +40,4 @@ const output = outputFileList.map(({ name, format, min }) => {
 export default {
   context: RUNTIME_CONTEXT,
   output,
-  plugins: [json({ namedExports: false })],
 };
