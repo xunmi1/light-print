@@ -4,7 +4,7 @@ import {
   importNode,
   removeNode,
   createNodeIterator,
-  getNode,
+  normalizeNode,
   cloneStyle,
   getDocument,
   setProperty,
@@ -90,13 +90,13 @@ const performPrint = (container: HTMLIFrameElement) =>
     });
   });
 
-const lightPrint = <T extends Node | string>(containerOrSelector: T, options: PrintOptions = {}) => {
-  const dom = getNode(containerOrSelector);
-  if (!dom) throw new Error('Invalid HTML element');
+const lightPrint = (containerOrSelector: Element | string, options: PrintOptions = {}) => {
+  const dom = normalizeNode(containerOrSelector);
+  if (!dom) throw new Error('Invalid HTML element.');
 
   return loadContainer(options.documentTitle).then(container => {
     const printDocument = getDocument(container);
-    if (!printDocument) throw new Error('Not found document');
+    if (!printDocument) throw new Error('Not found document.');
 
     setDocumentZoom(printDocument, options.zoom);
 

@@ -1,7 +1,7 @@
 export const isIE = () => /msie|trident/i.test(window.navigator.userAgent);
 
 export const isString = (val: unknown): val is string => typeof val === 'string';
-export const isNode = (target: unknown): target is Node => target instanceof Node;
+export const isElement = <T extends Element>(target: unknown): target is T => target instanceof Element;
 
 export const appendNode = <T extends Node>(parent: T, child: T) => parent.appendChild(child);
 
@@ -25,8 +25,8 @@ export const cloneStyle = <T extends Element>(target: T, origin: T) => {
   target.setAttribute('style', styleText);
 };
 
-export const setProperty = <T extends ElementCSSInlineStyle>(
-  target: T,
+export const setProperty = (
+  target: ElementCSSInlineStyle,
   propertyName: string,
   value: number | string,
   priority?: string
@@ -36,13 +36,9 @@ export const setProperty = <T extends ElementCSSInlineStyle>(
 
 export const getDocument = (target: HTMLIFrameElement) => target.contentWindow?.document ?? target.contentDocument;
 
-export const getNode = (containerOrSelector: unknown): Node | undefined => {
-  if (isNode(containerOrSelector)) return containerOrSelector;
-
-  if (isString(containerOrSelector)) {
-    const dom = window.document.querySelector(containerOrSelector);
-    if (dom) return dom;
-  }
+export const normalizeNode = <T extends Element>(target: unknown) => {
+  if (isElement<T>(target)) return target;
+  if (isString(target)) return window.document.querySelector<T>(target) ?? undefined;
 };
 
 export const bindOnceEvent = <T extends EventTarget, K extends keyof WindowEventMap>(
@@ -53,7 +49,7 @@ export const bindOnceEvent = <T extends EventTarget, K extends keyof WindowEvent
 ) => {
   const wrappedListener: EventListener = event => {
     listener(event as WindowEventMap[K]);
-    el.removeEventListener(eventName, wrappedListener, options);
+    el.removeEventListener(eventName, wrappedListener);
   };
 
   el.addEventListener(eventName, wrappedListener, options);
