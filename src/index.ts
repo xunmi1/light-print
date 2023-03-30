@@ -99,6 +99,8 @@ const lightPrint = (containerOrSelector: Element | string, options: PrintOptions
     if (!printDocument) throw new Error('Not found document.');
 
     setDocumentZoom(printDocument, options.zoom);
+    // remove the default margin.
+    setProperty(document.body, 'margin', 0);
 
     if (options.mediaPrintStyle) {
       const styleNode = createStyleNode(options.mediaPrintStyle);
