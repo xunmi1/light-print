@@ -100,7 +100,7 @@ const lightPrint = (containerOrSelector: Element | string, options: PrintOptions
 
     setDocumentZoom(printDocument, options.zoom);
     // remove the default margin.
-    setProperty(document.body, 'margin', 0);
+    setProperty(printDocument.body, 'margin', 0);
 
     if (options.mediaPrintStyle) {
       const styleNode = createStyleNode(options.mediaPrintStyle);
