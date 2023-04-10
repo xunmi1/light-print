@@ -25,7 +25,7 @@ export const cloneStyle = <T extends Element>(target: T, origin: T) => {
   target.setAttribute('style', styleText);
 };
 
-export const setProperty = (
+export const setStyleProperty = (
   target: ElementCSSInlineStyle,
   propertyName: string,
   value: number | string,
@@ -33,8 +33,6 @@ export const setProperty = (
 ) => {
   target.style.setProperty(propertyName, String(value), priority);
 };
-
-export const getDocument = (target: HTMLIFrameElement) => target.contentWindow?.document ?? target.contentDocument;
 
 export const normalizeNode = <T extends Element>(target: unknown) => {
   if (isElement<T>(target)) return target;

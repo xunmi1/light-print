@@ -23,7 +23,7 @@
     "build": "npm run lint && npm run build-ts && npm run build-rollup && rimraf .cache",
     "build-ts": "rimraf types && tsc -p tsconfig.json --outDir .cache",
     "build-rollup": "rimraf dist && rollup -c scripts/rollup.config.js  -i .cache/index.js",
-    "lint": "prettier --write \"**/*.{ts,md}\" --ignore-path .gitignore"
+    "lint": "prettier -w \"**/*\" -u --ignore-path .gitignore"
   },
   "repository": {
     "type": "git",

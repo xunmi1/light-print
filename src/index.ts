@@ -6,8 +6,7 @@ import {
   createNodeIterator,
   normalizeNode,
   cloneStyle,
-  getDocument,
-  setProperty,
+  setStyleProperty,
   bindOnceEvent,
 } from './utils';
 
@@ -17,18 +16,15 @@ export interface PrintOptions {
   zoom?: number | string;
 }
 
-const createContainer = (documentTitle: PrintOptions['documentTitle']): HTMLIFrameElement => {
+const createContainer = (): HTMLIFrameElement => {
   const container = window.document.createElement('iframe');
-  const hidden = 'position: absolute; height: 0; width: 0; visibility: hidden;';
-  container.setAttribute('style', hidden);
-  const title = documentTitle ?? window.document.title;
-  container.setAttribute('srcdoc', `<html><head><title>${title}</title></head></html>`);
+  container.setAttribute('style', 'display: none;');
   return container;
 };
 
 const createStyleNode = (style: string): HTMLStyleElement => {
   const node = window.document.createElement('style');
-  node.innerHTML = `@media print {${style}}`;
+  node.textContent = `@media print {${style}}`;
   return node;
 };
 
@@ -48,30 +44,18 @@ const cloneDocumentStyle = (printDocument: Document, dom: Node) => {
   }
 };
 
-/**
- * Reset html zoom
- */
-const setDocumentZoom = (document: Document, zoom: number | string = 1) => {
-  setProperty(document.documentElement, 'zoom', zoom);
-};
-
-const loadContainer = (title: PrintOptions['documentTitle']) =>
-  new Promise<HTMLIFrameElement>((resolve, reject) => {
-    const container = createContainer(title);
-    appendNode(window.document.body, container);
-    bindOnceEvent(container, 'load', () => resolve(container));
-    bindOnceEvent(container, 'error', () => reject(new Error('Failed to load document')));
+const mount = (container: HTMLIFrameElement, parent: Element) =>
+  new Promise<void>((resolve, reject) => {
+    appendNode(parent, container);
+    bindOnceEvent(container, 'load', () => resolve());
+    bindOnceEvent(container, 'error', event => reject(new Error('Failed to mount document.', { cause: event })));
   });
 
-const performPrint = (container: HTMLIFrameElement) =>
+const emitPrint = (container: HTMLIFrameElement) =>
   new Promise<void>((resolve, reject) => {
     // required for IE
     container.focus();
-    const contentWindow = container.contentWindow;
-    if (!contentWindow) {
-      reject(new Error('Not found window'));
-      return;
-    }
+    const contentWindow = container.contentWindow!;
     if (isIE()) {
       try {
         contentWindow.document.execCommand('print', false);
@@ -84,23 +68,26 @@ const performPrint = (container: HTMLIFrameElement) =>
 
     bindOnceEvent(contentWindow, 'afterprint', () => {
       resolve();
-      /** destroy window */
-      contentWindow.close();
+      // destroy window
       removeNode(container);
     });
   });
 
-const lightPrint = (containerOrSelector: Element | string, options: PrintOptions = {}) => {
+const lightPrint = (containerOrSelector: Element | string, options: PrintOptions = {}): Promise<void> => {
   const dom = normalizeNode(containerOrSelector);
-  if (!dom) throw new Error('Invalid HTML element.');
+  // ensure to return a rejected promise.
+  if (!dom) return Promise.reject(new Error('Invalid HTML element.'));
 
-  return loadContainer(options.documentTitle).then(container => {
-    const printDocument = getDocument(container);
+  const container = createContainer();
+  // must be mounted and loaded before using `contentWindow` for Firefox.
+  return mount(container, window.document.body).then(() => {
+    const printDocument = container.contentWindow?.document;
     if (!printDocument) throw new Error('Not found document.');
 
-    setDocumentZoom(printDocument, options.zoom);
+    printDocument.title = options.documentTitle ?? document.title;
+    setStyleProperty(printDocument.documentElement, 'zoom', options.zoom ?? 1);
     // remove the default margin.
-    setProperty(printDocument.body, 'margin', 0);
+    setStyleProperty(printDocument.body, 'margin', 0);
 
     if (options.mediaPrintStyle) {
       const styleNode = createStyleNode(options.mediaPrintStyle);
@@ -109,8 +96,8 @@ const lightPrint = (containerOrSelector: Element | string, options: PrintOptions
 
     appendNode(printDocument.body, importNode(printDocument, dom));
     cloneDocumentStyle(printDocument, dom);
-    /** run print handler */
-    return performPrint(container);
+
+    return emitPrint(container);
   });
 };
 

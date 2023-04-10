@@ -6,7 +6,7 @@
 
   <body style="margin: 0">
     <style>
-      #a {
+      #app {
         width: 100mm;
       }
       .test {
@@ -15,7 +15,7 @@
         border: 4pt solid green;
       }
     </style>
-    <div id="a">
+    <div id="app">
       <div style="padding: 12mm" class="test">TEST</div>
     </div>
   </body>
@@ -23,9 +23,11 @@
   <script type="module">
     import lightPrint from '../dist/light-print.js';
     setTimeout(() => {
-      lightPrint('#a', {
+      lightPrint('#app', {
         documentTitle: 'test',
-        mediaPrintStyle: `@page { size: A4 landscape }`,
+        mediaPrintStyle: `@page { size: A4 landscape; margin: 10mm } body { border: 4pt solid red }`,
+      }).catch(err => {
+        console.warn(err);
       });
     }, 1000);
   </script>

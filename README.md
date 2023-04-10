@@ -24,7 +24,7 @@ Print container elements and their descendants.
 ```js
 import lightPrint from 'light-print';
 
-lightPrint('#id').then(() => {
+lightPrint('#id', { mediaPrintStyle: `@page { size: A4 portrait }` }).then(() => {
   // do something when exiting the print window.
 });
 ```
