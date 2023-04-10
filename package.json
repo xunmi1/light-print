@@ -1,6 +1,6 @@
 {
   "name": "light-print",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "A lightweight print tool for the browser",
   "type": "module",
   "main": "dist/light-print.cjs",
@@ -41,12 +41,12 @@
   },
   "homepage": "https://github.com/xunmi1/light-print#readme",
   "devDependencies": {
-    "@rollup/plugin-terser": "^0.4.0",
+    "@rollup/plugin-terser": "^0.4.1",
     "@xunmi/prettier-config": "^1.0.2",
     "prettier": "^2.8.7",
-    "rimraf": "^4.4.1",
+    "rimraf": "^5.0.0",
     "rollup": "^3.20.2",
-    "typescript": "^4.9.5"
+    "typescript": "^5.0.4"
   },
   "engines": {
     "node": ">=14.16"
