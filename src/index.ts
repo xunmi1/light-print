@@ -46,9 +46,10 @@ const cloneDocumentStyle = (printDocument: Document, dom: Node) => {
 
 const mount = (container: HTMLIFrameElement, parent: Element) =>
   new Promise<void>((resolve, reject) => {
-    appendNode(parent, container);
+    // bind event first, then mount node.
     bindOnceEvent(container, 'load', () => resolve());
     bindOnceEvent(container, 'error', event => reject(new Error('Failed to mount document.', { cause: event })));
+    appendNode(parent, container);
   });
 
 const emitPrint = (container: HTMLIFrameElement) =>
