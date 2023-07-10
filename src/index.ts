@@ -57,6 +57,11 @@ const emitPrint = (container: HTMLIFrameElement) =>
     // required for IE
     container.focus();
     const contentWindow = container.contentWindow!;
+    bindOnceEvent(contentWindow, 'afterprint', () => {
+      resolve();
+      // destroy window
+      removeNode(container);
+    });
     if (isIE()) {
       try {
         contentWindow.document.execCommand('print', false);
@@ -66,12 +71,6 @@ const emitPrint = (container: HTMLIFrameElement) =>
     } else {
       contentWindow.print();
     }
-
-    bindOnceEvent(contentWindow, 'afterprint', () => {
-      resolve();
-      // destroy window
-      removeNode(container);
-    });
   });
 
 const lightPrint = (containerOrSelector: Element | string, options: PrintOptions = {}): Promise<void> => {
