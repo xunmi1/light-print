@@ -8,6 +8,7 @@ import {
   cloneStyle,
   setStyleProperty,
   bindOnceEvent,
+  withResolvers,
 } from './utils';
 
 export interface PrintOptions {
@@ -44,34 +45,36 @@ const cloneDocumentStyle = (printDocument: Document, dom: Node) => {
   }
 };
 
-const mount = (container: HTMLIFrameElement, parent: Element) =>
-  new Promise<void>((resolve, reject) => {
-    // bind event first, then mount node.
-    bindOnceEvent(container, 'load', () => resolve());
-    bindOnceEvent(container, 'error', event => reject(new Error('Failed to mount document.', { cause: event })));
-    appendNode(parent, container);
+const mount = (container: HTMLIFrameElement, parent: Element) => {
+  const { promise, resolve, reject } = withResolvers<void>();
+  bindOnceEvent(container, 'load', () => resolve());
+  bindOnceEvent(container, 'error', event => reject(new Error('Failed to mount document.', { cause: event })));
+  appendNode(parent, container);
+  return promise;
+};
+
+const emitPrint = (container: HTMLIFrameElement) => {
+  const { promise, resolve } = withResolvers<void>();
+  // required for IE
+  container.focus();
+  const contentWindow = container.contentWindow!;
+  bindOnceEvent(contentWindow, 'afterprint', () => {
+    resolve();
+    // destroy window
+    removeNode(container);
   });
 
-const emitPrint = (container: HTMLIFrameElement) =>
-  new Promise<void>((resolve, reject) => {
-    // required for IE
-    container.focus();
-    const contentWindow = container.contentWindow!;
-    bindOnceEvent(contentWindow, 'afterprint', () => {
-      resolve();
-      // destroy window
-      removeNode(container);
-    });
-    if (isIE()) {
-      try {
-        contentWindow.document.execCommand('print', false);
-      } catch {
-        contentWindow.print();
-      }
-    } else {
+  if (isIE()) {
+    try {
+      contentWindow.document.execCommand('print', false);
+    } catch {
       contentWindow.print();
     }
-  });
+  } else {
+    contentWindow.print();
+  }
+  return promise;
+};
 
 const lightPrint = (containerOrSelector: Element | string, options: PrintOptions = {}): Promise<void> => {
   const dom = normalizeNode(containerOrSelector);

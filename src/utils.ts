@@ -11,7 +11,9 @@ export const removeNode = <T extends Node>(node: T) => node.parentNode?.removeCh
 
 const SHOW_ELEMENT = window.NodeFilter.SHOW_ELEMENT;
 export const createNodeIterator = (root: Node, filter?: NodeFilter) =>
-  window.document.createNodeIterator(root, SHOW_ELEMENT, filter);
+  // IE requires four parameters (entityReferenceExpansion: false)
+  // @ts-expect-error
+  window.document.createNodeIterator(root, SHOW_ELEMENT, filter ?? null, false);
 
 /** clone element style */
 export const cloneStyle = <T extends Element>(target: T, origin: T) => {
@@ -52,3 +54,18 @@ export const bindOnceEvent = <T extends EventTarget, K extends keyof WindowEvent
 
   el.addEventListener(eventName, wrappedListener, options);
 };
+
+/**
+ * `Promise.withResolvers` polyfill
+ */
+export function withResolvers<T>() {
+  if (Promise.withResolvers != null) return Promise.withResolvers<T>();
+  let resolve: PromiseWithResolvers<T>['resolve'];
+  let reject: PromiseWithResolvers<T>['reject'];
+  const promise = new Promise<T>((_resolve, _reject) => {
+    resolve = _resolve;
+    reject = _reject;
+  });
+  // @ts-expect-error
+  return { promise, resolve, reject };
+}

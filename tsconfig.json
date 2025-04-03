@@ -2,9 +2,13 @@
   "compilerOptions": {
     "target": "es5",
     "module": "esnext",
-    "strict": true,
-    "noUnusedLocals": true,
     "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "verbatimModuleSyntax": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleDetection": "force",
+    "useDefineForClassFields": true,
     "resolveJsonModule": true,
     "declaration": true,
     "declarationDir": "./types",
@@ -12,7 +16,16 @@
     "sourceMap": false,
     "outDir": "./dist",
     "baseUrl": "./",
-    "lib": ["esnext", "dom"]
+    "lib": ["esnext", "dom"],
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "skipLibCheck": true,
+    "strictPropertyInitialization": false,
+    "noImplicitAny": true
   },
   "include": ["src/*"]
 }

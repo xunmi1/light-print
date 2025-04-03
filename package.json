@@ -41,12 +41,12 @@
   },
   "homepage": "https://github.com/xunmi1/light-print#readme",
   "devDependencies": {
-    "@rollup/plugin-terser": "^0.4.3",
+    "@rollup/plugin-terser": "^0.4.4",
     "@xunmi/prettier-config": "^1.0.2",
-    "prettier": "^3.0.0",
-    "rimraf": "^5.0.1",
-    "rollup": "^3.26.2",
-    "typescript": "^5.1.6"
+    "prettier": "^3.5.3",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.39.0",
+    "typescript": "^5.8.2"
   },
   "engines": {
     "node": ">=14.16"
