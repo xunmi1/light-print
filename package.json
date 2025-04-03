@@ -1,13 +1,13 @@
 {
   "name": "light-print",
-  "version": "2.0.6",
-  "description": "A lightweight print tool for the browser",
+  "version": "2.1.0",
+  "description": "A lightweight print tool for the browser.",
   "type": "module",
   "main": "dist/light-print.cjs",
   "module": "dist/light-print.js",
   "types": "types/index.d.ts",
-  "unpkg": "dist/light-print.min.cjs",
-  "jsdelivr": "dist/light-print.min.cjs",
+  "unpkg": "dist/light-print.global.min.js",
+  "jsdelivr": "dist/light-print.global.min.js",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
@@ -47,9 +47,6 @@
     "rimraf": "^6.0.1",
     "rollup": "^4.39.0",
     "typescript": "^5.8.2"
-  },
-  "engines": {
-    "node": ">=14.16"
   },
   "prettier": "@xunmi/prettier-config"
 }

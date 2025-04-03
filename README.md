@@ -17,6 +17,14 @@ yarn add light-print
 pnpm add light-print
 ```
 
+CDN
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/light-print@2"></script>
+```
+
+If the browser does not support Promise (e.g. IE browser), then a global Promise polyfill is needed.
+
 ### Usage
 
 Print container elements and their descendants.

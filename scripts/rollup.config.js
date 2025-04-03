@@ -5,8 +5,6 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const pkg = require('../package.json');
 
-const RUNTIME_CONTEXT = 'window';
-
 const currentYear = new Date().getFullYear();
 const banner = `/*!
  * ${pkg.name} v${pkg.version}
@@ -19,17 +17,18 @@ const banner = `/*!
  * @type {{ name?: string; format: import('rollup').ModuleFormat, min?: boolean }[]}
  */
 const outputFileList = [
-  { name: 'lightPrint', format: 'umd' },
-  { name: 'lightPrint', format: 'umd', min: true },
   { format: 'es' },
   { format: 'es', min: true },
+  { format: 'cjs' },
+  { name: 'lightPrint', format: 'iife' },
+  { name: 'lightPrint', format: 'iife', min: true },
 ];
 
 /**
  * @type {import('rollup').OutputOptions[]}
  */
 const output = outputFileList.map(({ name, format, min }) => {
-  const file = `dist/${pkg.name}${min ? '.min' : ''}${format === 'umd' ? '.cjs' : '.js'}`;
+  const file = `dist/${pkg.name}${format === 'iife' ? '.global' : ''}${min ? '.min' : ''}${format === 'cjs' ? '.cjs' : '.js'}`;
   const plugins = min ? [terser()] : [];
   return { name, format, banner, file, sourcemap: false, plugins };
 });
@@ -38,6 +37,5 @@ const output = outputFileList.map(({ name, format, min }) => {
  * @type {import('rollup').RollupOptions}
  */
 export default {
-  context: RUNTIME_CONTEXT,
   output,
 };
