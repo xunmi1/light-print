@@ -16,7 +16,7 @@ export const createNodeIterator = (root: Node, filter?: NodeFilter) =>
   window.document.createNodeIterator(root, SHOW_ELEMENT, filter ?? null, false);
 
 /** clone element style */
-export const cloneStyle = <T extends Element>(target: T, origin: T) => {
+export function cloneStyle<T extends Element>(target: T, origin: T) {
   const style = window.getComputedStyle(origin, null);
   let styleText = '';
   for (let index = 0; index < style.length; index++) {
@@ -25,7 +25,17 @@ export const cloneStyle = <T extends Element>(target: T, origin: T) => {
   }
 
   target.setAttribute('style', styleText);
-};
+}
+
+/** clone canvas */
+export function cloneCanvas<T extends HTMLCanvasElement>(target: T, origin: T) {
+  target.getContext('2d')?.drawImage(origin, 0, 0);
+}
+
+export function cloneNode(target: Node, origin: Node) {
+  cloneStyle(target as Element, origin as Element);
+  if (target.nodeName === 'CANVAS') cloneCanvas(target as HTMLCanvasElement, origin as HTMLCanvasElement);
+}
 
 export const setStyleProperty = (
   target: ElementCSSInlineStyle,

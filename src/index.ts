@@ -5,7 +5,7 @@ import {
   removeNode,
   createNodeIterator,
   normalizeNode,
-  cloneStyle,
+  cloneNode,
   setStyleProperty,
   bindOnceEvent,
   withResolvers,
@@ -34,14 +34,15 @@ const createStyleNode = (style: string): HTMLStyleElement => {
  */
 const cloneDocumentStyle = (printDocument: Document, dom: Node) => {
   const originIterator = createNodeIterator(dom);
-  // start from `body`
+  // start from `body` node
   const printIterator = createNodeIterator(printDocument.body);
-
-  let node = printIterator.nextNode();
-  while (node) {
-    node = printIterator.nextNode();
+  // skip `body` node
+  printIterator.nextNode();
+  while (true) {
+    const node = printIterator.nextNode();
     const originNode = originIterator.nextNode();
-    if (originNode && node) cloneStyle(node as Element, originNode as Element);
+    if (originNode && node) cloneNode(node, originNode);
+    else break;
   }
 };
 
