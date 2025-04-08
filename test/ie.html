@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
 
   <body style="margin: 0">
@@ -28,7 +29,7 @@
         documentTitle: 'test',
         mediaPrintStyle: '@page { size: A4 landscape; margin: 10mm } body { border: 4pt solid red }',
       }).catch(function (err) {
-        console.warn(err);
+        console.error(err);
       });
     }, 1000);
   </script>
