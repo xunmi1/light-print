@@ -5,11 +5,13 @@ import {
   removeNode,
   createNodeIterator,
   normalizeNode,
-  cloneNode,
   setStyleProperty,
   bindOnceEvent,
   withResolvers,
+  createStyleNode,
 } from './utils';
+import { waitResources } from './resources';
+import { cloneNode } from './clone';
 
 export interface PrintOptions {
   documentTitle?: string;
@@ -17,22 +19,16 @@ export interface PrintOptions {
   zoom?: number | string;
 }
 
-const createContainer = (): HTMLIFrameElement => {
+function createContainer() {
   const container = window.document.createElement('iframe');
-  container.setAttribute('style', 'display: none;');
+  container.srcdoc = '<!DOCTYPE html>';
+  setStyleProperty(container, 'position', 'absolute', 'important');
+  setStyleProperty(container, 'top', '-9999px', 'important');
+  setStyleProperty(container, 'visibility', 'hidden', 'important');
   return container;
-};
+}
 
-const createStyleNode = (style: string): HTMLStyleElement => {
-  const node = window.document.createElement('style');
-  node.textContent = `@media print {${style}}`;
-  return node;
-};
-
-/**
- * Copy all styles of DOM elements that need to be printed
- */
-const cloneDocumentStyle = (printDocument: Document, dom: Node) => {
+function cloneDocument(printDocument: Document, dom: Node) {
   const originIterator = createNodeIterator(dom);
   // start from `body` node
   const printIterator = createNodeIterator(printDocument.body);
@@ -44,22 +40,22 @@ const cloneDocumentStyle = (printDocument: Document, dom: Node) => {
     if (originNode && node) cloneNode(node, originNode);
     else break;
   }
-};
+}
 
-const mount = (container: HTMLIFrameElement, parent: Element) => {
+function mount(container: HTMLIFrameElement, parent: Element) {
   const { promise, resolve, reject } = withResolvers<void>();
   bindOnceEvent(container, 'load', () => resolve());
   bindOnceEvent(container, 'error', event => reject(new Error('Failed to mount document.', { cause: event })));
   appendNode(parent, container);
   return promise;
-};
+}
 
-const emitPrint = (container: HTMLIFrameElement) => {
+function emitPrint(container: HTMLIFrameElement) {
   const { promise, resolve } = withResolvers<void>();
   // required for IE
   container.focus();
   const contentWindow = container.contentWindow!;
-  bindOnceEvent(contentWindow, 'afterprint', () => {
+  bindOnceEvent(container.contentWindow!, 'afterprint', () => {
     resolve();
     // destroy window
     removeNode(container);
@@ -75,9 +71,9 @@ const emitPrint = (container: HTMLIFrameElement) => {
     contentWindow.print();
   }
   return promise;
-};
+}
 
-const lightPrint = (containerOrSelector: Element | string, options: PrintOptions = {}): Promise<void> => {
+function lightPrint(containerOrSelector: Element | string, options: PrintOptions = {}): Promise<void> {
   const dom = normalizeNode(containerOrSelector);
   // ensure to return a rejected promise.
   if (!dom) return Promise.reject(new Error('Invalid HTML element.'));
@@ -99,10 +95,12 @@ const lightPrint = (containerOrSelector: Element | string, options: PrintOptions
     }
 
     appendNode(printDocument.body, importNode(printDocument, dom));
-    cloneDocumentStyle(printDocument, dom);
 
-    return emitPrint(container);
+    return waitResources(container.contentWindow).then(() => {
+      cloneDocument(printDocument, dom);
+      emitPrint(container);
+    });
   });
-};
+}
 
 export default lightPrint;
