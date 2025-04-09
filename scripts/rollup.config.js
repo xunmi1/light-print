@@ -1,9 +1,6 @@
 // @ts-check
 import terser from '@rollup/plugin-terser';
-import { createRequire } from 'node:module';
-
-const require = createRequire(import.meta.url);
-const pkg = require('../package.json');
+import pkg from '../package.json' with { type: 'json' };
 
 const currentYear = new Date().getFullYear();
 const banner = `/*!
