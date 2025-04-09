@@ -67,3 +67,7 @@ export function createStyleNode(style: string) {
   node.textContent = style;
   return node;
 }
+
+export function toArray<T>(arrayLike: ArrayLike<T>): T[] {
+  return Array.prototype.slice.call(arrayLike);
+}

@@ -25,6 +25,7 @@ function createContainer() {
   setStyleProperty(container, 'position', 'absolute', 'important');
   setStyleProperty(container, 'top', '-9999px', 'important');
   setStyleProperty(container, 'visibility', 'hidden', 'important');
+  setStyleProperty(container, 'transform', 'scale(0)', 'important');
   return container;
 }
 
@@ -45,21 +46,21 @@ function cloneDocument(printDocument: Document, dom: Node) {
 function mount(container: HTMLIFrameElement, parent: Element) {
   const { promise, resolve, reject } = withResolvers<void>();
   bindOnceEvent(container, 'load', () => resolve());
-  bindOnceEvent(container, 'error', event => reject(new Error('Failed to mount document.', { cause: event })));
+  bindOnceEvent(container, 'error', () => reject(new Error('Failed to mount document.')));
   appendNode(parent, container);
   return promise;
 }
 
 function emitPrint(container: HTMLIFrameElement) {
   const { promise, resolve } = withResolvers<void>();
-  // required for IE
-  container.focus();
   const contentWindow = container.contentWindow!;
-  bindOnceEvent(container.contentWindow!, 'afterprint', () => {
-    resolve();
-    // destroy window
-    removeNode(container);
-  });
+  // required for IE
+  contentWindow.focus();
+  // When the browser's network cache is disabled,
+  // the execution end time of `print()` will be later than the `afterprint` event.
+  // Conversely, the 'afterprint' event will be fired later.
+  // Thus, both need to be completed to indicate that the printing process has ended.
+  bindOnceEvent(contentWindow, 'afterprint', () => resolve());
 
   if (isIE()) {
     try {
@@ -95,11 +96,16 @@ function lightPrint(containerOrSelector: Element | string, options: PrintOptions
     }
 
     appendNode(printDocument.body, importNode(printDocument, dom));
-
-    return waitResources(container.contentWindow).then(() => {
-      cloneDocument(printDocument, dom);
-      emitPrint(container);
-    });
+    // Resources can affect the size of elements (e.g. `<img>`).
+    return waitResources(container.contentWindow)
+      .then(() => {
+        cloneDocument(printDocument, dom);
+        return emitPrint(container);
+      })
+      .finally(() => {
+        // The container can only be destroyed after the printing process has been completed.
+        removeNode(container);
+      });
   });
 }
 

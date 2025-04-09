@@ -1,4 +1,4 @@
-import { bindOnceEvent, withResolvers } from './utils';
+import { bindOnceEvent, withResolvers, toArray } from './utils';
 
 function isObjectElement(node: Element): node is HTMLObjectElement {
   return node.nodeName === 'OBJECT';
@@ -38,7 +38,7 @@ function checkLoaded(node: ResourceElement) {
 /** wait for resources loaded */
 export function waitResources(currentWindow: Window) {
   // ignore non-resource nodes
-  const resourceNodes = Array.from(
+  const resourceNodes = toArray(
     currentWindow.document.querySelectorAll<ResourceElement>(RESOURCE_ELECTORS.join(','))
   ).filter(node => !!getResourceURL(node));
   return Promise.all(

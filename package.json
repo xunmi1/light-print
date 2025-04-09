@@ -21,7 +21,7 @@
   ],
   "scripts": {
     "build": "npm run lint && npm run build-ts && npm run build-rollup && rimraf .cache",
-    "build-ts": "rimraf types && tsc -p tsconfig.json --outDir .cache",
+    "build-ts": "rimraf types && tsc --outDir .cache",
     "build-rollup": "rimraf dist && rollup -c scripts/rollup.config.js  -i .cache/index.js",
     "lint": "prettier -w \"**/*\" -u"
   },
@@ -46,7 +46,7 @@
     "prettier": "^3.5.3",
     "rimraf": "^6.0.1",
     "rollup": "^4.39.0",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.3"
   },
   "prettier": "@xunmi/prettier-config"
 }

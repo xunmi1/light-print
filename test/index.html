@@ -138,13 +138,16 @@
   <script type="module">
     import lightPrint from '../dist/light-print.js';
 
-    document.querySelector('#print-action').addEventListener('click', () => {
-      lightPrint('#app', {
-        documentTitle: 'test',
-        mediaPrintStyle: `@page { size: A4; margin: 10mm }`,
-      }).catch(err => {
+    document.querySelector('#print-action').addEventListener('click', async () => {
+      try {
+        await lightPrint('#app', {
+          documentTitle: 'test',
+          mediaPrintStyle: `@page { size: A4; margin: 10mm }`,
+        });
+        console.log('Print end.');
+      } catch (err) {
         console.error(err);
-      });
+      }
     });
   </script>
 </html>
