@@ -62,12 +62,20 @@ export function withResolvers<T>() {
   return { promise, resolve, reject };
 }
 
-export function createStyleNode(style: string) {
-  const node = window.document.createElement('style');
-  node.textContent = style;
-  return node;
-}
-
 export function toArray<T>(arrayLike: ArrayLike<T>): T[] {
   return Array.prototype.slice.call(arrayLike);
+}
+
+// Reuse style node to reduce node creation.
+let sharedStyleNode: HTMLStyleElement | undefined;
+
+export function getSharedStyleNode(contentDocument: Document) {
+  if (!sharedStyleNode) {
+    sharedStyleNode = contentDocument.createElement('style');
+  }
+  return sharedStyleNode;
+}
+
+export function resetSharedStyleNode() {
+  sharedStyleNode = undefined;
 }

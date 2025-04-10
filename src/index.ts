@@ -8,9 +8,11 @@ import {
   setStyleProperty,
   bindOnceEvent,
   withResolvers,
-  createStyleNode,
+  getSharedStyleNode,
+  resetSharedStyleNode,
 } from './utils';
 import { waitResources } from './resources';
+import { markPrintId, resetPrintId } from './printId';
 import { cloneNode } from './clone';
 
 export interface PrintOptions {
@@ -36,11 +38,15 @@ function cloneDocument(printDocument: Document, dom: Node) {
   // skip `body` node
   printIterator.nextNode();
   while (true) {
-    const node = printIterator.nextNode();
-    const originNode = originIterator.nextNode();
-    if (originNode && node) cloneNode(node, originNode);
-    else break;
+    const node = printIterator.nextNode() as Element | null;
+    const originNode = originIterator.nextNode() as Element | null;
+
+    if (originNode && node) {
+      markPrintId(node);
+      cloneNode(node, originNode);
+    } else break;
   }
+  resetPrintId();
 }
 
 function mount(container: HTMLIFrameElement, parent: Element) {
@@ -90,21 +96,22 @@ function lightPrint(containerOrSelector: Element | string, options: PrintOptions
     // remove the default margin.
     setStyleProperty(printDocument.body, 'margin', 0);
 
-    if (options.mediaPrintStyle) {
-      const styleNode = createStyleNode(options.mediaPrintStyle);
-      appendNode(printDocument.head, styleNode);
-    }
-
     appendNode(printDocument.body, importNode(printDocument, dom));
     // Resources can affect the size of elements (e.g. `<img>`).
     return waitResources(container.contentWindow)
       .then(() => {
         cloneDocument(printDocument, dom);
+        const styleNode = getSharedStyleNode(printDocument);
+        // Style of highest priority.
+        if (options.mediaPrintStyle) styleNode.textContent += options.mediaPrintStyle;
+        // Insert after all styles have been generated.
+        appendNode(printDocument.head, styleNode);
         return emitPrint(container);
       })
       .finally(() => {
         // The container can only be destroyed after the printing process has been completed.
         removeNode(container);
+        resetSharedStyleNode();
       });
   });
 }

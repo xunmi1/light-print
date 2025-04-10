@@ -80,6 +80,49 @@
         color: red;
         border: 4pt solid green;
       }
+
+      #beforeAfter {
+        &::before {
+          content: '::before';
+          color: #ff720a;
+          padding: 8px;
+        }
+        &::after {
+          content: '::after';
+          color: #fc9a00;
+          padding: 8px;
+        }
+      }
+
+      #firstLetterline {
+        &::first-letter {
+          font-size: 2rem;
+        }
+        &::first-line {
+          font-weight: bold;
+        }
+      }
+
+      #inputPlaceholder {
+        font-size: 1.2rem;
+        &::placeholder {
+          color: #00786f;
+        }
+      }
+
+      #details[open] {
+        summary {
+          display: list-item;
+          &::marker {
+            content: '❤️';
+          }
+        }
+        &::details-content {
+          margin-inline-start: 1.5rem;
+          padding: 4px;
+          background-color: #a29bfe;
+        }
+      }
     </style>
   </head>
 
@@ -112,6 +155,20 @@
                   loading="lazy"
                   height="24"
                 />
+              </td>
+            </tr>
+            <tr>
+              <td>pseudoElement</td>
+              <td>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem">
+                  <div id="beforeAfter"></div>
+                  <div id="firstLetterline">::first-letter & ::first-line</div>
+                  <input id="inputPlaceholder" type="text" placeholder="input ::placeholder" />
+                  <details id="details" open>
+                    <summary>Details ::marker</summary>
+                    <div>::details-content</div>
+                  </details>
+                </div>
               </td>
             </tr>
           </tbody>
