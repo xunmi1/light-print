@@ -54,3 +54,7 @@ interface PrintOptions {
 
 function lightPrint(containerOrSelector: Element | string, options?: PrintOptions): Promise<void>;
 ```
+
+### Notes
+
+- Does not support resources introduced in styles, such as `background-image: url(...)`.
