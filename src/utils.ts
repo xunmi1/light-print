@@ -10,6 +10,18 @@ export const importNode = <T extends Node>(document: Document, node: T): T => do
 
 export const removeNode = <T extends Node>(node: T) => node.parentNode?.removeChild(node);
 
+type SafeGet<Key, Map> = Key extends keyof Map ? Map[Key] : never;
+
+export type ElementNameMap = {
+  [K in keyof (HTMLElementTagNameMap & SVGElementTagNameMap)]:
+    | SafeGet<K, HTMLElementTagNameMap>
+    | SafeGet<K, SVGElementTagNameMap>;
+};
+
+export function whichElement<T extends keyof ElementNameMap>(node: Element, name: T): node is ElementNameMap[T] {
+  return node.localName === name;
+}
+
 const SHOW_ELEMENT = window.NodeFilter.SHOW_ELEMENT;
 export function createNodeIterator(root: Node, filter?: NodeFilter) {
   // IE requires four parameters (entityReferenceExpansion: false)

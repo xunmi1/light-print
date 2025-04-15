@@ -1,5 +1,5 @@
 import { getPrintIdSelector } from './printId';
-import { getSharedStyleNode } from './utils';
+import { getSharedStyleNode, whichElement } from './utils';
 
 function toStyleText(style?: CSSStyleDeclaration) {
   if (!style?.length) return '';
@@ -46,11 +46,11 @@ function clonePseudoElementStyle<T extends Element>(target: T, origin: T) {
 
 function getPseudoElementStyle(origin: Element, pseudoElt: string) {
   if (pseudoElt === '::placeholder') {
-    if (origin.nodeName !== 'INPUT' && origin.nodeName !== 'TEXTAREA') return;
+    if (!whichElement(origin, 'input') && !whichElement(origin, 'textarea')) return;
   } else if (pseudoElt === '::file-selector-button') {
-    if (!(origin.nodeName === 'INPUT' && (origin as HTMLInputElement).type === 'file')) return;
+    if (!(whichElement(origin, 'input') && origin.type === 'file')) return;
   } else if (pseudoElt === '::details-content') {
-    if (origin.nodeName !== 'DETAILS') return;
+    if (!whichElement(origin, 'details')) return;
   }
   const style = window.getComputedStyle(origin, pseudoElt);
   // Replaced elements need to be checked for `content`.
@@ -69,5 +69,5 @@ function cloneCanvas<T extends HTMLCanvasElement>(target: T, origin: T) {
 export function cloneNode(target: Element, origin: Element) {
   cloneElementStyle(target, origin);
   clonePseudoElementStyle(target, origin);
-  if (target.nodeName === 'CANVAS') cloneCanvas(target as HTMLCanvasElement, origin as HTMLCanvasElement);
+  if (whichElement(target, 'canvas')) cloneCanvas(target as HTMLCanvasElement, origin as HTMLCanvasElement);
 }

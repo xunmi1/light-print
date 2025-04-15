@@ -1,36 +1,24 @@
-import { bindOnceEvent, withResolvers, toArray } from './utils';
-
-function isObjectElement(node: Element): node is HTMLObjectElement {
-  return node.nodeName === 'OBJECT';
-}
-
-function isImageElement(node: Element): node is HTMLImageElement {
-  return node.nodeName === 'IMG';
-}
+import { whichElement, bindOnceEvent, withResolvers, toArray, type ElementNameMap } from './utils';
 
 // `style` and `link` are not needed because of the use of `getComputedStyle`
-const RESOURCE_ELECTORS = ['img', 'audio', 'video', 'iframe', 'object', 'embed'];
+// `source` is not needed because it depends on other elements.
+const RESOURCE_ELECTORS = ['img', 'audio', 'video', 'iframe', 'object', 'embed', 'image'] as const;
 
-type ResourceElement =
-  | HTMLImageElement
-  | HTMLAudioElement
-  | HTMLVideoElement
-  | HTMLIFrameElement
-  | HTMLObjectElement
-  | HTMLEmbedElement;
+type ResourceElement = ElementNameMap[(typeof RESOURCE_ELECTORS)[number]];
 
 function getResourceURL(node: ResourceElement) {
-  if (isObjectElement(node)) return node.data;
-  // @ts-expect-error
+  if (whichElement(node, 'object')) return node.data;
+  if (whichElement(node, 'iframe') || whichElement(node, 'embed')) return node.src;
+  if (whichElement(node, 'image')) return node.href;
   return node.currentSrc || node.src;
 }
 
-function checkLoaded(node: ResourceElement) {
+function checkLoaded(node: ResourceElement): Promise<void> | void {
+  if (whichElement(node, 'img') && node.complete) return;
   const { promise, resolve, reject } = withResolvers<void>();
-  if (isImageElement(node) && node.complete) return resolve();
   bindOnceEvent(node, 'load', () => resolve());
   bindOnceEvent(node, 'error', () =>
-    reject(new Error(`Failed to load resource (${node.nodeName.toLowerCase()}: ${getResourceURL(node)}).`))
+    reject(new Error(`Failed to load resource (${node.localName}: ${getResourceURL(node)}).`))
   );
   return promise;
 }
