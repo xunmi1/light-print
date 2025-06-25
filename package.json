@@ -43,9 +43,9 @@
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
     "@xunmi/prettier-config": "^1.0.2",
-    "prettier": "^3.5.3",
+    "prettier": "^3.6.1",
     "rimraf": "^6.0.1",
-    "rollup": "^4.39.0",
+    "rollup": "^4.44.0",
     "typescript": "^5.8.3"
   },
   "prettier": "@xunmi/prettier-config"
