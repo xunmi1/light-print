@@ -68,8 +68,8 @@ function cloneCanvas<T extends HTMLCanvasElement>(target: T, origin: T) {
 
 export function cloneNode(target: Element, origin: Element) {
   cloneElementStyle(target, origin);
-  // clone the associated pseudo-elements only when it is an `HTMLElement`.
+  // clone the associated pseudo-elements only When it's not `SVGElement`.
   // using `origin` because `target` is not in the current window, and `instanceof` cannot be used for judgment.
-  if (origin instanceof HTMLElement) clonePseudoElementStyle(target, origin);
+  if (!(origin instanceof SVGElement)) clonePseudoElementStyle(target, origin);
   if (whichElement(target, 'canvas')) cloneCanvas(target, origin as HTMLCanvasElement);
 }

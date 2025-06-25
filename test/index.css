@@ -1,0 +1,114 @@
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.06) 0, rgba(0, 0, 0, 0.06) 1px, transparent 1px, transparent 20px),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.06) 0, rgba(0, 0, 0, 0.06) 1px, transparent 1px, transparent 20px);
+}
+
+#page {
+  position: relative;
+  /* mock A4 page size */
+  width: 210mm;
+  max-height: 297mm;
+  /* mock page margin */
+  padding: 10mm;
+
+  margin: 0 auto;
+  background-color: white;
+  box-shadow: 0 24px 48px -12px rgb(0 0 0 / 0.25);
+
+  &::before {
+    position: absolute;
+    inset: auto 4px 4px auto;
+    content: 'A4 paper size';
+    color: #0008;
+    font-size: 0.85rem;
+    line-height: 1;
+  }
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+
+  thead {
+    background-color: #f1f1f1;
+  }
+
+  th,
+  td {
+    padding: 12px;
+    border: 1px solid #ddd;
+  }
+}
+
+#print-action {
+  margin: 1rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+}
+
+.text {
+  font-size: 12pt;
+  color: red;
+  border: 4pt solid green;
+}
+
+#beforeAfter {
+  &::before {
+    content: '::before';
+    color: #ff720a;
+    padding: 8px;
+  }
+  &::after {
+    content: '::after';
+    color: #fc9a00;
+    padding: 8px;
+  }
+}
+
+#firstLetterline {
+  line-height: 1;
+  &::first-letter {
+    font-size: 2rem;
+  }
+  &::first-line {
+    font-weight: bold;
+  }
+}
+
+#inputPlaceholder {
+  font-size: 1.2rem;
+  &::placeholder {
+    color: #00786f;
+  }
+}
+
+#inputFileSelectorButton::file-selector-button {
+  color: #ddd;
+  background-color: #00786f;
+  border: 1px solid;
+}
+
+#details[open] {
+  summary {
+    display: list-item;
+    &::marker {
+      content: '❤️';
+    }
+  }
+  &::details-content {
+    margin-inline-start: 1.5rem;
+    padding: 4px;
+    background-color: #a29bfe;
+  }
+}

@@ -13,9 +13,10 @@ export const removeNode = <T extends Node>(node: T) => node.parentNode?.removeCh
 type SafeGet<Key, Map> = Key extends keyof Map ? Map[Key] : never;
 
 export type ElementNameMap = {
-  [K in keyof (HTMLElementTagNameMap & SVGElementTagNameMap)]:
+  [K in keyof (HTMLElementTagNameMap & SVGElementTagNameMap & MathMLElementTagNameMap)]:
     | SafeGet<K, HTMLElementTagNameMap>
-    | SafeGet<K, SVGElementTagNameMap>;
+    | SafeGet<K, SVGElementTagNameMap>
+    | SafeGet<K, MathMLElementTagNameMap>;
 };
 
 export function whichElement<T extends keyof ElementNameMap>(node: Element, name: T): node is ElementNameMap[T] {
