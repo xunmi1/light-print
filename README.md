@@ -7,6 +7,8 @@
 
 A lightweight print tool for the browser.
 
+Here is an online **[Usage Example](./test/index.html)**.
+
 ### Install
 
 ```bash

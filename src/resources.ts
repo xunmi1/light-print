@@ -1,7 +1,7 @@
 import { whichElement, bindOnceEvent, withResolvers, toArray, type ElementNameMap } from './utils';
 
 // `style` and `link` are not needed because of the use of `getComputedStyle`
-// `source` is not needed because it depends on other elements.
+// `source` element is not needed because it depends on other elements.
 const RESOURCE_ELECTORS = ['img', 'audio', 'video', 'iframe', 'object', 'embed', 'image'] as const;
 
 type ResourceElement = ElementNameMap[(typeof RESOURCE_ELECTORS)[number]];
