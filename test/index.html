@@ -8,8 +8,6 @@
   </head>
 
   <body>
-    <button id="print-action">Print</button>
-
     <div id="page">
       <div id="app">
         <table>
@@ -96,19 +94,45 @@
               </td>
             </tr>
 
-            <tr>
+            <tr class="nested-hidden">
               <td>iframe</td>
               <td>
-                <iframe src="./index.html" width="100%" height="160"></iframe>
+                <iframe src="./index.html?nested" width="100%" height="160"></iframe>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+
+      <button id="print-action" autofocus class="nested-hidden">Print</button>
     </div>
   </body>
 
   <script type="module">
+    if (location.search.includes('nested')) {
+      document.querySelectorAll('.nested-hidden').forEach(node => node.parentNode?.removeChild(node));
+    }
+  </script>
+
+  <script type="module">
+    import lightPrint from '../dist/light-print.js';
+
+    const action = document.querySelector('#print-action');
+    action.addEventListener('click', async () => {
+      try {
+        await lightPrint('#app', {
+          documentTitle: 'test',
+          mediaPrintStyle: `@page { size: A4; margin: 10mm }`,
+        });
+        console.log('Print end.');
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  </script>
+
+  <script type="module">
+    // draw canvas
     const canvas = document.querySelector('#canvas');
     canvas.style.width = `${canvas.clientWidth}px`;
     canvas.style.height = `${canvas.clientHeight}px`;
@@ -121,21 +145,5 @@
     ctx.fillStyle = 'deepskyblue';
     ctx.arc(25, 25, 25, 0, 2 * Math.PI);
     ctx.fill();
-  </script>
-
-  <script type="module">
-    import lightPrint from '../dist/light-print.js';
-
-    document.querySelector('#print-action').addEventListener('click', async () => {
-      try {
-        await lightPrint('#app', {
-          documentTitle: 'test',
-          mediaPrintStyle: `@page { size: A4; margin: 10mm }`,
-        });
-        console.log('Print end.');
-      } catch (err) {
-        console.error(err);
-      }
-    });
   </script>
 </html>

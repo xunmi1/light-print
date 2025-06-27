@@ -10,8 +10,8 @@ body {
   line-height: 1.5;
 
   background-image:
-    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.06) 0, rgba(0, 0, 0, 0.06) 1px, transparent 1px, transparent 20px),
-    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.06) 0, rgba(0, 0, 0, 0.06) 1px, transparent 1px, transparent 20px);
+    repeating-linear-gradient(0deg, rgb(0 0 0 / 0.06) 0, rgb(0 0 0 / 0.06) 1px, transparent 1px, transparent 20px),
+    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.06) 0, rgb(0 0 0 / 0.06) 1px, transparent 1px, transparent 20px);
 }
 
 #page {
@@ -19,12 +19,14 @@ body {
   /* mock A4 page size */
   width: 210mm;
   max-height: 297mm;
-  /* mock page margin */
+  /* mock A4 page margin */
   padding: 10mm;
 
-  margin: 0 auto;
+  margin: 3rem auto;
   background-color: white;
-  box-shadow: 0 24px 48px -12px rgb(0 0 0 / 0.25);
+  box-shadow:
+    2px 2px 12px -2px rgb(0 0 0 / 0.15),
+    0 24px 48px -12px rgb(0 0 0 / 0.25);
 
   &::before {
     position: absolute;
@@ -39,9 +41,11 @@ body {
 table {
   border-collapse: collapse;
   width: 100%;
+  color: rgb(38 38 38);
 
   thead {
     background-color: #f1f1f1;
+    color: black;
   }
 
   th,
@@ -52,9 +56,26 @@ table {
 }
 
 #print-action {
-  margin: 1rem;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
+  display: block;
+  font-size: 1.2rem;
+  position: sticky;
+  padding: 0.6rem 1.6rem;
+  margin: 1rem 0 0 auto;
+  inset-block-end: 1rem;
+  box-shadow: 2px 2px 4px rgb(0 0 0 / 0.25);
+  background-color: black;
+  border: none;
+  color: white;
+  border-radius: 9999px;
+  outline: none;
+
+  &:hover {
+    background-color: rgb(45 45 45);
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgb(0 0 0 / 0.25);
+  }
 }
 
 .text {
@@ -87,7 +108,6 @@ table {
 }
 
 #inputPlaceholder {
-  font-size: 1.2rem;
   &::placeholder {
     color: #00786f;
   }
@@ -95,7 +115,7 @@ table {
 
 #inputFileSelectorButton::file-selector-button {
   color: #ddd;
-  background-color: #00786f;
+  background-color: rgb(100 100 100);
   border: 1px solid;
 }
 

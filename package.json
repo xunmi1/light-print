@@ -39,7 +39,7 @@
   "bugs": {
     "url": "https://github.com/xunmi1/light-print/issues"
   },
-  "homepage": "https://github.com/xunmi1/light-print#readme",
+  "homepage": "https://xunmi1.github.io/light-print/",
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
     "@xunmi/prettier-config": "^1.0.2",
