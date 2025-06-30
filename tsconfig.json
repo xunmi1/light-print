@@ -16,7 +16,7 @@
     "sourceMap": false,
     "outDir": "./dist",
     "baseUrl": "./",
-    "lib": ["esnext", "dom"],
+    "lib": ["esnext", "dom", "dom.iterable"],
 
     "strict": true,
     "noUnusedParameters": true,

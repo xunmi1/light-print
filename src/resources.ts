@@ -1,4 +1,5 @@
 import { whichElement, bindOnceEvent, withResolvers, toArray, type ElementNameMap } from './utils';
+import { waitFonts } from './fonts';
 
 // `style` and `link` are not needed because of the use of `getComputedStyle`
 // `source` element is not needed because it depends on other elements.
@@ -25,15 +26,15 @@ function checkLoaded(node: ResourceElement): Promise<void> | void {
 
 /** wait for resources loaded */
 export function waitResources(currentWindow: Window) {
-  // ignore non-resource nodes
-  const resourceNodes = toArray(
-    currentWindow.document.querySelectorAll<ResourceElement>(RESOURCE_ELECTORS.join(','))
-  ).filter(node => !!getResourceURL(node));
-  return Promise.all(
-    resourceNodes.map(node => {
+  const selectors = RESOURCE_ELECTORS.join(',');
+  const resourceNodes = toArray(currentWindow.document.querySelectorAll<ResourceElement>(selectors));
+  const tasks = resourceNodes
+    .filter(node => !!getResourceURL(node))
+    .map(node => {
       //  load the resource as soon as possible.
       node.setAttribute('loading', 'eager');
       return checkLoaded(node);
-    })
-  );
+    });
+  tasks.push(waitFonts(currentWindow));
+  return Promise.all(tasks);
 }

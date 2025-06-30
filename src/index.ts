@@ -11,6 +11,7 @@ import {
   getSharedStyleNode,
   resetSharedStyleNode,
 } from './utils';
+import { importFonts } from './fonts';
 import { waitResources } from './resources';
 import { markPrintId, resetPrintId } from './printId';
 import { cloneNode } from './clone';
@@ -95,6 +96,7 @@ function lightPrint(containerOrSelector: Element | string, options: PrintOptions
     setStyleProperty(printDocument.documentElement, 'zoom', options.zoom ?? 1);
     // remove the default margin.
     setStyleProperty(printDocument.body, 'margin', 0);
+    importFonts(container.contentWindow);
 
     appendNode(printDocument.body, importNode(printDocument, dom));
     // Resources can affect the size of elements (e.g. `<img>`).

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Grid+Double&display=swap" rel="stylesheet" />
     <link href="./index.css" rel="stylesheet" />
   </head>
 
@@ -20,7 +20,7 @@
           <tbody>
             <tr>
               <td>text</td>
-              <td><div style="padding: 2mm" class="text">TEST</div></td>
+              <td><div class="text">light-print</div></td>
             </tr>
             <tr>
               <td>canvas</td>
@@ -94,25 +94,19 @@
               </td>
             </tr>
 
-            <tr class="nested-hidden">
+            <tr>
               <td>iframe</td>
               <td>
-                <iframe src="./index.html?nested" width="100%" height="160"></iframe>
+                <iframe src="https://xunmi1.github.io/light-print/" width="100%" height="160"></iframe>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <button id="print-action" autofocus class="nested-hidden">Print</button>
+      <button id="print-action" autofocus>Print</button>
     </div>
   </body>
-
-  <script type="module">
-    if (location.search.includes('nested')) {
-      document.querySelectorAll('.nested-hidden').forEach(node => node.parentNode?.removeChild(node));
-    }
-  </script>
 
   <script type="module">
     import lightPrint from '../dist/light-print.js';

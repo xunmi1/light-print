@@ -4,11 +4,15 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  height: 100%;
+}
+
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
   line-height: 1.5;
-
   background-image:
     repeating-linear-gradient(0deg, rgb(0 0 0 / 0.06) 0, rgb(0 0 0 / 0.06) 1px, transparent 1px, transparent 20px),
     repeating-linear-gradient(90deg, rgb(0 0 0 / 0.06) 0, rgb(0 0 0 / 0.06) 1px, transparent 1px, transparent 20px);
@@ -18,7 +22,7 @@ body {
   position: relative;
   /* mock A4 page size */
   width: 210mm;
-  max-height: 297mm;
+  min-height: 297mm;
   /* mock A4 page margin */
   padding: 10mm;
 
@@ -64,10 +68,11 @@ table {
   inset-block-end: 1rem;
   box-shadow: 2px 2px 4px rgb(0 0 0 / 0.25);
   background-color: black;
-  border: none;
   color: white;
+  border: none;
   border-radius: 9999px;
   outline: none;
+  cursor: pointer;
 
   &:hover {
     background-color: rgb(45 45 45);
@@ -79,9 +84,9 @@ table {
 }
 
 .text {
-  font-size: 12pt;
+  font-family: 'Bitcount Grid Double', system-ui, sans-serif;
+  font-size: 14pt;
   color: red;
-  border: 4pt solid green;
 }
 
 #beforeAfter {
