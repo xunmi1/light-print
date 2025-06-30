@@ -48,8 +48,9 @@ lightPrint('#id', { mediaPrintStyle: `@page { size: A4 portrait }` }).then(() =>
 <script setup>
 import { useTemplateRef } from 'vue';
 import lightPrint from 'light-print';
-// In versions prior to 3.5, we could declare a `ref` with the same name as a ref attribute in the template.
+// In versions prior to 3.5, we could declare a `ref` matching the name of the template's ref attribute value.
 const targetRef = useTemplateRef('target');
+
 async function print() {
   await lightPrint(targetRef.value);
 }
@@ -70,6 +71,7 @@ import lightPrint from 'light-print';
 
 function MyComponent() {
   const targetRef = useRef(null);
+
   async function print() {
     await lightPrint(targetRef.current);
   }
@@ -78,7 +80,7 @@ function MyComponent() {
 }
 ```
 
-In other frameworks, a similar approach can be adopted for usage.
+In other frameworks/libraries, a similar approach can be adopted for usage.
 
 ## Types
 
@@ -95,6 +97,7 @@ interface PrintOptions {
 function lightPrint(containerOrSelector: Element | string, options?: PrintOptions): Promise<void>;
 ```
 
-### Limitations
+## Limitations
 
-- Does not support resources introduced in styles, such as `background-image: url(...)`.
+- The following resources referenced in styles are not supported, such as `background-image: url(...)`. they can be replaced with `<img src="..." />` tags.
+- To specify fixed dimensions (width and height) for element containers is recommended, as they cannot adapt to page dimensions when printing.
