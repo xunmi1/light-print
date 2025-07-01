@@ -1,7 +1,7 @@
 {
   "name": "light-print",
   "version": "2.3.0",
-  "description": "A lightweight print tool for the browser.",
+  "description": "Lightweight HTML element printing for browsers with PDF support.",
   "type": "module",
   "main": "dist/light-print.cjs",
   "module": "dist/light-print.js",
@@ -32,7 +32,12 @@
   "sideEffects": false,
   "keywords": [
     "print",
-    "browser print"
+    "printing",
+    "dom-print",
+    "browser-print",
+    "pdf",
+    "vue-print",
+    "react-print"
   ],
   "author": "xunmi",
   "license": "MIT",

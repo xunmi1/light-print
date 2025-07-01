@@ -5,7 +5,7 @@
 [![npm](https://img.shields.io/npm/v/light-print?style=flat-square)](https://www.npmjs.com/package/light-print)
 [![license](https://img.shields.io/npm/l/light-print?style=flat-square)](https://www.npmjs.com/package/light-print)
 
-A lightweight print tool for the browser.
+🖨️ Lightweight HTML element printing for browsers with PDF support.
 
 🚀 Here is an online [**usage example**](https://xunmi1.github.io/light-print/test/index.html).
 
@@ -31,10 +31,15 @@ If the browser does not support Promise (e.g. IE browser), then a global Promise
 
 Print container elements and their descendants.
 
+After the browser displays the print dialog:
+
+- Select any printer to proceed with printing.
+- Select the "Save as PDF" option to generate a PDF file.
+
 ```js
 import lightPrint from 'light-print';
 
-lightPrint('#id', { mediaPrintStyle: `@page { size: A4 portrait }` }).then(() => {
+lightPrint('#id', { mediaPrintStyle: '@page { size: A4 portrait }' }).then(() => {
   // do something when exiting the print window.
 });
 ```
@@ -48,7 +53,7 @@ lightPrint('#id', { mediaPrintStyle: `@page { size: A4 portrait }` }).then(() =>
 <script setup>
 import { useTemplateRef } from 'vue';
 import lightPrint from 'light-print';
-// In versions prior to 3.5, we could declare a `ref` matching the name of the template's ref attribute value.
+// Prior to Vue v3.5, we could declare a `ref` matching the name of the template's ref attribute value.
 const targetRef = useTemplateRef('target');
 
 async function print() {
@@ -97,7 +102,28 @@ interface PrintOptions {
 function lightPrint(containerOrSelector: Element | string, options?: PrintOptions): Promise<void>;
 ```
 
+## FAQ
+
+1. Is this compatible with React/Vue/Angular?
+
+   Works with all frameworks! See our [framework examples](#usage-in-vue).
+
+2. How to handle page breaks?
+
+   Use CSS page break properties, e.g.
+
+   ```css
+   .page-break {
+     page-break-after: always;
+     break-after: page;
+   }
+   ```
+
+3. How to handle headers and footers?
+
+   For the `mediaPrintStyle` parameter, either configure its [paged media](https://developer.chrome.com/blog/print-margins), or set page margins to zero and manually implement the DOM structure for headers and footers.
+
 ## Limitations
 
 - The following resources referenced in styles are not supported, such as `background-image: url(...)`. they can be replaced with `<img src="..." />` tags.
-- To specify fixed dimensions (width and height) for element containers is recommended, as they cannot adapt to page dimensions when printing.
+- To specify fixed dimensions (width and height) for element container is recommended, as they cannot adapt to page dimensions when printing.
