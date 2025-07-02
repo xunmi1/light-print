@@ -91,11 +91,11 @@ In other frameworks/libraries, a similar approach can be adopted for usage.
 
 ```ts
 interface PrintOptions {
-  /** document title */
+  /** The title of the document. */
   documentTitle?: string;
-  /** additional print style when printing */
+  /** The additional style of the document. */
   mediaPrintStyle?: string;
-  /** page zoom */
+  /** The zoom of the document. */
   zoom?: number | string;
 }
 
@@ -125,5 +125,5 @@ function lightPrint(containerOrSelector: Element | string, options?: PrintOption
 
 ## Limitations
 
-- The following resources referenced in styles are not supported, such as `background-image: url(...)`. they can be replaced with `<img src="..." />` tags.
+- The following resources referenced in styles are not supported, such as `background-image: url(...)`. they can be replaced with `<img src="..." />` tag.
 - To specify fixed dimensions (width and height) for element container is recommended, as they cannot adapt to page dimensions when printing.

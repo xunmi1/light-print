@@ -17,8 +17,11 @@ import { markPrintId, resetPrintId } from './printId';
 import { cloneNode } from './clone';
 
 export interface PrintOptions {
+  /** The title of the document. */
   documentTitle?: string;
+  /** The additional style of the document. */
   mediaPrintStyle?: string;
+  /** The zoom of the document. */
   zoom?: number | string;
 }
 
@@ -81,6 +84,11 @@ function emitPrint(container: HTMLIFrameElement) {
   return promise;
 }
 
+/**
+ * Print the HTML element.
+ * @param containerOrSelector An actual HTML element or a CSS selector.
+ * @param options Print options.
+ */
 function lightPrint(containerOrSelector: Element | string, options: PrintOptions = {}): Promise<void> {
   const dom = normalizeNode(containerOrSelector);
   // ensure to return a rejected promise.
