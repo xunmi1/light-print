@@ -1,0 +1,14 @@
+{
+  "files.readonlyInclude": {
+    "**/node_modules/**": true,
+    "**/package-lock.json": true,
+    "dist/**": true
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "prettier.configPath": "node_modules/@xunmi/prettier-config/index.json",
+  "livePreview.defaultPreviewPath": "/test/index.html",
+  "livePreview.openPreviewTarget": "External Browser"
+}

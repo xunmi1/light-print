@@ -5,24 +5,29 @@
   "type": "module",
   "main": "dist/light-print.cjs",
   "module": "dist/light-print.js",
-  "types": "types/index.d.ts",
+  "types": "dist/light-print.d.ts",
   "unpkg": "dist/light-print.global.min.js",
   "jsdelivr": "dist/light-print.global.min.js",
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
-      "import": "./dist/light-print.js",
-      "require": "./dist/light-print.cjs"
+      "import": {
+        "types": "./dist/light-print.d.ts",
+        "default": "./dist/light-print.js"
+      },
+      "require": {
+        "types": "./dist/light-print.d.cts",
+        "default": "./dist/light-print.cjs"
+      }
     }
   },
   "files": [
-    "dist",
-    "types/index.d.ts"
+    "dist"
   ],
   "scripts": {
-    "build": "npm run lint && npm run build-ts && npm run build-rollup && rimraf .cache",
-    "build-ts": "rimraf types && tsc --outDir .cache",
+    "build": "npm run lint && npm run build-ts && npm run build-rollup && npm run build-dts && rimraf .cache",
+    "build-ts": "rimraf .cache && tsc --outDir .cache",
     "build-rollup": "rimraf dist && rollup -c scripts/rollup.config.js  -i .cache/index.js",
+    "build-dts": "rollup -c scripts/rollup.dts.config.js  -i .cache/index.d.ts",
     "lint": "prettier -w \"**/*\" -u"
   },
   "repository": {
@@ -48,9 +53,10 @@
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
     "@xunmi/prettier-config": "^1.0.2",
-    "prettier": "^3.6.1",
+    "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
-    "rollup": "^4.44.0",
+    "rollup": "^4.44.1",
+    "rollup-plugin-dts": "^6.2.1",
     "typescript": "^5.8.3"
   },
   "prettier": "@xunmi/prettier-config"

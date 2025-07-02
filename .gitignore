@@ -1,7 +1,6 @@
 .DS_Store
 node_modules
 dist
-types
 
 # Build mid product
 .cache
@@ -17,7 +16,6 @@ __snapshots__
 
 # Editor directories and files
 .idea
-.vscode
 *.suo
 *.ntvs*
 *.njsproj

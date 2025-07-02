@@ -11,8 +11,6 @@
     "useDefineForClassFields": true,
     "resolveJsonModule": true,
     "declaration": true,
-    "declarationDir": "./types",
-    "removeComments": true,
     "sourceMap": false,
     "outDir": "./dist",
     "baseUrl": "./",
