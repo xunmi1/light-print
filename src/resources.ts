@@ -25,9 +25,9 @@ function checkLoaded(node: ResourceElement): Promise<void> | void {
 }
 
 /** wait for resources loaded */
-export function waitResources(currentWindow: Window) {
+export function waitResources(doc: Document) {
   const selectors = RESOURCE_ELECTORS.join(',');
-  const resourceNodes = toArray(currentWindow.document.querySelectorAll<ResourceElement>(selectors));
+  const resourceNodes = toArray(doc.querySelectorAll<ResourceElement>(selectors));
   const tasks = resourceNodes
     .filter(node => !!getResourceURL(node))
     .map(node => {
@@ -35,6 +35,6 @@ export function waitResources(currentWindow: Window) {
       node.setAttribute('loading', 'eager');
       return checkLoaded(node);
     });
-  tasks.push(waitFonts(currentWindow));
+  tasks.push(waitFonts(doc));
   return Promise.all(tasks);
 }

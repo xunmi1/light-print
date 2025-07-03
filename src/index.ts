@@ -1,13 +1,4 @@
-import {
-  isIE,
-  appendNode,
-  importNode,
-  removeNode,
-  normalizeNode,
-  setStyleProperty,
-  bindOnceEvent,
-  withResolvers,
-} from './utils';
+import { isIE, appendNode, removeNode, normalizeNode, setStyleProperty, bindOnceEvent, withResolvers } from './utils';
 import { importFonts } from './fonts';
 import { waitResources } from './resources';
 import { cloneDocument } from './clone';
@@ -40,9 +31,8 @@ function mount(container: HTMLIFrameElement, parent: Element) {
   return promise;
 }
 
-function emitPrint(container: HTMLIFrameElement) {
+function emitPrint(contentWindow: Window) {
   const { promise, resolve } = withResolvers<void>();
-  const contentWindow = container.contentWindow!;
   // required for IE
   contentWindow.focus();
   // When the browser's network cache is disabled,
@@ -69,40 +59,39 @@ function emitPrint(container: HTMLIFrameElement) {
  * @param options Print options.
  */
 function lightPrint(containerOrSelector: Element | string, options: PrintOptions = {}): Promise<void> {
-  const target = normalizeNode(containerOrSelector);
+  const hostElement = normalizeNode(containerOrSelector);
   // ensure to return a rejected promise.
-  if (!target) return Promise.reject(new Error('Invalid HTML element.'));
+  if (!hostElement) return Promise.reject(new Error('Invalid HTML element.'));
 
   const container = createContainer();
   // must be mounted and loaded before using `contentWindow` for Firefox.
-  return mount(container, window.document.body).then(() => {
-    const printDocument = container.contentWindow?.document;
-    if (!printDocument) throw new Error('Not found document.');
+  return mount(container, window.document.body)
+    .then(() => {
+      if (!container.contentWindow?.document) throw new Error('Not found document.');
 
-    const context = createContext(container.contentWindow);
+      const context = createContext(container.contentWindow);
 
-    printDocument.title = options.documentTitle ?? window.document.title;
-    setStyleProperty(printDocument.documentElement, 'zoom', options.zoom ?? 1);
-    // remove the default margin.
-    setStyleProperty(printDocument.body, 'margin', 0);
-    importFonts(context.window);
+      context.document.title = options.documentTitle ?? window.document.title;
+      setStyleProperty(context.document.documentElement, 'zoom', options.zoom ?? 1);
+      // remove the default margin.
+      setStyleProperty(context.document.body, 'margin', 0);
+      importFonts(context.document);
 
-    appendNode(printDocument.body, importNode(printDocument, target));
-    // Resources can affect the size of elements (e.g. `<img>`).
-    return waitResources(context.window)
-      .then(() => {
-        cloneDocument(context, target);
+      appendNode(context.document.body, context.document.importNode(hostElement, true));
+      // Resources can affect the size of elements (e.g. `<img>`).
+      return waitResources(context.document).then(() => {
+        cloneDocument(context, hostElement);
         // Style of highest priority.
         context.appendStyle(options.mediaPrintStyle);
-        // Insert after all styles have been generated.
+        // Mount after all styles have been generated.
         context.mountStyle();
-        return emitPrint(container);
-      })
-      .finally(() => {
-        // The container can only be destroyed after the printing process has been completed.
-        removeNode(container);
+        return emitPrint(context.window);
       });
-  });
+    })
+    .finally(() => {
+      // The container can only be destroyed after the printing process has been completed.
+      removeNode(container);
+    });
 }
 
 export default lightPrint;

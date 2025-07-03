@@ -6,8 +6,6 @@ export const isElement = <T extends Element>(target: unknown): target is T => ta
 
 export const appendNode = <T extends Node>(parent: T, child: T) => parent.appendChild(child);
 
-export const importNode = <T extends Node>(document: Document, node: T): T => document.importNode(node, true);
-
 export const removeNode = <T extends Node>(node: T) => node.parentNode?.removeChild(node);
 
 type SafeGet<Key, Map> = Key extends keyof Map ? Map[Key] : never;

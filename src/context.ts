@@ -26,10 +26,11 @@ export function createContext(contentWindow: Window) {
 
   const context = {
     window: contentWindow,
+    document: contentWindow.document,
     appendStyle,
     mountStyle,
     getSelector,
-  };
+  } as const;
 
   return context;
 }

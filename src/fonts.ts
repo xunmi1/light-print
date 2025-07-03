@@ -1,10 +1,10 @@
-export function importFonts(currentWindow: Window) {
-  const fonts = currentWindow.document.fonts;
+export function importFonts(doc: Document) {
+  const fonts = doc.fonts;
   window.document.fonts?.forEach(font => fonts.add(font));
 }
 
 function NOOP() {}
 
-export function waitFonts(currentWindow: Window): Promise<void> | void {
-  return currentWindow.document.fonts?.ready.then(NOOP);
+export function waitFonts(doc: Document): Promise<void> | void {
+  return doc.fonts?.ready.then(NOOP);
 }

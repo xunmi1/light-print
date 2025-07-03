@@ -32,7 +32,6 @@ const PSEUDO_ELECTORS_REPLACED = ['::before', '::after', '::marker'];
 
 function clonePseudoElementStyle<T extends Element>(target: T, origin: T, context: Context) {
   const selector = context.getSelector(target);
-  if (!selector) return;
   let styleText = '';
   for (const pseudoElt of PSEUDO_ELECTORS) {
     const style = toStyleText(getPseudoElementStyle(origin, pseudoElt));
@@ -60,10 +59,10 @@ function getPseudoElementStyle(origin: Element, pseudoElt: string) {
 
 /** clone canvas */
 function cloneCanvas<T extends HTMLCanvasElement>(target: T, origin: T) {
-  target.getContext('2d')?.drawImage(origin, 0, 0);
+  target.getContext('2d')!.drawImage(origin, 0, 0);
 }
 
-function cloneElement(context: Context, target: Element, origin: Element) {
+function cloneElement(target: Element, origin: Element, context: Context) {
   cloneElementStyle(target, origin);
   // clone the associated pseudo-elements only When it's not `SVGElement`.
   // using `origin` because `target` is not in the current window, and `instanceof` cannot be used for judgment.
@@ -71,16 +70,16 @@ function cloneElement(context: Context, target: Element, origin: Element) {
   if (whichElement(target, 'canvas')) cloneCanvas(target, origin as HTMLCanvasElement);
 }
 
-export function cloneDocument(context: Context, target: Node) {
-  const originIterator = createElementIterator(target);
+export function cloneDocument(context: Context, hostElement: Node) {
+  const originIterator = createElementIterator(hostElement);
   // start from `body` node
-  const targetIterator = createElementIterator(context.window.document.body);
+  const targetIterator = createElementIterator(context.document.body);
   // skip `body` node
   targetIterator.nextNode();
   while (true) {
     const targetElement = targetIterator.nextNode();
     const originElement = originIterator.nextNode();
     if (!targetElement || !originElement) break;
-    cloneElement(context, targetElement, originElement);
+    cloneElement(targetElement, originElement, context);
   }
 }
