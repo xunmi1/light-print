@@ -1,5 +1,5 @@
-import { getPrintIdSelector } from './printId';
-import { getSharedStyleNode, whichElement } from './utils';
+import type { Context } from './context';
+import { createElementIterator, whichElement } from './utils';
 
 function toStyleText(style?: CSSStyleDeclaration) {
   if (!style?.length) return '';
@@ -30,18 +30,15 @@ const PSEUDO_ELECTORS = [
 
 const PSEUDO_ELECTORS_REPLACED = ['::before', '::after', '::marker'];
 
-function clonePseudoElementStyle<T extends Element>(target: T, origin: T) {
-  const selector = getPrintIdSelector(target);
+function clonePseudoElementStyle<T extends Element>(target: T, origin: T, context: Context) {
+  const selector = context.getSelector(target);
   if (!selector) return;
   let styleText = '';
   for (const pseudoElt of PSEUDO_ELECTORS) {
     const style = toStyleText(getPseudoElementStyle(origin, pseudoElt));
     if (style) styleText += `${selector}${pseudoElt}{${style}}`;
   }
-  if (styleText) {
-    const styleNode = getSharedStyleNode(target.ownerDocument);
-    styleNode.textContent += styleText;
-  }
+  context.appendStyle(styleText);
 }
 
 function getPseudoElementStyle(origin: Element, pseudoElt: string) {
@@ -66,10 +63,24 @@ function cloneCanvas<T extends HTMLCanvasElement>(target: T, origin: T) {
   target.getContext('2d')?.drawImage(origin, 0, 0);
 }
 
-export function cloneNode(target: Element, origin: Element) {
+function cloneElement(context: Context, target: Element, origin: Element) {
   cloneElementStyle(target, origin);
   // clone the associated pseudo-elements only When it's not `SVGElement`.
   // using `origin` because `target` is not in the current window, and `instanceof` cannot be used for judgment.
-  if (!(origin instanceof SVGElement)) clonePseudoElementStyle(target, origin);
+  if (!(origin instanceof SVGElement)) clonePseudoElementStyle(target, origin, context);
   if (whichElement(target, 'canvas')) cloneCanvas(target, origin as HTMLCanvasElement);
+}
+
+export function cloneDocument(context: Context, target: Node) {
+  const originIterator = createElementIterator(target);
+  // start from `body` node
+  const targetIterator = createElementIterator(context.window.document.body);
+  // skip `body` node
+  targetIterator.nextNode();
+  while (true) {
+    const targetElement = targetIterator.nextNode();
+    const originElement = originIterator.nextNode();
+    if (!targetElement || !originElement) break;
+    cloneElement(context, targetElement, originElement);
+  }
 }

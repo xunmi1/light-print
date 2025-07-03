@@ -117,7 +117,7 @@
       try {
         await lightPrint('#app', {
           documentTitle: 'test',
-          mediaPrintStyle: `@page { size: A4; margin: 10mm }`,
+          mediaPrintStyle: `@page { size: A4 portrait; margin: 10mm }`,
         });
         console.log('Print end.');
       } catch (err) {

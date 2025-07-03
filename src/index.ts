@@ -3,18 +3,15 @@ import {
   appendNode,
   importNode,
   removeNode,
-  createNodeIterator,
   normalizeNode,
   setStyleProperty,
   bindOnceEvent,
   withResolvers,
-  getSharedStyleNode,
-  resetSharedStyleNode,
 } from './utils';
 import { importFonts } from './fonts';
 import { waitResources } from './resources';
-import { markPrintId, resetPrintId } from './printId';
-import { cloneNode } from './clone';
+import { cloneDocument } from './clone';
+import { createContext, type Context } from './context';
 
 export interface PrintOptions {
   /** The title of the document. */
@@ -33,24 +30,6 @@ function createContainer() {
   setStyleProperty(container, 'visibility', 'hidden', 'important');
   setStyleProperty(container, 'transform', 'scale(0)', 'important');
   return container;
-}
-
-function cloneDocument(printDocument: Document, dom: Node) {
-  const originIterator = createNodeIterator(dom);
-  // start from `body` node
-  const printIterator = createNodeIterator(printDocument.body);
-  // skip `body` node
-  printIterator.nextNode();
-  while (true) {
-    const node = printIterator.nextNode() as Element | null;
-    const originNode = originIterator.nextNode() as Element | null;
-
-    if (originNode && node) {
-      markPrintId(node);
-      cloneNode(node, originNode);
-    } else break;
-  }
-  resetPrintId();
 }
 
 function mount(container: HTMLIFrameElement, parent: Element) {
@@ -90,9 +69,9 @@ function emitPrint(container: HTMLIFrameElement) {
  * @param options Print options.
  */
 function lightPrint(containerOrSelector: Element | string, options: PrintOptions = {}): Promise<void> {
-  const dom = normalizeNode(containerOrSelector);
+  const target = normalizeNode(containerOrSelector);
   // ensure to return a rejected promise.
-  if (!dom) return Promise.reject(new Error('Invalid HTML element.'));
+  if (!target) return Promise.reject(new Error('Invalid HTML element.'));
 
   const container = createContainer();
   // must be mounted and loaded before using `contentWindow` for Firefox.
@@ -100,28 +79,28 @@ function lightPrint(containerOrSelector: Element | string, options: PrintOptions
     const printDocument = container.contentWindow?.document;
     if (!printDocument) throw new Error('Not found document.');
 
-    printDocument.title = options.documentTitle ?? document.title;
+    const context = createContext(container.contentWindow);
+
+    printDocument.title = options.documentTitle ?? window.document.title;
     setStyleProperty(printDocument.documentElement, 'zoom', options.zoom ?? 1);
     // remove the default margin.
     setStyleProperty(printDocument.body, 'margin', 0);
-    importFonts(container.contentWindow);
+    importFonts(context.window);
 
-    appendNode(printDocument.body, importNode(printDocument, dom));
+    appendNode(printDocument.body, importNode(printDocument, target));
     // Resources can affect the size of elements (e.g. `<img>`).
-    return waitResources(container.contentWindow)
+    return waitResources(context.window)
       .then(() => {
-        cloneDocument(printDocument, dom);
-        const styleNode = getSharedStyleNode(printDocument);
+        cloneDocument(context, target);
         // Style of highest priority.
-        if (options.mediaPrintStyle) styleNode.textContent += options.mediaPrintStyle;
+        context.appendStyle(options.mediaPrintStyle);
         // Insert after all styles have been generated.
-        appendNode(printDocument.head, styleNode);
+        context.mountStyle();
         return emitPrint(container);
       })
       .finally(() => {
         // The container can only be destroyed after the printing process has been completed.
         removeNode(container);
-        resetSharedStyleNode();
       });
   });
 }

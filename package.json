@@ -1,7 +1,7 @@
 {
   "name": "light-print",
   "version": "2.4.0",
-  "description": "Lightweight HTML element printing for browsers with PDF support.",
+  "description": "Lightweight HTML element printing for browsers.",
   "type": "module",
   "main": "dist/light-print.cjs",
   "module": "dist/light-print.js",

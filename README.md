@@ -5,7 +5,7 @@
 [![npm](https://img.shields.io/npm/v/light-print?style=flat-square)](https://www.npmjs.com/package/light-print)
 [![license](https://img.shields.io/npm/l/light-print?style=flat-square)](https://www.npmjs.com/package/light-print)
 
-🖨️ Lightweight HTML element printing for browsers with PDF support.
+🖨️ Lightweight HTML element printing for browsers.
 
 🚀 Here is an online [**usage example**](https://xunmi1.github.io/light-print/test/index.html).
 
@@ -40,7 +40,7 @@ After the browser displays the print dialog:
 import lightPrint from 'light-print';
 
 lightPrint('#id', { mediaPrintStyle: '@page { size: A4 portrait }' }).then(() => {
-  // do something when exiting the print window.
+  // do something when exiting the print dialog.
 });
 ```
 
@@ -121,7 +121,7 @@ function lightPrint(containerOrSelector: Element | string, options?: PrintOption
 
 3. How to handle headers and footers?
 
-   For the `mediaPrintStyle` parameter, either configure its [paged media](https://developer.chrome.com/blog/print-margins), or set page margins to zero and manually implement the DOM structure for headers and footers.
+   For the `mediaPrintStyle` parameter, either configure its [page media](https://developer.chrome.com/blog/print-margins), or set page margins to zero and manually implement the DOM structure for headers and footers.
 
 ## Limitations
 
