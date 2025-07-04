@@ -1,6 +1,6 @@
 import { appendNode } from './utils';
 
-export function createContext(contentWindow: Window) {
+export function createContext() {
   let styleNode: HTMLStyleElement;
   let printId = 1;
 
@@ -15,22 +15,24 @@ export function createContext(contentWindow: Window) {
 
   function appendStyle(text?: string) {
     if (!text) return;
-    if (!styleNode) styleNode = contentWindow.document.createElement('style');
+    styleNode ??= context.document.createElement('style');
     styleNode.textContent += text;
   }
 
   function mountStyle() {
     if (!styleNode) return;
-    appendNode(contentWindow.document.head, styleNode);
+    appendNode(context.document.head, styleNode);
   }
 
   const context = {
-    window: contentWindow,
-    document: contentWindow.document,
+    window: undefined as Window | undefined,
+    get document() {
+      return this.window!.document;
+    },
     appendStyle,
     mountStyle,
     getSelector,
-  } as const;
+  };
 
   return context;
 }

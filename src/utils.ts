@@ -77,7 +77,3 @@ export function withResolvers<T>() {
   // @ts-expect-error
   return { promise, resolve, reject };
 }
-
-export function toArray<T>(arrayLike: ArrayLike<T>): T[] {
-  return Array.prototype.slice.call(arrayLike);
-}

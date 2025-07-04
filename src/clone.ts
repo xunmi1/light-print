@@ -1,5 +1,5 @@
 import type { Context } from './context';
-import { createElementIterator, whichElement } from './utils';
+import { appendNode, createElementIterator, whichElement } from './utils';
 
 function toStyleText(style?: CSSStyleDeclaration) {
   if (!style?.length) return '';
@@ -71,9 +71,13 @@ function cloneElement(target: Element, origin: Element, context: Context) {
 }
 
 export function cloneDocument(context: Context, hostElement: Node) {
+  const doc = context.document;
+  // clone the `hostElement` structure.
+  appendNode(doc.body, doc.importNode(hostElement, true));
+
   const originIterator = createElementIterator(hostElement);
   // start from `body` node
-  const targetIterator = createElementIterator(context.document.body);
+  const targetIterator = createElementIterator(doc.body);
   // skip `body` node
   targetIterator.nextNode();
   while (true) {

@@ -25,7 +25,7 @@ CDN
 <script src="https://cdn.jsdelivr.net/npm/light-print@2"></script>
 ```
 
-If the browser does not support Promise (e.g. IE browser), then a global Promise polyfill is needed.
+If the browser does not support Promise (e.g. IE browser), then a global polyfill is needed.
 
 ## Usage
 
@@ -121,9 +121,18 @@ function lightPrint(containerOrSelector: Element | string, options?: PrintOption
 
 3. How to handle headers and footers?
 
-   For the `mediaPrintStyle` parameter, either configure its [page media](https://developer.chrome.com/blog/print-margins), or set page margins to zero and manually implement the DOM structure for headers and footers.
+   In the `mediaPrintStyle` parameter, either configure its [page media](https://developer.chrome.com/blog/print-margins), or set page margins to zero and manually implement the DOM structure for headers and footers.
 
 ## Limitations
 
 - The following resources referenced in styles are not supported, such as `background-image: url(...)`. they can be replaced with `<img src="..." />` tag.
 - To specify fixed dimensions (width and height) for element container is recommended, as they cannot adapt to page dimensions when printing.
+- Automatic font loading is not supported for non-Chromium browsers; `@font-face` can be declared within the mediaPrintStyle parameter, e.g.
+  ```js
+  const mediaPrintStyle = `
+    @font-face {
+      font-family: 'PrintFont';
+      src: url('print-font.woff2') format('woff2');
+    }
+  `;
+  ```

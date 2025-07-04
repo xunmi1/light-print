@@ -1,8 +1,8 @@
 import { isIE, appendNode, removeNode, normalizeNode, setStyleProperty, bindOnceEvent, withResolvers } from './utils';
-import { importFonts } from './fonts';
+import { tryImportFonts } from './fonts';
 import { waitResources } from './resources';
 import { cloneDocument } from './clone';
-import { createContext, type Context } from './context';
+import { createContext } from './context';
 
 export interface PrintOptions {
   /** The title of the document. */
@@ -64,34 +64,32 @@ function lightPrint(containerOrSelector: Element | string, options: PrintOptions
   if (!hostElement) return Promise.reject(new Error('Invalid HTML element.'));
 
   const container = createContainer();
+  const context = createContext();
   // must be mounted and loaded before using `contentWindow` for Firefox.
   return mount(container, window.document.body)
     .then(() => {
       if (!container.contentWindow?.document) throw new Error('Not found document.');
+      context.window = container.contentWindow;
 
-      const context = createContext(container.contentWindow);
-
-      context.document.title = options.documentTitle ?? window.document.title;
-      setStyleProperty(context.document.documentElement, 'zoom', options.zoom ?? 1);
+      const doc = context.document;
+      doc.title = options.documentTitle ?? window.document.title;
+      setStyleProperty(doc.documentElement, 'zoom', options.zoom ?? 1);
       // remove the default margin.
-      setStyleProperty(context.document.body, 'margin', 0);
-      importFonts(context.document);
+      setStyleProperty(doc.body, 'margin', 0);
 
-      appendNode(context.document.body, context.document.importNode(hostElement, true));
-      // Resources can affect the size of elements (e.g. `<img>`).
-      return waitResources(context.document).then(() => {
-        cloneDocument(context, hostElement);
-        // Style of highest priority.
-        context.appendStyle(options.mediaPrintStyle);
-        // Mount after all styles have been generated.
-        context.mountStyle();
-        return emitPrint(context.window);
-      });
+      tryImportFonts(doc);
+      cloneDocument(context, hostElement);
+      // style of highest priority.
+      context.appendStyle(options.mediaPrintStyle);
+      // mount after all styles have been generated.
+      context.mountStyle();
     })
-    .finally(() => {
+    .then(() => waitResources(context.document))
+    .then(() => emitPrint(context.window!))
+    .finally(() =>
       // The container can only be destroyed after the printing process has been completed.
-      removeNode(container);
-    });
+      removeNode(container)
+    );
 }
 
 export default lightPrint;

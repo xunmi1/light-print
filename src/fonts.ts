@@ -1,6 +1,16 @@
-export function importFonts(doc: Document) {
-  const fonts = doc.fonts;
-  window.document.fonts?.forEach(font => fonts.add(font));
+export function tryImportFonts(doc: Document) {
+  if (!doc.fonts) return;
+  try {
+    // If `document.fonts.forEach(...)` is used,
+    // the console will still display uncaught exception messages.
+    const iterator = window.document.fonts.values();
+    while (true) {
+      const font = iterator.next().value;
+      if (!font) break;
+      // Can't add face to FontFaceSet that comes from `@font-face` rules for non-Chromium browsers.
+      doc.fonts.add(font);
+    }
+  } catch {}
 }
 
 function NOOP() {}
