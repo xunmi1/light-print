@@ -126,7 +126,6 @@ table {
 
 #details[open] {
   summary {
-    display: list-item;
     &::marker {
       content: '❤️';
     }

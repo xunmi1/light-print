@@ -12,7 +12,7 @@ const PSEUDO_ELECTORS = [
   '::details-content',
 ];
 
-const PSEUDO_ELECTORS_REPLACED = ['::before', '::after', '::marker'];
+const PSEUDO_ELECTORS_REPLACED = ['::before', '::after'];
 
 function getStyleTextDiff(targetStyle: CSSStyleDeclaration, originStyle: CSSStyleDeclaration) {
   let styleText = '';
@@ -26,6 +26,7 @@ function getStyleTextDiff(targetStyle: CSSStyleDeclaration, originStyle: CSSStyl
 }
 
 function getElementNonInlineStyle<T extends Element>(target: T, origin: T) {
+  // identical inline styles are omitted.
   return getStyleTextDiff(window.getComputedStyle(target), window.getComputedStyle(origin));
 }
 
@@ -37,7 +38,11 @@ function getPseudoElementStyle<T extends Element>(target: T, origin: T, pseudoEl
   } else if (pseudoElt === '::details-content') {
     if (!whichElement(origin, 'details')) return;
   }
+
   const originStyle = window.getComputedStyle(origin, pseudoElt);
+
+  if (pseudoElt === '::marker' && originStyle.display !== 'list-item') return;
+
   // replaced elements need to be checked for `content`.
   if (PSEUDO_ELECTORS_REPLACED.includes(pseudoElt)) {
     const content = originStyle.content;
