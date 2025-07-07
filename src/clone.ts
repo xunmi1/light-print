@@ -1,22 +1,6 @@
 import type { Context } from './context';
 import { appendNode, createElementIterator, whichElement } from './utils';
 
-function toStyleText(style?: CSSStyleDeclaration) {
-  if (!style?.length) return '';
-  let styleText = '';
-  for (let index = 0; index < style.length; index++) {
-    const value = style.getPropertyValue(style[index]);
-    if (value) styleText += `${style[index]}:${value};`;
-  }
-
-  return styleText;
-}
-
-/** clone element style */
-function cloneElementStyle<T extends Element>(target: T, origin: T) {
-  target.setAttribute('style', toStyleText(window.getComputedStyle(origin)));
-}
-
 const PSEUDO_ELECTORS = [
   '::before',
   '::after',
@@ -30,17 +14,22 @@ const PSEUDO_ELECTORS = [
 
 const PSEUDO_ELECTORS_REPLACED = ['::before', '::after', '::marker'];
 
-function clonePseudoElementStyle<T extends Element>(target: T, origin: T, context: Context) {
-  const selector = context.getSelector(target);
+function getStyleTextDiff(targetStyle: CSSStyleDeclaration, originStyle: CSSStyleDeclaration) {
   let styleText = '';
-  for (const pseudoElt of PSEUDO_ELECTORS) {
-    const style = toStyleText(getPseudoElementStyle(origin, pseudoElt));
-    if (style) styleText += `${selector}${pseudoElt}{${style}}`;
+  for (let index = 0; index < originStyle.length; index++) {
+    const property = originStyle[index];
+    const value = originStyle.getPropertyValue(property);
+    if (value && value !== targetStyle.getPropertyValue(property)) styleText += `${property}:${value};`;
   }
-  context.appendStyle(styleText);
+
+  return styleText;
 }
 
-function getPseudoElementStyle(origin: Element, pseudoElt: string) {
+function getElementNonInlineStyle<T extends Element>(target: T, origin: T) {
+  return getStyleTextDiff(window.getComputedStyle(target), window.getComputedStyle(origin));
+}
+
+function getPseudoElementStyle<T extends Element>(target: T, origin: T, pseudoElt: string) {
   if (pseudoElt === '::placeholder') {
     if (!whichElement(origin, 'input') && !whichElement(origin, 'textarea')) return;
   } else if (pseudoElt === '::file-selector-button') {
@@ -48,13 +37,35 @@ function getPseudoElementStyle(origin: Element, pseudoElt: string) {
   } else if (pseudoElt === '::details-content') {
     if (!whichElement(origin, 'details')) return;
   }
-  const style = window.getComputedStyle(origin, pseudoElt);
-  // Replaced elements need to be checked for `content`.
+  const originStyle = window.getComputedStyle(origin, pseudoElt);
+  // replaced elements need to be checked for `content`.
   if (PSEUDO_ELECTORS_REPLACED.includes(pseudoElt)) {
-    const content = style.content;
+    const content = originStyle.content;
     if (!content || content === 'normal' || content === 'none') return;
   }
-  return style;
+  const targetStyle = window.getComputedStyle(target, pseudoElt);
+
+  return getStyleTextDiff(targetStyle, originStyle);
+}
+
+/** clone element style */
+function cloneElementStyle<T extends Element>(target: T, origin: T, context: Context) {
+  // inline styles have been cloned,
+  // thus only styles defined via non-inline styles require cloning.
+  const style = getElementNonInlineStyle(target, origin);
+  if (!style) return;
+  const selector = context.getSelector(target);
+  context.appendStyle(`${selector}{${style}}`);
+}
+
+function clonePseudoElementStyle<T extends Element>(target: T, origin: T, context: Context) {
+  const selector = context.getSelector(target);
+  let styleText = '';
+  for (const pseudoElt of PSEUDO_ELECTORS) {
+    const style = getPseudoElementStyle(target, origin, pseudoElt);
+    if (style) styleText += `${selector}${pseudoElt}{${style}}`;
+  }
+  context.appendStyle(styleText);
 }
 
 /** clone canvas */
@@ -63,7 +74,7 @@ function cloneCanvas<T extends HTMLCanvasElement>(target: T, origin: T) {
 }
 
 function cloneElement(target: Element, origin: Element, context: Context) {
-  cloneElementStyle(target, origin);
+  cloneElementStyle(target, origin, context);
   // clone the associated pseudo-elements only When it's not `SVGElement`.
   // using `origin` because `target` is not in the current window, and `instanceof` cannot be used for judgment.
   if (!(origin instanceof SVGElement)) clonePseudoElementStyle(target, origin, context);
@@ -72,7 +83,7 @@ function cloneElement(target: Element, origin: Element, context: Context) {
 
 export function cloneDocument(context: Context, hostElement: Node) {
   const doc = context.document;
-  // clone the `hostElement` structure.
+  // clone the `hostElement` structure to `body`, contains inline styles.
   appendNode(doc.body, doc.importNode(hostElement, true));
 
   const originIterator = createElementIterator(hostElement);
