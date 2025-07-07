@@ -10,7 +10,7 @@ type ResourceElement = ElementNameMap[(typeof RESOURCE_ELECTORS)[number]];
 function getResourceURL(node: ResourceElement) {
   if (whichElement(node, 'object')) return node.data;
   if (whichElement(node, 'iframe') || whichElement(node, 'embed')) return node.src;
-  if (whichElement(node, 'image')) return node.href;
+  if (whichElement(node, 'image')) return node.href.baseVal;
   return node.currentSrc || node.src;
 }
 
