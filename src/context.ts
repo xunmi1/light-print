@@ -1,16 +1,20 @@
 import { appendNode } from './utils';
 
 export function createContext() {
-  let styleNode: HTMLStyleElement;
+  let styleNode: HTMLStyleElement | undefined;
   let printId = 1;
 
-  function getSelector(node: Element) {
+  function markId(node: Element) {
     let id = node.getAttribute('data-print-id');
     if (!id) {
       id = (printId++).toString();
       node.setAttribute('data-print-id', id);
     }
-    return `[data-print-id="${id}"]`;
+    return id;
+  }
+
+  function getSelector(node: Element) {
+    return `[data-print-id="${markId(node)}"]`;
   }
 
   function appendStyle(text?: string) {

@@ -10,9 +10,9 @@ const PSEUDO_ELECTORS = [
   '::placeholder',
   '::file-selector-button',
   '::details-content',
-];
+] as const;
 
-const PSEUDO_ELECTORS_REPLACED = ['::before', '::after'];
+const BLOCK_CONTAINERS = ['block', 'inline-block', 'list-item', 'flow-root', 'table-caption', 'table-cell'];
 
 function getStyleTextDiff(targetStyle: CSSStyleDeclaration, originStyle: CSSStyleDeclaration) {
   let styleText = '';
@@ -30,21 +30,24 @@ function getElementNonInlineStyle<T extends Element>(target: T, origin: T) {
   return getStyleTextDiff(window.getComputedStyle(target), window.getComputedStyle(origin));
 }
 
-function getPseudoElementStyle<T extends Element>(target: T, origin: T, pseudoElt: string) {
+function getPseudoElementStyle<T extends Element>(target: T, origin: T, pseudoElt: (typeof PSEUDO_ELECTORS)[number]) {
   if (pseudoElt === '::placeholder') {
     if (!whichElement(origin, 'input') && !whichElement(origin, 'textarea')) return;
   } else if (pseudoElt === '::file-selector-button') {
     if (!(whichElement(origin, 'input') && origin.type === 'file')) return;
   } else if (pseudoElt === '::details-content') {
     if (!whichElement(origin, 'details')) return;
+  } else if (pseudoElt === '::marker') {
+    const display = window.getComputedStyle(origin).display;
+    if (display !== 'list-item') return;
+  } else if (pseudoElt === '::first-letter' || pseudoElt === '::first-line') {
+    const display = window.getComputedStyle(origin).display;
+    if (BLOCK_CONTAINERS.indexOf(display) < 0) return;
   }
 
   const originStyle = window.getComputedStyle(origin, pseudoElt);
-
-  if (pseudoElt === '::marker' && originStyle.display !== 'list-item') return;
-
   // replaced elements need to be checked for `content`.
-  if (PSEUDO_ELECTORS_REPLACED.includes(pseudoElt)) {
+  if (pseudoElt === '::before' || pseudoElt === '::after') {
     const content = originStyle.content;
     if (!content || content === 'normal' || content === 'none') return;
   }
@@ -54,21 +57,22 @@ function getPseudoElementStyle<T extends Element>(target: T, origin: T, pseudoEl
 }
 
 /** clone element style */
-function cloneElementStyle<T extends Element>(target: T, origin: T, context: Context) {
-  // inline styles have been cloned,
-  // thus only styles defined via non-inline styles require cloning.
-  const style = getElementNonInlineStyle(target, origin);
-  if (!style) return;
-  const selector = context.getSelector(target);
-  context.appendStyle(`${selector}{${style}}`);
+function cloneElementStyle<T extends Element>(target: T, origin: T) {
+  const nonInlineStyle = getElementNonInlineStyle(target, origin);
+  if (!nonInlineStyle) return;
+  const inlineStyle = target.getAttribute('style') ?? '';
+  // setting inline styles immediately triggers a layout recalculation,
+  // and subsequently retrieve the correct styles of the child elements.
+  target.setAttribute('style', `${nonInlineStyle}${inlineStyle}`);
 }
 
 function clonePseudoElementStyle<T extends Element>(target: T, origin: T, context: Context) {
-  const selector = context.getSelector(target);
   let styleText = '';
   for (const pseudoElt of PSEUDO_ELECTORS) {
     const style = getPseudoElementStyle(target, origin, pseudoElt);
-    if (style) styleText += `${selector}${pseudoElt}{${style}}`;
+    if (!style) continue;
+    const selector = context.getSelector(target);
+    styleText += `${selector}${pseudoElt}{${style}}`;
   }
   context.appendStyle(styleText);
 }
@@ -79,8 +83,8 @@ function cloneCanvas<T extends HTMLCanvasElement>(target: T, origin: T) {
 }
 
 function cloneElement(target: Element, origin: Element, context: Context) {
-  cloneElementStyle(target, origin, context);
-  // clone the associated pseudo-elements only When it's not `SVGElement`.
+  cloneElementStyle(target, origin);
+  // clone the associated pseudo-elements only when it's not `SVGElement`.
   // using `origin` because `target` is not in the current window, and `instanceof` cannot be used for judgment.
   if (!(origin instanceof SVGElement)) clonePseudoElementStyle(target, origin, context);
   if (whichElement(target, 'canvas')) cloneCanvas(target, origin as HTMLCanvasElement);
