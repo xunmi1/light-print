@@ -1,6 +1,6 @@
 {
   "name": "light-print",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "Lightweight HTML element printing for browsers.",
   "type": "module",
   "main": "dist/light-print.cjs",
@@ -55,7 +55,7 @@
     "@xunmi/prettier-config": "^1.0.2",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
-    "rollup": "^4.44.1",
+    "rollup": "^4.44.2",
     "rollup-plugin-dts": "^6.2.1",
     "typescript": "^5.8.3"
   },

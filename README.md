@@ -125,7 +125,7 @@ function lightPrint(containerOrSelector: Element | string, options?: PrintOption
 
 3. How to implement headers/footers?
 
-   Configure via [page media](https://developer.chrome.com/blog/print-margins) in the `mediaPrintStyle`, or set page margins to zero and manually implement the DOM structure for headers/footers.
+   Configure via [paged media](https://developer.chrome.com/blog/print-margins) in the `mediaPrintStyle`, or set page margins to zero and manually implement the DOM structure for headers/footers.
 
 ## Limitations
 
