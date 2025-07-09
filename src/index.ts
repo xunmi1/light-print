@@ -5,11 +5,11 @@ import { cloneDocument } from './clone';
 import { createContext } from './context';
 
 export interface PrintOptions {
-  /** The title of the document. */
+  /** Document title */
   documentTitle?: string;
-  /** The additional style of the document. */
+  /** Additional print styles */
   mediaPrintStyle?: string;
-  /** The zoom of the document. */
+  /** Document zoom level */
   zoom?: number | string;
 }
 

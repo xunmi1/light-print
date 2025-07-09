@@ -7,7 +7,7 @@
 
 🖨️ Lightweight HTML element printing for browsers.
 
-🚀 Here is an online [**usage example**](https://xunmi1.github.io/light-print/test/index.html).
+🚀 View an online [**usage example**](https://xunmi1.github.io/light-print/test/index.html).
 
 ## Install
 
@@ -22,10 +22,11 @@ pnpm add light-print
 CDN
 
 ```html
+<!-- After importing, `window.lightPrint` is globally available. -->
 <script src="https://cdn.jsdelivr.net/npm/light-print@2"></script>
 ```
 
-If the browser does not support Promise (e.g. IE browser), then a global polyfill is needed.
+If the browser doesn't support Promise (e.g., Internet Explorer), a global polyfill is required.
 
 ## Usage
 
@@ -33,19 +34,22 @@ Print container elements and their descendants.
 
 After the browser displays the print dialog:
 
-- Select any printer to proceed with printing.
+- Select any printer to print
 - Select the "Save as PDF" option to generate a PDF file.
 
 ```js
 import lightPrint from 'light-print';
 
-lightPrint('#id', { mediaPrintStyle: '@page { size: A4 portrait }' }).then(() => {
-  // do something when exiting the print dialog.
+lightPrint('#id', {
+  // Modify different aspects of printed pages.
+  mediaPrintStyle: '@page { size: A4 portrait }',
+}).then(() => {
+  // Executes when the print dialog closes.
 });
 ```
 
-- The argument can either be a CSS selector or an actual DOM element.
-- Returns a Promise when exiting the print window.
+- Accepts either a CSS selector or an actual element.
+- Returns a Promise that resolves when the print dialog closes.
 
 ### Usage in Vue
 
@@ -85,17 +89,17 @@ function MyComponent() {
 }
 ```
 
-In other frameworks/libraries, a similar approach can be adopted for usage.
+The same approach works with other frameworks/libraries.
 
 ## Types
 
 ```ts
 interface PrintOptions {
-  /** The title of the document. */
+  /** Document title */
   documentTitle?: string;
-  /** The additional style of the document. */
+  /** Additional print styles */
   mediaPrintStyle?: string;
-  /** The zoom of the document. */
+  /** Document zoom level */
   zoom?: number | string;
 }
 
@@ -119,15 +123,15 @@ function lightPrint(containerOrSelector: Element | string, options?: PrintOption
    }
    ```
 
-3. How to handle headers and footers?
+3. How to implement headers/footers?
 
-   In the `mediaPrintStyle` parameter, either configure its [page media](https://developer.chrome.com/blog/print-margins), or set page margins to zero and manually implement the DOM structure for headers and footers.
+   Configure via [page media](https://developer.chrome.com/blog/print-margins) in the `mediaPrintStyle`, or set page margins to zero and manually implement the DOM structure for headers/footers.
 
 ## Limitations
 
-- The following resources referenced in styles are not supported, such as `background-image: url(...)`. they can be replaced with `<img src="..." />` tag.
-- To specify fixed dimensions (width and height) for element container is recommended, as they cannot adapt to page dimensions when printing.
-- Automatic font loading is not supported for non-Chromium browsers; `@font-face` can be declared within the mediaPrintStyle parameter, e.g.
+- The following resources referenced in styles are not supported, such as `background-image: url(...)`. They can be replaced with `<img src="..." />` tags.
+- It is recommended to specify fixed dimensions (width and height) for the element container, as it cannot adapt to page dimensions when printing.
+- Automatic font loading is not supported for non-Chromium browsers. You can declare `@font-face` within the `mediaPrintStyle`, for example:
   ```js
   const mediaPrintStyle = `
     @font-face {
