@@ -9,6 +9,10 @@
 
 🚀 View an online [**usage example**](https://xunmi1.github.io/light-print/test/index.html).
 
+- **Lightweight**: Zero Dependencies & 2KB minzipped
+- **Auto-Styled**: Preserves the existing styles without extra CSS setup
+- **Callback-Free**: Native promise handling for print workflows
+
 ## Install
 
 ```bash
