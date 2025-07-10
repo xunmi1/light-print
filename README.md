@@ -129,7 +129,6 @@ function lightPrint(containerOrSelector: Element | string, options?: PrintOption
 
 ## Limitations
 
-- The following resources referenced in styles are not supported, such as `background-image: url(...)`. They can be replaced with `<img src="..." />` tags.
 - It is recommended to specify fixed dimensions (width and height) for the element container, as it cannot adapt to page dimensions when printing.
 - Automatic font loading is not supported for non-Chromium browsers. You can declare `@font-face` within the `mediaPrintStyle`, for example:
   ```js
