@@ -15,6 +15,7 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "lib": ["esnext", "dom", "dom.iterable"],
+    "types": [],
 
     "strict": true,
     "noUnusedParameters": true,

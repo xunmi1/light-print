@@ -7,7 +7,7 @@
 
 🖨️ Lightweight HTML element printing for browsers.
 
-🚀 View an online [**usage example**](https://xunmi1.github.io/light-print/test/index.html).
+🚀 View an online [**usage example**](https://xunmi1.github.io/light-print/examples/index.html).
 
 - **Lightweight**: Zero Dependencies & 2KB minzipped
 - **Auto-Styled**: Preserves the existing styles without extra CSS setup

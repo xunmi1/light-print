@@ -4,6 +4,12 @@
   box-sizing: border-box;
 }
 
+@font-face {
+  font-family: 'Bitcount Grid Double';
+  font-weight: 400;
+  src: url(./BitcountGridDouble-Regular.ttf);
+}
+
 html,
 body {
   min-height: 100%;
@@ -40,6 +46,10 @@ body {
     font-size: 0.85rem;
     line-height: 1;
   }
+}
+
+#app {
+  background-color: white;
 }
 
 table {
@@ -124,15 +134,18 @@ table {
   border: 1px solid;
 }
 
-#details[open] {
-  summary {
-    &::marker {
-      content: '❤️';
-    }
+#details {
+  > summary::marker {
+    content: '👉';
   }
-  &::details-content {
-    margin-inline-start: 1.5rem;
-    padding: 4px;
-    background-color: #a29bfe;
+  &[open] > summary::marker {
+    content: '❤️';
+  }
+
+  @supports selector(&::details-content) {
+    &::details-content {
+      margin-inline-start: 1.5rem;
+      background-color: #a29bfe;
+    }
   }
 }

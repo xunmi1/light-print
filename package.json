@@ -24,11 +24,13 @@
     "dist"
   ],
   "scripts": {
+    "start": "http-server ./ -p 3000",
     "build": "npm run lint && npm run build-ts && npm run build-rollup && npm run build-dts && rimraf .cache",
     "build-ts": "rimraf .cache && tsc --outDir .cache",
     "build-rollup": "rimraf dist && rollup -c scripts/rollup.config.js -i .cache/index.js",
     "build-dts": "rollup -c scripts/rollup.dts.config.js -i .cache/index.d.ts",
-    "lint": "prettier -w \"**/*\" -u"
+    "lint": "prettier -w \"**/*\" -u",
+    "test": " playwright test"
   },
   "repository": {
     "type": "git",
@@ -51,8 +53,11 @@
   },
   "homepage": "https://xunmi1.github.io/light-print/",
   "devDependencies": {
+    "@playwright/test": "^1.54.1",
     "@rollup/plugin-terser": "^0.4.4",
+    "@types/node": "^24.0.12",
     "@xunmi/prettier-config": "^1.0.2",
+    "http-server": "^14.1.1",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
     "rollup": "^4.44.2",
