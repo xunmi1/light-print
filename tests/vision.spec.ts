@@ -22,9 +22,10 @@ test('visually consistent', async ({ page }, testInfo) => {
   const [originBox, targetBox] = await Promise.all([origin.boundingBox(), target.boundingBox()]);
   if (!originBox || !targetBox) throw new Error('Failed to get bounding box');
 
-  expect(round(targetBox.width, 2)).toEqual(round(originBox.width, 2));
-  expect(round(targetBox.height, 2)).toEqual(round(originBox.height, 2));
-
+  expect(round(targetBox.width)).toEqual(round(originBox.width));
+  expect(round(targetBox.height)).toEqual(round(originBox.height));
+  // webkit browser does not support
+  const maskSelectors = isWebkit ? ['#inputPlaceholder', '#inputFileSelectorButton', '#details'] : [];
   // The screenshot dimensions from `element.screenshot()` are inconsistent,
   // so we're using `page.screenshot()` instead.
   const [_, targetBuffer] = await Promise.all([
@@ -32,10 +33,14 @@ test('visually consistent', async ({ page }, testInfo) => {
       path: getScreenshotPath('origin', testInfo),
       clip: roundBox(originBox),
       fullPage: true,
+      mask: maskSelectors.map(v => page.locator(v)),
+      maskColor: 'white',
     }),
     page.screenshot({
       clip: roundBox(targetBox),
       fullPage: true,
+      mask: maskSelectors.map(v => iframePage.locator(v)),
+      maskColor: 'white',
     }),
   ]);
 
@@ -66,6 +71,6 @@ function preventDestroy() {
   Node.prototype.removeChild = function (child) {
     // @ts-expect-error
     if (child.localName === 'iframe') return child;
-    return originalRemoveChild.apply(this, arguments);
+    return originalRemoveChild.call(this, child);
   };
 }

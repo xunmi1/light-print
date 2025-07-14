@@ -47,12 +47,11 @@ jobs:
       startsWith(github.event.head_commit.message, 'perf') ||
       startsWith(github.event.head_commit.message, 'test')
     steps:
+      - uses: actions/checkout@v4
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: build-artifact
-          path: './'
-      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
