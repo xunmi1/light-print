@@ -30,8 +30,8 @@
         documentTitle: 'test',
         mediaPrintStyle: '@page { size: A4 landscape; margin: 10mm } body { border: 4pt solid red }',
       }).catch(function (err) {
-        console.error(err);
         window.alert(err);
+        throw err;
       });
     }, 1000);
   </script>

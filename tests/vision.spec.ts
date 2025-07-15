@@ -1,4 +1,34 @@
 import { test, expect, type TestInfo } from '@playwright/test';
+import { delayNetwork, getScreenshotPath, round, roundBox } from './utils';
+
+test('print() was called', async ({ page }) => {
+  await page.goto('/examples/index.html');
+  // To allow time for event binding, needs to be delay network 1s.
+  await delayNetwork(page, 1000);
+  await page.click('#print-action');
+  await page.locator('body > iframe').waitFor({ state: 'attached' });
+  page.evaluate(() => {
+    // @ts-expect-error
+    window.waitForPrint = new Promise(resolve => {
+      const iframe = window.document.querySelector<HTMLIFrameElement>('body > iframe')!;
+      // replace `print()`
+      iframe.contentWindow!.print = () => resolve(true);
+    });
+  });
+  // @ts-expect-error
+  const handler = await page.waitForFunction(() => window.waitForPrint, null, { timeout: 5000 });
+  const isCalled = await handler.jsonValue();
+  expect(isCalled).toBe(true);
+});
+
+test('destroy() was called', async ({ page }, testInfo) => {
+  // Only Chromium didn't display the print dialog and terminated the print process,
+  // while other browsers remained on the print dialog, the `Playwright` can't close it.
+  test.skip(testInfo.project.name !== 'chromium');
+  await page.goto('/examples/index.html');
+  await page.click('#print-action');
+  await expect(page.locator('body > iframe')).not.toBeAttached();
+});
 
 test('visually consistent', async ({ page }, testInfo) => {
   const isWebkit = testInfo.project.name === 'webkit';
@@ -14,6 +44,7 @@ test('visually consistent', async ({ page }, testInfo) => {
   await action.click();
 
   const iframe = page.locator('body > iframe');
+  await expect(iframe).not.toBeVisible();
   // avoid scroll
   await iframe.evaluate(element => (element.style = 'width: 100%; height: 1500px'));
   const iframePage = iframe.contentFrame();
@@ -46,24 +77,6 @@ test('visually consistent', async ({ page }, testInfo) => {
 
   await expect(targetBuffer).toMatchSnapshot('origin.png', { maxDiffPixelRatio: 0.005 });
 });
-
-function getScreenshotPath(name: string, testInfo: TestInfo) {
-  // need to be the same as `snapshotPathTemplate` config
-  return `tests/__screenshots__/${name}-${process.platform}-${testInfo.project.name}.png`;
-}
-
-function round(number: number, precision = 0) {
-  return Math.round(number * 10 ** precision) / 10 ** precision;
-}
-
-function roundBox(rect: Record<string, number>, precision = 0) {
-  return {
-    x: round(rect.x, precision),
-    y: round(rect.y, precision),
-    width: round(rect.width, precision),
-    height: round(rect.height, precision),
-  };
-}
 
 /** @HACK to prevent destroy iframe */
 function preventDestroy() {
