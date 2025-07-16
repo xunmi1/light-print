@@ -27,4 +27,4 @@ __snapshots__
 /playwright-report/
 /blob-report/
 /playwright/.cache/
-/tests/__screenshots__
+/tests/browser/__screenshots__

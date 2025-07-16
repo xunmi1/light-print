@@ -30,7 +30,10 @@
     "build-rollup": "rimraf dist && rollup -c scripts/rollup.config.js -i .cache/index.js",
     "build-dts": "rollup -c scripts/rollup.dts.config.js -i .cache/index.d.ts",
     "lint": "prettier -w \"**/*\" -u",
-    "test": " playwright test"
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "vitest",
+    "test:e2e": " playwright test",
+    "coverage": "vitest run --coverage"
   },
   "repository": {
     "type": "git",
@@ -55,14 +58,17 @@
   "devDependencies": {
     "@playwright/test": "^1.54.1",
     "@rollup/plugin-terser": "^0.4.4",
-    "@types/node": "^24.0.12",
+    "@types/node": "^22.16.4",
+    "@vitest/coverage-v8": "^3.2.4",
     "@xunmi/prettier-config": "^1.0.2",
+    "happy-dom": "^18.0.1",
     "http-server": "^14.1.1",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
-    "rollup": "^4.44.2",
+    "rollup": "^4.45.1",
     "rollup-plugin-dts": "^6.2.1",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
   },
   "prettier": "@xunmi/prettier-config"
 }

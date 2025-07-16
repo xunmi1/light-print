@@ -6,7 +6,7 @@ export function delayNetwork(page: Page, ms: number) {
 
 export function getScreenshotPath(name: string, testInfo: TestInfo) {
   // need to be the same as `snapshotPathTemplate` config
-  return `tests/__screenshots__/${name}-${process.platform}-${testInfo.project.name}.png`;
+  return `tests/browser/__screenshots__/${name}-${process.platform}-${testInfo.project.name}.png`;
 }
 
 export function round(number: number, precision = 0) {
