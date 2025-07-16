@@ -1,4 +1,4 @@
-import { test, expect, type TestInfo, type Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 test('no printing when offline', async ({ page, context }) => {
   // disable network cache
@@ -13,6 +13,6 @@ test('no printing when offline', async ({ page, context }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.click('#print-action');
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(500);
   expect(errors.join('\n')).toContain('Failed to load resource');
 });

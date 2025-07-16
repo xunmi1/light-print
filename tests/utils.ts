@@ -21,3 +21,7 @@ export function roundBox(rect: Record<string, number>, precision = 0) {
     height: round(rect.height, precision),
   };
 }
+
+export function getPrintContainter(page: Page) {
+  return page.locator('body > iframe');
+}
