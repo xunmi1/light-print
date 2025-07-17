@@ -35,8 +35,8 @@ test('destroy() was called', async ({ page }, testInfo) => {
 });
 
 test('visually consistent', async ({ page }, testInfo) => {
-  const isWebkit = testInfo.project.name === 'webkit';
-  if (isWebkit) testInfo.setTimeout(60_000);
+  const isWebKit = testInfo.project.name === 'webkit';
+  if (isWebKit) testInfo.setTimeout(60_000);
   await page.setViewportSize({ width: 2000, height: 3000 });
   await page.goto('/examples/index.html');
   await page.evaluate(preventDestroyContainer);
@@ -60,7 +60,7 @@ test('visually consistent', async ({ page }, testInfo) => {
   expect(round(targetBox.width)).toBe(round(originBox.width));
   expect(round(targetBox.height)).toBe(round(originBox.height));
   // webkit browser does not support
-  const maskSelectors = isWebkit ? ['#inputPlaceholder', '#inputFileSelectorButton', '#details'] : [];
+  const maskSelectors = isWebKit ? ['#inputPlaceholder', '#inputFileSelectorButton', '#details'] : [];
   // The screenshot dimensions from `element.screenshot()` are inconsistent,
   // so we're using `page.screenshot()` instead.
   const [_, targetBuffer] = await Promise.all([
