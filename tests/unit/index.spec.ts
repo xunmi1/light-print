@@ -25,3 +25,12 @@ describe('print target', () => {
     await expect(lightPrint('#app')).resolves.toBeUndefined();
   });
 });
+
+describe('destroy', () => {
+  test('destroy contanter', async () => {
+    const innerHTML = '<div id="app"></div>';
+    document.body.innerHTML = innerHTML;
+    await lightPrint('#app');
+    expect(document.body.innerHTML).toBe(innerHTML);
+  });
+});

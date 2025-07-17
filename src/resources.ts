@@ -1,4 +1,4 @@
-import { whichElement, bindOnceEvent, withResolvers, type ElementNameMap } from './utils';
+import { whichElement, bindOnceEvent, withResolvers, type ElementNameMap, NOOP } from './utils';
 import { waitFonts } from './fonts';
 
 // `style` and `link` are not needed because of the use of `getComputedStyle`
@@ -36,5 +36,5 @@ export function waitResources(doc: Document) {
       return checkLoaded(node);
     });
   tasks.push(waitFonts(doc));
-  return Promise.all(tasks);
+  return Promise.all(tasks).then(NOOP);
 }

@@ -1,3 +1,5 @@
+import { NOOP } from './utils';
+
 export function tryImportFonts(doc: Document) {
   if (!doc.fonts) return;
   try {
@@ -12,8 +14,6 @@ export function tryImportFonts(doc: Document) {
     }
   } catch {}
 }
-
-function NOOP() {}
 
 export function waitFonts(doc: Document): Promise<void> | void {
   return doc.fonts?.ready.then(NOOP);

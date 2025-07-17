@@ -77,3 +77,5 @@ export function withResolvers<T>() {
   // @ts-expect-error
   return { promise, resolve, reject };
 }
+
+export function NOOP() {}

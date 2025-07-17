@@ -1,6 +1,7 @@
 # light-print
 
 [![ci](https://img.shields.io/github/actions/workflow/status/xunmi1/light-print/ci.yml?style=flat-square&logo=github)](https://github.com/xunmi1/light-print/actions/workflows/ci.yml)
+[![Codecov](https://img.shields.io/codecov/c/github/xunmi1/light-print/main?token=bi8naFdmmW&style=flat-square)](https://codecov.io/github/xunmi1/light-print)
 [![npm bundle size](https://img.shields.io/bundlephobia/minzip/light-print?style=flat-square)](https://www.npmjs.com/package/light-print)
 [![npm](https://img.shields.io/npm/v/light-print?style=flat-square)](https://www.npmjs.com/package/light-print)
 [![license](https://img.shields.io/npm/l/light-print?style=flat-square)](https://www.npmjs.com/package/light-print)
