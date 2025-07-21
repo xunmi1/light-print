@@ -79,3 +79,7 @@ export function withResolvers<T>() {
 }
 
 export function NOOP() {}
+
+export function getStyle(element: Element, pseudoElt?: string) {
+  return element.ownerDocument.defaultView!.getComputedStyle(element, pseudoElt);
+}

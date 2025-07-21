@@ -1,5 +1,5 @@
 import type { Context } from './context';
-import { appendNode, createElementIterator, whichElement } from './utils';
+import { appendNode, createElementIterator, whichElement, getStyle } from './utils';
 
 const PSEUDO_ELECTORS = [
   '::before',
@@ -27,7 +27,7 @@ function getStyleTextDiff(targetStyle: CSSStyleDeclaration, originStyle: CSSStyl
 
 function getElementNonInlineStyle<T extends Element>(target: T, origin: T) {
   // identical inline styles are omitted.
-  return getStyleTextDiff(window.getComputedStyle(target), window.getComputedStyle(origin));
+  return getStyleTextDiff(getStyle(target), getStyle(origin));
 }
 
 function getPseudoElementStyle<T extends Element>(target: T, origin: T, pseudoElt: (typeof PSEUDO_ELECTORS)[number]) {
@@ -38,21 +38,20 @@ function getPseudoElementStyle<T extends Element>(target: T, origin: T, pseudoEl
   } else if (pseudoElt === '::details-content') {
     if (!whichElement(origin, 'details')) return;
   } else if (pseudoElt === '::marker') {
-    const display = window.getComputedStyle(origin).display;
+    const display = getStyle(origin).display;
     if (display !== 'list-item') return;
   } else if (pseudoElt === '::first-letter' || pseudoElt === '::first-line') {
-    const display = window.getComputedStyle(origin).display;
+    const display = getStyle(origin).display;
     if (BLOCK_CONTAINERS.indexOf(display) < 0) return;
   }
 
-  const originStyle = window.getComputedStyle(origin, pseudoElt);
+  const originStyle = getStyle(origin, pseudoElt);
   // replaced elements need to be checked for `content`.
   if (pseudoElt === '::before' || pseudoElt === '::after') {
     const content = originStyle.content;
     if (!content || content === 'normal' || content === 'none') return;
   }
-  const targetStyle = window.getComputedStyle(target, pseudoElt);
-
+  const targetStyle = getStyle(target, pseudoElt);
   return getStyleTextDiff(targetStyle, originStyle);
 }
 

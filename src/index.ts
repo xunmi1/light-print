@@ -68,8 +68,7 @@ function lightPrint(containerOrSelector: Element | string, options: PrintOptions
   // must be mounted and loaded before using `contentWindow` for Firefox.
   return mount(container, window.document.body)
     .then(() => {
-      if (!container.contentWindow?.document) throw new Error('Not found document.');
-      context.window = container.contentWindow;
+      context.window = container.contentWindow!;
 
       const doc = context.document;
       doc.title = options.documentTitle ?? window.document.title;
