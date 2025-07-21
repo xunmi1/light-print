@@ -1,29 +1,9 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "verbatimModuleSyntax": true,
-    "forceConsistentCasingInFileNames": true,
-    "moduleDetection": "force",
-    "useDefineForClassFields": true,
-    "resolveJsonModule": true,
-    "declaration": true,
-    "sourceMap": false,
-    "outDir": "./dist",
-    "baseUrl": "./",
-    "lib": ["esnext", "dom", "dom.iterable"],
-    "types": [],
-
-    "strict": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
-    "skipLibCheck": true,
-    "strictPropertyInitialization": false,
-    "noImplicitAny": true
-  },
-  "include": ["src/*"]
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.lib.json" },
+    { "path": "./tsconfig.node.json" },
+    { "path": "./tsconfig.unit.json" },
+    { "path": "./tsconfig.e2e.json" }
+  ]
 }
