@@ -14,7 +14,6 @@ describe('print target', () => {
     await expect(lightPrint()).rejects.toThrowError('Invalid HTML element');
   });
   test('target is an HTML element', async () => {
-    // @ts-expect-error
     await expect(lightPrint({})).rejects.toThrowError('Invalid HTML element');
     const element = document.createElement('div');
     await expect(lightPrint(element)).resolves.toBeUndefined();
@@ -27,10 +26,10 @@ describe('print target', () => {
 });
 
 describe('destroy', () => {
-  test('destroy contanter', async () => {
-    const innerHTML = '<div id="app"></div>';
-    document.body.innerHTML = innerHTML;
+  test('restore the original state after printing', async () => {
+    const innerHTML = '<head></head><body><div id="app"></div></body>';
+    document.documentElement.innerHTML = innerHTML;
     await lightPrint('#app');
-    expect(document.body.innerHTML).toBe(innerHTML);
+    expect(document.documentElement.innerHTML).toBe(innerHTML);
   });
 });

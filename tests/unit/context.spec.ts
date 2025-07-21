@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest';
+import { Window } from 'happy-dom';
 
 import { createContext } from '../../src/context';
 
@@ -24,7 +25,6 @@ describe('context', () => {
 
     const selector1 = context.getSelector(document.querySelector('.a')!);
     const selector2 = context.getSelector(document.querySelector('.b')!);
-
     expect(selector1).not.toBe(selector2);
 
     const selector3 = context.getSelector(document.querySelector('.a')!);
@@ -53,7 +53,6 @@ describe('context', () => {
     expect(newWindow.getComputedStyle(target).color).toBeFalsy();
 
     context.mountStyle();
-    const targetNode = newWindow.document.querySelector('.test');
     expect(newWindow.getComputedStyle(target).color).toBe('red');
     // doesn't effect origin window
     const origin = window.document.querySelector('.test')!;

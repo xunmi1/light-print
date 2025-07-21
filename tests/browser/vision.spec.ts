@@ -85,9 +85,8 @@ test('visually consistent', async ({ page }, testInfo) => {
 /** @HACK prevent destroy iframe container */
 function preventDestroyContainer() {
   const originalRemoveChild = Node.prototype.removeChild;
-  Node.prototype.removeChild = function (child) {
-    // @ts-expect-error
-    if (child.localName === 'iframe') return child;
-    return originalRemoveChild.call(this, child);
+  Node.prototype.removeChild = function <T extends Node>(child: T) {
+    if ('localName' in child && child.localName === 'iframe') return child;
+    return originalRemoveChild.call(this, child) as T;
   };
 }

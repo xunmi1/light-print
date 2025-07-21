@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { Window as HappyWindow } from 'happy-dom';
+import { Window, type CSSStyleDeclaration } from 'happy-dom';
 
 import { cloneDocument } from '../../src/clone';
 import { createContext } from '../../src/context';
@@ -21,14 +21,15 @@ describe('clone element', () => {
 
     let originStyle = getStyle(window, '.only-inline');
     let targetStyle = getStyle(newWindow, '.only-inline');
-    expect({ ...targetStyle }).toEqual({ ...originStyle });
+    expect(targetStyle).toEqual(originStyle);
 
     originStyle = getStyle(window, '.no-inline');
     targetStyle = getStyle(newWindow, '.no-inline');
-    expect({ ...targetStyle }).toEqual({ ...originStyle });
+    expect(targetStyle).toEqual(originStyle);
+
     originStyle = getStyle(window, '.has-inline');
     targetStyle = getStyle(newWindow, '.has-inline');
-    expect({ ...targetStyle }).toEqual({ ...originStyle });
+    expect(targetStyle).toEqual(originStyle);
   });
 
   test('clone attributes', async () => {
@@ -41,57 +42,98 @@ describe('clone element', () => {
       </div>
     `;
     const context = setupContext();
+    const newWindow = context.window!;
     cloneDocument(context, document.querySelector('#app')!);
     const originImg = window.document.querySelector('img')!;
-    const targetImg = window.document.querySelector('img')!;
-    expect(targetImg.loading).toEqual(originImg.loading);
-    expect(targetImg.src).toEqual(originImg.src);
+    const targetImg = newWindow.document.querySelector('img')!;
+    expect(targetImg.loading).toBe(originImg.loading);
+    expect(targetImg.src).toBe('');
 
     const originInput = window.document.querySelector('input')!;
-    const targetInput = window.document.querySelector('input')!;
+    const targetInput = newWindow.document.querySelector('input')!;
     expect(targetInput.type).toBe(originInput.type);
 
     const originCanvas = window.document.querySelector('canvas')!;
-    const targetCanvas = window.document.querySelector('canvas')!;
+    const targetCanvas = newWindow.document.querySelector('canvas')!;
     expect(targetCanvas.width).toBe(originCanvas.width);
     expect(targetCanvas.height).toBe(originCanvas.height);
 
     const originDetails = window.document.querySelector('details')!;
-    const targetDetails = window.document.querySelector('details')!;
+    const targetDetails = newWindow.document.querySelector('details')!;
     expect(targetDetails.open).toBe(originDetails.open);
   });
 });
 
 // `happy-dom` doesn't support pseudo element
 // https://github.com/capricorn86/happy-dom/issues/1836
-describe.todo('clone pseudo element', () => {
+describe('clone pseudo element', () => {
   test('before and after', async () => {
+    // Due to happy-dom's lack of pseudo-element support in getComputedStyle,
+    // we manually implemented it with the limitation of requiring `data-print-id` style targeting.
     document.body.innerHTML = `
-      <div id="app">
-        <style>
-          .test::before { content: '::before'; color: red; }
-          .test::after { content: 'after'; color: blue }
+      <style>
+          [data-print-id="1"]::before { content: 'before'; color: red; }
+          [data-print-id="1"]::after { content: 'after'; color: blue; }
+          [data-print-id="2"]::after { color: blue; }
         </style>
-        <div class="test">style</div>
+      <div id="app">
+        <div data-print-id="1" id="a">style</div>
+        <div data-print-id="2">style</div>
       </div>
     `;
 
     const context = setupContext();
     const newWindow = context.window!;
-    cloneDocument(context, document.querySelector('#app')!);
 
-    expect(getStyle(newWindow, '.test', '::before')).toEqual(getStyle(window, '.test', '::before'));
-    expect(getStyle(newWindow, '.test', '::after')).toEqual(getStyle(window, '.test', '::after'));
+    cloneDocument(context, document.querySelector('#app')!);
+    context.mountStyle();
+
+    expect(getStyle(newWindow, '[data-print-id="1"]', '::before')?.color).toBe('red');
+    expect(getStyle(newWindow, '[data-print-id="1"]', '::after')?.color).toBe('blue');
+    expect(getStyle(newWindow, '[data-print-id="2"]', '::after')?.color).toBeFalsy();
   });
 });
 
-function getStyle(contentWindow: HappyWindow | Window, selector: string, pseudoElt?: string) {
-  return contentWindow.getComputedStyle((contentWindow as any).document.querySelector(selector)!, pseudoElt);
+function getStyle(contentWindow: Window, selector: string, pseudoElt?: string) {
+  const node = contentWindow.document.querySelector(selector)!;
+  const style = contentWindow.getComputedStyle(node, pseudoElt);
+  return toStyleRecord(style);
+}
+
+/**
+ * The `happy-dom`'s CSSStyleDeclaration implementation is incorrect
+ * and fails to iterate over properties.
+ */
+function toStyleRecord(style: CSSStyleDeclaration) {
+  return Object.fromEntries(
+    getAllPropertyNames(style)
+      .map<[string, string] | void>(key => {
+        if (typeof key !== 'string' || isNumberLike(key)) return;
+        // @ts-expect-error
+        const value = style[key];
+        if (typeof value === 'string' && value) return [key, value];
+      })
+      .filter(v => v != null)
+  );
+}
+
+function isNumberLike(value: string) {
+  return /^\d+$/.test(value);
 }
 
 function setupContext() {
   const context = createContext();
-  // @ts-expect-error
-  context.window = new HappyWindow({ url: 'about:blank' });
+  context.window = new Window({ url: 'about:blank' });
   return context;
+}
+
+function getAllPropertyNames(object: object) {
+  const props = new Set<string | symbol>();
+
+  while (object && object !== Object.prototype) {
+    Reflect.ownKeys(object).forEach(key => props.add(key));
+    object = Object.getPrototypeOf(object);
+  }
+
+  return Array.from(props);
 }
