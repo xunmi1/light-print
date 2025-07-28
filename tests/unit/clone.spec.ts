@@ -77,7 +77,7 @@ describe('clone pseudo element', () => {
           [data-print-id="2"]::after { color: blue; }
         </style>
       <div id="app">
-        <div data-print-id="1" id="a">style</div>
+        <div data-print-id="1">style</div>
         <div data-print-id="2">style</div>
       </div>
     `;

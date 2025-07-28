@@ -16,7 +16,6 @@ describe('compatibility', async () => {
       return { ...original, isIE };
     });
     document.body.innerHTML = '<div id="app"></div>';
-    const lightPrint = await import('../../src/index').then(module => module.default);
     await expect(lightPrint('#app')).resolves.toBeUndefined();
     expect(isIE).toBeCalled();
   });
