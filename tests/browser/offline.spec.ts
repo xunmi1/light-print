@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('no printing when offline', async ({ page, context }) => {
+test('throw error when containing network resources', async ({ page, context }) => {
   // disable network cache
   await page.route('**/*', route => {
     const headers = route.request().headers();

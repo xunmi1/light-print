@@ -1,43 +1,11 @@
 import { test, expect } from '@playwright/test';
-import { delayNetwork, getPrintContainter, getScreenshotPath, round, roundBox } from './utils';
+import { getPrintContainter, getScreenshotPath, round, roundBox, preventDestroyContainer } from './utils';
 
-test('print() was called', async ({ page }) => {
-  await page.goto('/examples/index.html');
-  // To allow time for event binding, needs to be delay network 1s.
-  await delayNetwork(page, 2000);
-  await page.click('#print-action');
-  await getPrintContainter(page).waitFor({ state: 'attached' });
-  await page.evaluate(() => {
-    // @ts-expect-error
-    window.waitForPrint = new Promise(resolve => {
-      const iframe = window.document.querySelector<HTMLIFrameElement>('body > iframe')!;
-      // replace `print()`
-      iframe.contentWindow!.print = () => resolve(true);
-    });
-  });
-  // @ts-expect-error
-  const handler = await page.waitForFunction(() => window.waitForPrint, null, { timeout: 5000 });
-  const isCalled = await handler.jsonValue();
-  expect(isCalled).toBe(true);
-});
-
-test('destroy() was called', async ({ page }, testInfo) => {
-  await page.goto('/examples/index.html');
-  await delayNetwork(page, 1000);
-  await page.click('#print-action');
-  const container = getPrintContainter(page);
-  await expect(container).toBeAttached();
-  // Only Chromium didn't display the print dialog and terminated the print process,
-  // while other browsers remained on the print dialog, the `Playwright` can't close it.
-  if (testInfo.project.name === 'chromium') {
-    await expect(container).not.toBeAttached();
-  }
-});
+test.use({ viewport: { width: 1920, height: 1080 } });
 
 test('visually consistent', async ({ page }, testInfo) => {
   const isWebKit = testInfo.project.name === 'webkit';
   if (isWebKit) testInfo.setTimeout(60_000);
-  await page.setViewportSize({ width: 2000, height: 3000 });
   await page.goto('/examples/index.html');
   await page.evaluate(preventDestroyContainer);
 
@@ -49,7 +17,7 @@ test('visually consistent', async ({ page }, testInfo) => {
 
   const container = getPrintContainter(page);
   await expect(container).toBeHidden();
-  // avoid scroll
+  // avoid container scrolling
   await container.evaluate(element => (element.style = 'width: 100%; height: 1500px'));
   const frame = container.contentFrame();
   const target = frame.locator('#app');
@@ -79,14 +47,5 @@ test('visually consistent', async ({ page }, testInfo) => {
     }),
   ]);
 
-  await expect(targetBuffer).toMatchSnapshot('origin.png', { maxDiffPixelRatio: 0.005 });
+  expect(targetBuffer).toMatchSnapshot('origin.png', { maxDiffPixelRatio: 0.005 });
 });
-
-/** @HACK prevent destroy iframe container */
-function preventDestroyContainer() {
-  const originalRemoveChild = Node.prototype.removeChild;
-  Node.prototype.removeChild = function <T extends Node>(child: T) {
-    if ('localName' in child && child.localName === 'iframe') return child;
-    return originalRemoveChild.call(this, child) as T;
-  };
-}

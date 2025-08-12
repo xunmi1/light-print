@@ -24,7 +24,7 @@
     "dist"
   ],
   "scripts": {
-    "start": "http-server ./ -p 3000",
+    "start": "http-server ./ -p 3100",
     "build": "npm run lint && npm run build-ts && npm run build-rollup && npm run build-dts && rimraf .cache",
     "build-ts": "rimraf .cache && tsc --outDir .cache --project tsconfig.lib.json",
     "build-rollup": "rimraf dist && rollup -c scripts/rollup.config.js -i .cache/index.js",
