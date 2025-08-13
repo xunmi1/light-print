@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { getPrintContainter, getScreenshotPath, round, roundBox, preventDestroyContainer } from './utils';
+import { getPrintContainter, screenshot, round, preventDestroyContainer } from './utils';
 
 test.use({ viewport: { width: 1920, height: 1080 } });
 
@@ -22,30 +22,11 @@ test('visually consistent', async ({ page }, testInfo) => {
   const frame = container.contentFrame();
   const target = frame.locator('#app');
   const origin = page.locator('#app');
-  const [originBox, targetBox] = await Promise.all([origin.boundingBox(), target.boundingBox()]);
-  if (!originBox || !targetBox) throw new Error('Failed to get bounding box');
-
-  expect(round(targetBox.width)).toBe(round(originBox.width));
-  expect(round(targetBox.height)).toBe(round(originBox.height));
-  // webkit browser does not support
+  // WebKit browsers do not support certain pseudo-elements.
   const maskSelectors = isWebKit ? ['#inputPlaceholder', '#inputFileSelectorButton', '#details'] : [];
-  // The screenshot dimensions from `element.screenshot()` are inconsistent,
-  // so we're using `page.screenshot()` instead.
-  const [_, targetBuffer] = await Promise.all([
-    page.screenshot({
-      path: getScreenshotPath('origin', testInfo),
-      clip: roundBox(originBox),
-      fullPage: true,
-      mask: maskSelectors.map(v => page.locator(v)),
-      maskColor: 'white',
-    }),
-    page.screenshot({
-      clip: roundBox(targetBox),
-      fullPage: true,
-      mask: maskSelectors.map(v => frame.locator(v)),
-      maskColor: 'white',
-    }),
-  ]);
+
+  await screenshot(page, origin, { fileName: 'origin.png', testInfo, mask: maskSelectors.map(v => page.locator(v)) });
+  const targetBuffer = await screenshot(page, target, { mask: maskSelectors.map(v => frame.locator(v)) });
 
   expect(targetBuffer).toMatchSnapshot('origin.png', { maxDiffPixelRatio: 0.005 });
 });

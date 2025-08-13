@@ -1,9 +1,4 @@
-import type { Page, Route, TestInfo } from '@playwright/test';
-
-export function getScreenshotPath(name: string, testInfo: TestInfo) {
-  // need to be the same as `snapshotPathTemplate` config
-  return `tests/browser/__screenshots__/${name}-${process.platform}-${testInfo.project.name}.png`;
-}
+import type { Locator, Page, PageScreenshotOptions, Route, TestInfo } from '@playwright/test';
 
 function delay(ms: number) {
   if (ms === Infinity) return Promise.withResolvers<void>().promise;
@@ -65,4 +60,45 @@ export async function preventPrintDialog(page: Page, trigger: () => Promise<void
   await abort();
 
   return containers;
+}
+
+export function getScreenshotPath(name: string, testInfo: TestInfo) {
+  // need to be the same as `snapshotPathTemplate` config
+  return `tests/browser/__screenshots__/${name}-${process.platform}-${testInfo.project.name}.png`;
+}
+
+const FILE_PATTERN = /^(?<name>.*?)(?:\.(?<type>[^.]+))?$/;
+
+type ScreenshotType = PageScreenshotOptions['type'];
+type FileName = `${string}.${NonNullable<ScreenshotType>}`;
+
+export function screenshot(page: Page, target: Locator, options?: { mask?: Locator[] }): Promise<Buffer>;
+export function screenshot(
+  page: Page,
+  target: Locator,
+  options?: { fileName: FileName; testInfo: TestInfo; mask?: Locator[] }
+): Promise<Buffer>;
+export async function screenshot(
+  page: Page,
+  target: Locator,
+  options?: { fileName?: FileName; testInfo?: TestInfo; mask?: Locator[] }
+) {
+  const { fileName, testInfo, ...rest } = options ?? {};
+  const { name, type } = fileName?.match(FILE_PATTERN)?.groups ?? ({} as { name?: string; type?: string });
+  const path = name ? getScreenshotPath(name, testInfo!) : undefined;
+
+  const box = await target.boundingBox();
+  // The screenshot dimensions from `element.screenshot()` are inconsistent,
+  // so we're using `page.screenshot()` instead.
+  // @see https://github.com/microsoft/playwright/issues/18827
+  const buffer = await page.screenshot({
+    path,
+    clip: roundBox(box!),
+    fullPage: true,
+    animations: 'disabled',
+    type: type?.toLowerCase() as ScreenshotType,
+    maskColor: 'white',
+    ...rest,
+  });
+  return buffer;
 }

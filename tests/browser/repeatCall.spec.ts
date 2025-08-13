@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { getScreenshotPath, preventDestroyContainer, preventPrintDialog } from './utils';
+import { preventDestroyContainer, preventPrintDialog, screenshot } from './utils';
 
 test.use({ viewport: { width: 1920, height: 1080 } });
 
@@ -25,11 +25,9 @@ test('repeat prints should be identical', async ({ page }, testInfo) => {
   const first = containters.first().contentFrame().locator('#app');
   const last = containters.last().contentFrame().locator('#app');
 
-  await first.screenshot({
-    path: getScreenshotPath('repeat-first', testInfo),
-    scale: 'css',
-  });
-  const repeatLast = await last.screenshot({ scale: 'css' });
-
-  expect(repeatLast).toMatchSnapshot('repeat-first.png');
+  await screenshot(page, first, { fileName: 'repeat-first.png', testInfo });
+  const repeatLast = await screenshot(page, last);
+  // Firefox has rendering position discrepancies in CI.
+  const maxDiffPixelRatio = testInfo.project.name === 'firefox' ? 0.005 : 0;
+  expect(repeatLast).toMatchSnapshot('repeat-first.png', { maxDiffPixelRatio });
 });
