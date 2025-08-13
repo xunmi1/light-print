@@ -25,4 +25,5 @@ export default defineConfig({
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
     { name: 'webkit', use: { ...devices['Desktop Safari'] } },
   ],
+  tsconfig: './tsconfig.e2e.json',
 });

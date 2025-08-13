@@ -15,16 +15,21 @@ test('repeat prints should be identical', async ({ page }, testInfo) => {
     await Promise.all([page.click('#print-action'), page.click('#print-action')]);
   });
 
-  await expect(containters).toHaveCount(2);
   // avoid container scrolling
   await containters.evaluateAll(elements =>
     elements.forEach(element => (element.style = 'width: 100%; height: 1500px'))
   );
 
-  await containters.first().screenshot({
-    path: getScreenshotPath('repeat-first', testInfo),
-  });
-  const repeatLast = await containters.last().screenshot();
+  await expect(containters).toHaveCount(2);
 
-  expect(repeatLast).toMatchSnapshot('repeat-first.png', { maxDiffPixelRatio: 0.005 });
+  const first = containters.first().contentFrame().locator('#app');
+  const last = containters.last().contentFrame().locator('#app');
+
+  await first.screenshot({
+    path: getScreenshotPath('repeat-first', testInfo),
+    scale: 'css',
+  });
+  const repeatLast = await last.screenshot({ scale: 'css' });
+
+  expect(repeatLast).toMatchSnapshot('repeat-first.png');
 });
