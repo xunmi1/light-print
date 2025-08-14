@@ -8,9 +8,15 @@ import {
   type CSSStyleDeclaration,
 } from 'happy-dom';
 
+type WindowConstructorOptions = ConstructorParameters<typeof Window>[0];
 declare global {
   const window: Window;
   const document: Document;
+
+  const Window: {
+    prototype: Window;
+    new (options?: WindowConstructorOptions): Window;
+  };
 }
 
 declare module 'happy-dom' {

@@ -1,4 +1,6 @@
 {
   "extends": "./tsconfig.node.json",
-  "include": ["tests/unit/**/*"]
+  "include": ["tests/unit/**/*"],
+  "exclude": ["tests/unit/**/*.spec-d.ts"],
+  "references": [{ "path": "./tsconfig.check.json" }]
 }
