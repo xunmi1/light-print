@@ -50,6 +50,7 @@ body {
 
 #app {
   background-color: white;
+  print-color-adjust: exact;
 }
 
 table {

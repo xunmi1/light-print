@@ -1,19 +1,18 @@
 import { test, expect } from '@playwright/test';
-import { preventDestroyContainer, preventPrintDialog, screenshot } from './utils';
+import { preventDestroyContainer, preventPrintDialog, getPrintContainter, screenshot } from './utils';
 
 test.use({ viewport: { width: 1920, height: 1080 } });
+test.beforeEach(async ({ page }) => {
+  await preventDestroyContainer(page);
+  await preventPrintDialog(page);
+});
 
 test('repeat prints should be identical', async ({ page }, testInfo) => {
-  const isWebKit = testInfo.project.name === 'webkit';
-  if (isWebKit) testInfo.setTimeout(60_000);
-
   await page.goto('/examples/index.html');
-  await page.evaluate(preventDestroyContainer);
+  // trigger twice consecutively
+  await Promise.all([page.click('#print-action'), page.click('#print-action')]);
 
-  const containters = await preventPrintDialog(page, async () => {
-    // trigger twice consecutively
-    await Promise.all([page.click('#print-action'), page.click('#print-action')]);
-  });
+  const containters = getPrintContainter(page);
 
   // avoid container scrolling
   await containters.evaluateAll(elements =>

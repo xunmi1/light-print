@@ -32,34 +32,52 @@ export function getPrintContainter(page: Page) {
   return page.locator('body > iframe');
 }
 
-/** @HACK prevent destroy iframe container */
-export function preventDestroyContainer() {
-  const originalRemoveChild = Node.prototype.removeChild;
-  Node.prototype.removeChild = function <T extends Node>(child: T) {
-    if ('localName' in child && child.localName === 'iframe') return child;
-    return originalRemoveChild.call(this, child) as T;
-  };
+declare global {
+  interface Window {
+    lightPrint: typeof import('../../dist/light-print').default;
+  }
+}
+export async function loadPrintScript(page: Page) {
+  await page.addScriptTag({ path: 'dist/light-print.global.js' });
 }
 
-/** @HACK prevent display print dialog */
-export async function preventPrintDialog(page: Page, trigger: () => Promise<void> | void) {
-  // Indefinitely extend the request duration to prevent the print dialog.
-  const abort = await delayNetwork(page, Infinity);
-  await trigger();
-  const containers = getPrintContainter(page);
-  await containers.evaluateAll<void, HTMLIFrameElement>(elements =>
-    elements.forEach(element => {
-      const currentWindow = element.contentWindow!;
-      // replace `print()`
-      currentWindow.print = () => {
-        currentWindow.dispatchEvent(new Event('beforeprint'));
-        currentWindow.dispatchEvent(new Event('afterprint'));
-      };
-    })
-  );
-  await abort();
+/** @HACK prevent destroy iframe container */
+export async function preventDestroyContainer(page: Page) {
+  function replace() {
+    const replaced = '__replaced__';
+    const _removeChild = Node.prototype.removeChild;
 
-  return containers;
+    // @ts-expect-error
+    if (_removeChild[replaced]) return;
+    function removeChild<T extends Node>(this: Node, child: T) {
+      if (child instanceof HTMLIFrameElement) return child;
+      return _removeChild.call<Node, [T], T>(this, child);
+    }
+    removeChild[replaced] = true;
+    Node.prototype.removeChild = removeChild;
+  }
+  await page.addInitScript(replace);
+  await page.evaluate(replace);
+}
+
+async function print(this: Window) {
+  this.dispatchEvent(new Event('beforeprint'));
+  this.dispatchEvent(new Event('afterprint'));
+}
+
+function getBrowserName(page: Page) {
+  return page.context().browser()!.browserType().name();
+}
+
+/**
+ * @HACK prevent display print dialog
+ *
+ * `print()` blocks the main thread, and Firefox/WebKit in CI can't close the print dialog, preventing subsequent test execution.
+ */
+export async function preventPrintDialog(page: Page) {
+  if (getBrowserName(page) === 'chromium') return;
+
+  await page.exposeBinding('print', ({ frame }) => frame.evaluate(print));
 }
 
 export function getScreenshotPath(name: string, testInfo: TestInfo) {
