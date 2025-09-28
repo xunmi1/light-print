@@ -120,3 +120,12 @@ export async function screenshot(
   });
   return buffer;
 }
+
+export function getPageErrors(page: Page) {
+  const errors: Error[] = [];
+  page.on('pageerror', err => errors.push(err));
+  page.on('console', message => {
+    if (message.type() === 'error') errors.push(new Error(message.text()));
+  });
+  return errors;
+}
