@@ -11,7 +11,7 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     command: 'npm run start',
-    url: 'http://localhost:3100',
+    port: 3100,
     reuseExistingServer: !process.env.CI,
   },
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */

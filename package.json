@@ -24,7 +24,7 @@
     "dist"
   ],
   "scripts": {
-    "start": "http-server ./ -p 3100",
+    "start": "vite preview --port 3100 --outDir ./ --logLevel error",
     "build": "npm run lint && npm run build-ts && npm run build-rollup && npm run build-dts && rimraf .cache",
     "build-ts": "rimraf .cache && tsc --outDir .cache --project tsconfig.lib.json",
     "build-rollup": "rimraf dist && rollup -c scripts/rollup.config.js -i .cache/index.js",
@@ -55,18 +55,18 @@
   },
   "homepage": "https://xunmi1.github.io/light-print/",
   "devDependencies": {
-    "@playwright/test": "^1.54.2",
+    "@playwright/test": "^1.55.1",
     "@rollup/plugin-terser": "^0.4.4",
     "@types/node": "^22.16.4",
     "@vitest/coverage-v8": "^3.2.4",
     "@xunmi/prettier-config": "^1.0.2",
     "happy-dom": "^18.0.1",
-    "http-server": "^14.1.1",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
-    "rollup": "^4.46.2",
-    "rollup-plugin-dts": "^6.2.1",
+    "rollup": "^4.52.3",
+    "rollup-plugin-dts": "^6.2.3",
     "typescript": "^5.9.2",
+    "vite": "^7.1.7",
     "vitest": "^3.2.4"
   },
   "prettier": "@xunmi/prettier-config"
