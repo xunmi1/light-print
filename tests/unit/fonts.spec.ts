@@ -1,7 +1,7 @@
 import { expect, test, vi } from 'vitest';
 import { Document } from 'happy-dom';
 
-import lightPrint from '../../src';
+import lightPrint from 'src';
 
 test('fonts', async () => {
   // `happy-dom` doesn't support `document.fonts`,

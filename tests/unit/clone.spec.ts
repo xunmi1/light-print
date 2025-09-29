@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest';
 import { getStyle } from './utils';
 
-import { cloneDocument } from '../../src/clone';
-import { createContext } from '../../src/context';
+import { cloneDocument } from 'src/clone';
+import { createContext, SELECTOR_NAME } from 'src/context';
 
 describe('clone element', () => {
   test('clone style', async () => {
@@ -69,16 +69,16 @@ describe('clone element', () => {
 describe('clone pseudo element', () => {
   test('before and after', async () => {
     // Due to happy-dom's lack of pseudo-element support in getComputedStyle,
-    // we manually implemented it with the limitation of requiring `data-print-id` style targeting.
+    // we manually implemented it with the limitation of requiring `SELECTOR_NAME` style targeting.
     document.body.innerHTML = `
       <style>
-          [data-print-id="1"]::before { content: 'before'; color: red; }
-          [data-print-id="1"]::after { content: 'after'; color: blue; }
-          [data-print-id="2"]::after { color: blue; }
+          [${SELECTOR_NAME}="1"]::before { content: 'before'; color: red; }
+          [${SELECTOR_NAME}="1"]::after { content: 'after'; color: blue; }
+          [${SELECTOR_NAME}="2"]::after { color: blue; }
         </style>
       <div id="app">
-        <div data-print-id="1">style</div>
-        <div data-print-id="2">style</div>
+        <div ${SELECTOR_NAME}="1">style</div>
+        <div ${SELECTOR_NAME}="2">style</div>
       </div>
     `;
 
@@ -88,9 +88,9 @@ describe('clone pseudo element', () => {
     cloneDocument(context, document.querySelector('#app')!);
     context.mountStyle();
 
-    expect(getStyle(newWindow, '[data-print-id="1"]', '::before')?.color).toBe('red');
-    expect(getStyle(newWindow, '[data-print-id="1"]', '::after')?.color).toBe('blue');
-    expect(getStyle(newWindow, '[data-print-id="2"]', '::after')?.color).toBeFalsy();
+    expect(getStyle(newWindow, `[${SELECTOR_NAME}="1"]`, '::before')?.color).toBe('red');
+    expect(getStyle(newWindow, `[${SELECTOR_NAME}="1"]`, '::after')?.color).toBe('blue');
+    expect(getStyle(newWindow, `[${SELECTOR_NAME}="2"]`, '::after')?.color).toBeFalsy();
   });
 });
 

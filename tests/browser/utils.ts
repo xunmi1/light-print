@@ -34,7 +34,7 @@ export function getPrintContainter(page: Page) {
 
 declare global {
   interface Window {
-    lightPrint: typeof import('../../dist/light-print').default;
+    lightPrint: typeof import('dist/light-print').default;
   }
 }
 export async function loadPrintScript(page: Page) {

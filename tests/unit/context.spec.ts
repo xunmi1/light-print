@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { createContext } from '../../src/context';
+import { createContext } from 'src/context';
 import { getStyle } from './utils';
 
 describe('context', () => {

@@ -1,20 +1,27 @@
 import { appendNode } from './utils';
 
+/**
+ * Attribute name used to mark elements for printing.
+ * @internal
+ * Exporting this constant is solely for the convenience of testing.
+ */
+export const SELECTOR_NAME = 'data-print-id';
+
 export function createContext() {
   let styleNode: HTMLStyleElement | undefined;
   let printId = 1;
 
   function markId(node: Element) {
-    let id = node.getAttribute('data-print-id');
+    let id = node.getAttribute(SELECTOR_NAME);
     if (!id) {
       id = (printId++).toString();
-      node.setAttribute('data-print-id', id);
+      node.setAttribute(SELECTOR_NAME, id);
     }
     return id;
   }
 
   function getSelector(node: Element) {
-    return `[data-print-id="${markId(node)}"]`;
+    return `[${SELECTOR_NAME}="${markId(node)}"]`;
   }
 
   function appendStyle(text?: string) {

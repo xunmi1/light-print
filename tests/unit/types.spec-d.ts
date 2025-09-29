@@ -1,5 +1,5 @@
 import { test, expectTypeOf } from 'vitest';
-import lightPrint from '../../src';
+import lightPrint from 'src';
 
 test('parameters', () => {
   expectTypeOf(lightPrint).toBeFunction();

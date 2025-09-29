@@ -1,5 +1,5 @@
 import { expect, describe, test, vi } from 'vitest';
-import lightPrint from '../../src';
+import lightPrint from 'src';
 
 describe('compatibility', async () => {
   test('Promise', async () => {
@@ -11,7 +11,7 @@ describe('compatibility', async () => {
 
   test('mock IE', async () => {
     const isIE = vi.hoisted(() => vi.fn(() => true));
-    vi.mock(import('../../src/utils'), async importOriginal => {
+    vi.mock(import('src/utils'), async importOriginal => {
       const original = await importOriginal();
       return { ...original, isIE };
     });

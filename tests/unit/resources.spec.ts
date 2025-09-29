@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { Event } from 'happy-dom';
 
-import { waitResources } from '../../src/resources';
+import { waitResources } from 'src/resources';
 
 describe('resources', () => {
   test('successfully loaded', async () => {

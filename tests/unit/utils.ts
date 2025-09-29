@@ -16,7 +16,6 @@ function toStyleRecord(style: CSSStyleDeclaration) {
     getAllPropertyNames(style)
       .map<[string, string] | void>(key => {
         if (typeof key !== 'string' || isNumberLike(key)) return;
-        // @ts-expect-error
         const value = style[key];
         if (typeof value === 'string' && value) return [key, value];
       })
@@ -25,14 +24,14 @@ function toStyleRecord(style: CSSStyleDeclaration) {
 }
 
 function isNumberLike(value: string) {
-  return /^\d+$/.test(value);
+  return /^[+-]?\d*\.?\d+$/.test(value);
 }
 
-function getAllPropertyNames(object: object) {
-  const props = new Set<string | symbol>();
+function getAllPropertyNames<T extends object>(object: T) {
+  const props = new Set<keyof T>();
 
   while (object && object !== Object.prototype) {
-    Reflect.ownKeys(object).forEach(key => props.add(key));
+    Reflect.ownKeys(object).forEach(key => props.add(key as keyof T));
     object = Object.getPrototypeOf(object);
   }
 

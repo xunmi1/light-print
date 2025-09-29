@@ -1,6 +1,6 @@
 import { expect, describe, test } from 'vitest';
 
-import lightPrint from '../../src';
+import lightPrint from 'src';
 
 describe('return value', () => {
   test('promise', () => {

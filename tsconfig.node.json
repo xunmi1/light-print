@@ -15,6 +15,7 @@
     "resolveJsonModule": true,
     "noEmit": true,
     "composite": true,
+    "baseUrl": "./",
 
     /* Linting */
     "strict": true,
