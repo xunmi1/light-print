@@ -2,7 +2,8 @@ import { describe, expect, test } from 'vitest';
 import { getStyle } from './utils';
 
 import { cloneDocument } from 'src/clone';
-import { createContext, SELECTOR_NAME } from 'src/context';
+import { createContext, SELECTOR_NAME, type Context } from 'src/context';
+import type { ElementNameMap } from 'src/utils';
 
 describe('clone element', () => {
   test('clone style', async () => {
@@ -37,30 +38,54 @@ describe('clone element', () => {
       <div id="app">
          <img src="" loading="lazy" />
          <input type="file" />
-         <canvas width="50" height="50"></canvas>
          <details open></details>
       </div>
     `;
     const context = setupContext();
-    const newWindow = context.window!;
     cloneDocument(context, document.querySelector('#app')!);
-    const originImg = window.document.querySelector('img')!;
-    const targetImg = newWindow.document.querySelector('img')!;
+    const [originImg, targetImg] = querySelectors(context, 'img');
     expect(targetImg.loading).toBe(originImg.loading);
     expect(targetImg.src).toBe('');
 
-    const originInput = window.document.querySelector('input')!;
-    const targetInput = newWindow.document.querySelector('input')!;
+    const [originInput, targetInput] = querySelectors(context, 'input');
     expect(targetInput.type).toBe(originInput.type);
 
-    const originCanvas = window.document.querySelector('canvas')!;
-    const targetCanvas = newWindow.document.querySelector('canvas')!;
+    const [originDetails, targetDetails] = querySelectors(context, 'details');
+    expect(targetDetails.open).toBe(originDetails.open);
+  });
+});
+
+describe('clone canvas', () => {
+  test('normal', async () => {
+    document.body.innerHTML = `
+      <div id="app">
+         <canvas width="50" height="50"></canvas>
+      </div>
+    `;
+
+    const context = setupContext();
+    cloneDocument(context, document.querySelector('#app')!);
+    const [originCanvas, targetCanvas] = querySelectors(context, 'canvas');
+    expect(targetCanvas.width).toBe(originCanvas.width);
+    expect(targetCanvas.height).toBe(originCanvas.height);
+  });
+
+  test('zero size', async () => {
+    document.body.innerHTML = `
+      <div id="app">
+         <canvas id="zeroHeight" width="50" height="0"></canvas>
+         <canvas id="zeroWidth" width="0" height="50"></canvas>
+      </div>
+    `;
+    const context = setupContext();
+    cloneDocument(context, document.querySelector('#app')!);
+    let [originCanvas, targetCanvas] = querySelectors(context, '#zeroHeight');
     expect(targetCanvas.width).toBe(originCanvas.width);
     expect(targetCanvas.height).toBe(originCanvas.height);
 
-    const originDetails = window.document.querySelector('details')!;
-    const targetDetails = newWindow.document.querySelector('details')!;
-    expect(targetDetails.open).toBe(originDetails.open);
+    [originCanvas, targetCanvas] = querySelectors(context, '#zeroWidth');
+    expect(targetCanvas.width).toBe(originCanvas.width);
+    expect(targetCanvas.height).toBe(originCanvas.height);
   });
 });
 
@@ -98,4 +123,12 @@ function setupContext() {
   const context = createContext();
   context.window = new Window({ url: 'about:blank' });
   return context;
+}
+
+function querySelectors<T extends keyof ElementNameMap>(
+  context: Context,
+  selector: T
+): [ElementNameMap[T], ElementNameMap[T]];
+function querySelectors(context: Context, selector: string) {
+  return [window.document.querySelector(selector)!, context.window!.document.querySelector(selector)!];
 }

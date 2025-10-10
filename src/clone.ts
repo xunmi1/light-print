@@ -78,6 +78,7 @@ function clonePseudoElementStyle<T extends Element>(target: T, origin: T, contex
 
 /** clone canvas */
 function cloneCanvas<T extends HTMLCanvasElement>(target: T, origin: T) {
+  if (origin.width === 0 || origin.height === 0) return;
   target.getContext('2d')!.drawImage(origin, 0, 0);
 }
 
