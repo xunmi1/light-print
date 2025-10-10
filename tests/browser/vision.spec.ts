@@ -38,10 +38,8 @@ test('append style', async ({ page }, testInfo) => {
 
   const appendedStyle = '#app { background: blue !important; }';
 
-  await loadPrintScript(page);
-  await page.evaluate(style => {
-    window.lightPrint('#app', { mediaPrintStyle: style });
-  }, appendedStyle);
+  const lightPrint = await loadPrintScript(page);
+  await lightPrint('#app', { mediaPrintStyle: appendedStyle });
 
   const container = getPrintContainter(page);
   await container.evaluate(element => (element.style = 'width: 100%; height: 500px'));

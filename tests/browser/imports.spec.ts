@@ -23,6 +23,7 @@ test('IIFE', async ({ page }) => {
   await page.goto('/examples/nest.html');
   const errors = getPageErrors(page);
   await page.addScriptTag({ path: 'dist/light-print.global.js' });
+  // @ts-expect-error
   await page.evaluate(() => window.lightPrint('body'));
   expect(errors).toHaveLength(0);
 });
@@ -39,6 +40,7 @@ test('CommonJS', async ({ page }) => {
       window.lightPrint = module.exports;
     `,
   });
+  // @ts-expect-error
   await page.evaluate(() => window.lightPrint('body'));
   expect(errors).toHaveLength(0);
 });

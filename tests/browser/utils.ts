@@ -32,13 +32,12 @@ export function getPrintContainter(page: Page) {
   return page.locator('body > iframe');
 }
 
-declare global {
-  interface Window {
-    lightPrint: typeof import('dist/light-print').default;
-  }
-}
 export async function loadPrintScript(page: Page) {
   await page.addScriptTag({ path: 'dist/light-print.global.js' });
+  type PrintType = typeof import('dist/light-print').default;
+  // @ts-expect-error
+  const lightPrint: PrintType = (...params) => page.evaluate(args => window.lightPrint(...args), params);
+  return lightPrint;
 }
 
 /** @HACK prevent destroy iframe container */
@@ -60,7 +59,7 @@ export async function preventDestroyContainer(page: Page) {
   await page.evaluate(replace);
 }
 
-async function print(this: Window) {
+export function mockPrint(this: Window) {
   this.dispatchEvent(new Event('beforeprint'));
   this.dispatchEvent(new Event('afterprint'));
 }
@@ -76,8 +75,7 @@ function getBrowserName(page: Page) {
  */
 export async function preventPrintDialog(page: Page) {
   if (getBrowserName(page) === 'chromium') return;
-
-  await page.exposeBinding('print', ({ frame }) => frame.evaluate(print));
+  await page.exposeBinding('print', ({ frame }) => frame.evaluate(mockPrint));
 }
 
 export function getScreenshotPath(name: string, testInfo: TestInfo) {

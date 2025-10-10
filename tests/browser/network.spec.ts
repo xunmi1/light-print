@@ -16,17 +16,16 @@ test.describe('containing network resources', () => {
     });
     await page.goto('/examples/index.html');
     await page.context().setOffline(true);
-    await loadPrintScript(page);
-    const task = page.evaluate(() => window.lightPrint('#app'));
-    await expect(task).rejects.toThrow('Failed to load resource');
+    const lightPrint = await loadPrintScript(page);
+    await expect(lightPrint('#app')).rejects.toThrowError('Failed to load resource');
   });
 
   test('wait for resource loading', async ({ page }) => {
     await page.goto('/examples/index.html');
     const abortDelay = await delayNetwork(page, Infinity);
-    await loadPrintScript(page);
+    const lightPrint = await loadPrintScript(page);
     let status = 'pending';
-    const task = page.evaluate(() => window.lightPrint('#app'));
+    const task = lightPrint('#app');
     task.finally(() => (status = 'finished'));
     await page.waitForTimeout(500);
     expect(status).toBe('pending');
