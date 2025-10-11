@@ -1,3 +1,3 @@
 {
-  "recommendations": ["esbenp.prettier-vscode", "vitest.explorer", "ms-vscode.live-server"]
+  "recommendations": ["esbenp.prettier-vscode", "vitest.explorer"]
 }

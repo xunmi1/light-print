@@ -47,20 +47,43 @@ export function normalizeNode<T extends Element>(target: unknown) {
   if (isString(target)) return window.document.querySelector<T>(target) ?? undefined;
 }
 
-type EventMap = WindowEventMap & DocumentEventMap;
+type Registry = readonly (readonly [unknown, unknown])[];
+type FindRegistry<T, R extends Registry> = T extends R[0][0]
+  ? R[0][1]
+  : R extends [unknown, ...infer Tail extends Registry]
+    ? FindRegistry<T, Tail>
+    : never;
 
-export function bindOnceEvent<T extends EventTarget, K extends keyof EventMap>(
-  el: T,
-  eventName: K,
-  listener: (event: EventMap[K]) => void,
+type EventMapRegistry = [
+  [Window, WindowEventMap],
+  [Document, DocumentEventMap],
+  [HTMLVideoElement, HTMLVideoElementEventMap],
+  [HTMLMediaElement, HTMLMediaElementEventMap],
+  [HTMLBodyElement, HTMLBodyElementEventMap],
+  [SVGSVGElement, SVGSVGElementEventMap],
+  [HTMLElement, HTMLElementEventMap],
+  [SVGElement, SVGElementEventMap],
+  [MathMLElement, MathMLElementEventMap],
+  [Element, ElementEventMap],
+  [GlobalEventHandlers, GlobalEventHandlersEventMap],
+  [EventTarget, Record<string, Event>],
+];
+
+type EventMap<T> = FindRegistry<T, EventMapRegistry>;
+type EventName<T> = keyof EventMap<T> & string;
+type EventFor<T, K extends keyof EventMap<T>> = EventMap<T>[K];
+
+export function bindOnceEvent<Target extends EventTarget | GlobalEventHandlers, Name extends EventName<Target>>(
+  target: Target,
+  eventName: Name,
+  listener: (event: EventFor<Target, Name>) => void,
   options?: AddEventListenerOptions | boolean
 ) {
   const wrappedListener: EventListener = event => {
-    listener(event as EventMap[K]);
-    el.removeEventListener(eventName, wrappedListener);
+    listener(event as EventFor<Target, Name>);
+    target.removeEventListener(eventName, wrappedListener);
   };
-
-  el.addEventListener(eventName, wrappedListener, options);
+  target.addEventListener(eventName, wrappedListener, options);
 }
 
 /**
