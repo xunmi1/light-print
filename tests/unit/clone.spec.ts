@@ -89,6 +89,26 @@ describe('clone canvas', () => {
   });
 });
 
+describe('clone media', () => {
+  test('currentTime', async () => {
+    document.body.innerHTML = `
+      <div id="app">
+         <audio controls></audio>
+         <video controls></video>
+      </div>
+    `;
+    document.querySelector('audio')!.currentTime = 10;
+    document.querySelector('video')!.currentTime = 10;
+    const context = setupContext();
+    cloneDocument(context, document.querySelector('#app')!);
+    let [origin, target] = querySelectors(context, 'audio');
+    expect(target.currentTime).toBe(10);
+
+    [origin, target] = querySelectors(context, 'video');
+    expect(target.currentTime).toBe(10);
+  });
+});
+
 // `happy-dom` doesn't support pseudo element
 // https://github.com/capricorn86/happy-dom/issues/1836
 describe('clone pseudo element', () => {
