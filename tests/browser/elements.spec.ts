@@ -20,8 +20,8 @@ test.describe('canvas', () => {
 
     const container = getPrintContainter(page);
     await container.evaluate(element => (element.style = 'width: 200px; height: 100px'));
-    await screenshot(page, page.locator('canvas'), { fileName: 'canvas-2d.png', testInfo });
-    const buffer = await screenshot(page, container.contentFrame().locator('canvas'));
+    await screenshot(page.locator('canvas'), { fileName: 'canvas-2d.png', testInfo });
+    const buffer = await screenshot(container.contentFrame().locator('canvas'));
     expect(buffer).toMatchSnapshot('canvas-2d.png');
   });
 
@@ -41,20 +41,20 @@ test.describe('canvas', () => {
 
     const container = getPrintContainter(page);
     await container.evaluate(element => (element.style = 'width: 100px; height: 100px'));
-    await screenshot(page, page.locator('canvas'), { fileName: 'canvas-webgl.png', testInfo });
-    const buffer = await screenshot(page, container.contentFrame().locator('canvas'));
+    await screenshot(page.locator('canvas'), { fileName: 'canvas-webgl.png', testInfo });
+    const buffer = await screenshot(container.contentFrame().locator('canvas'));
     expect(buffer).toMatchSnapshot('canvas-webgl.png');
   });
 
   test('zero size', async ({ page }) => {
     await page.evaluate(() => {
       document.body.innerHTML = `
-      <div id="app">
-         <canvas width="50" height="0"></canvas>
-         <canvas width="0" height="50"></canvas>
-         <canvas width="50" height="50" style="display: none"></canvas>
-      </div>
-    `;
+        <div id="app">
+           <canvas width="50" height="0"></canvas>
+           <canvas width="0" height="50"></canvas>
+           <canvas width="50" height="50" style="display: none"></canvas>
+        </div>
+      `;
     });
     const lightPrint = await loadPrintScript(page);
     await expect(lightPrint('#app')).resolves.toBeUndefined();

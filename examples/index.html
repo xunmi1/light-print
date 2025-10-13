@@ -91,6 +91,15 @@
             </tr>
 
             <tr>
+              <td>video</td>
+              <td>
+                <video muted autoplay loop height="60" width="180">
+                  <source src="./assets/video.mp4" type="video/mp4" />
+                </video>
+              </td>
+            </tr>
+
+            <tr>
               <td>iframe</td>
               <td>
                 <iframe src="./nest.html" width="100%" height="80"></iframe>
@@ -107,21 +116,20 @@
   <script type="module">
     import lightPrint from '../dist/light-print.js';
 
+    const pageSize = `@page { size: A4 portrait; margin: 10mm }`;
+    const fontFaceSet = `
+      font-face {
+        font-family: 'Bitcount Grid Double';
+        font-weight: 400;
+        src: url(./assets/BitcountGridDouble-Regular.ttf);
+      }
+    `;
+
     const action = document.querySelector('#print-action');
     action.addEventListener('click', async () => {
       try {
-        await lightPrint('#app', {
-          documentTitle: 'test',
-          mediaPrintStyle: `
-            @page { size: A4 portrait; margin: 10mm }
-            @font-face {
-              font-family: 'Bitcount Grid Double';
-              font-weight: 400;
-              src: url(./assets/BitcountGridDouble-Regular.ttf);
-            }
-          `,
-        });
-        console.log('Print end.');
+        // Print it!
+        await lightPrint('#app', { mediaPrintStyle: `${pageSize}${fontFaceSet}` });
       } catch (err) {
         window.alert(err);
         throw err;

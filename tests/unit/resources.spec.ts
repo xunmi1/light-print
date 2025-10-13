@@ -22,8 +22,10 @@ describe('resources', () => {
     `;
     // `happy-dom` doesn't actually load resources.
     const result = waitResources(document);
-    const resourceNodes = document.querySelectorAll('img, object, iframe, embed, audio, video, image');
-    resourceNodes.forEach(node => node.dispatchEvent(new Event('load')));
+    document
+      .querySelectorAll('img, object, iframe, embed, image')
+      .forEach(node => node.dispatchEvent(new Event('load')));
+    document.querySelectorAll('video, audio').forEach(node => node.dispatchEvent(new Event('canplay')));
     await expect(result).resolves.toBeUndefined();
   });
 

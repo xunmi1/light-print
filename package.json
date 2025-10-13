@@ -31,7 +31,7 @@
     "build-dts": "rollup -c scripts/rollup.dts.config.js -i .cache/index.d.ts",
     "lint": "prettier -w \"**/*\" -u",
     "test:unit": "vitest",
-    "test:e2e": "playwright test",
+    "test:e2e": "rimraf tests/browser/__screenshots__ && playwright test",
     "coverage": "vitest run --coverage"
   },
   "repository": {

@@ -88,22 +88,25 @@ const FILE_PATTERN = /^(?<name>.*?)(?:\.(?<type>[^.]+))?$/;
 type ScreenshotType = PageScreenshotOptions['type'];
 type FileName = `${string}.${NonNullable<ScreenshotType>}`;
 
-export function screenshot(page: Page, target: Locator, options?: { mask?: Locator[] }): Promise<Buffer>;
+export function screenshot(target: Locator, options?: { mask?: Locator[] }): Promise<Buffer>;
 export function screenshot(
-  page: Page,
   target: Locator,
   options?: { fileName: FileName; testInfo: TestInfo; mask?: Locator[] }
 ): Promise<Buffer>;
 export async function screenshot(
-  page: Page,
   target: Locator,
   options?: { fileName?: FileName; testInfo?: TestInfo; mask?: Locator[] }
 ) {
-  const { fileName, testInfo, ...rest } = options ?? {};
-  const { name, type } = fileName?.match(FILE_PATTERN)?.groups ?? ({} as { name?: string; type?: string });
+  const { fileName, testInfo, mask = [] } = options ?? {};
+  const { name, type } = (fileName?.match(FILE_PATTERN)?.groups ?? {}) as { name?: string; type?: ScreenshotType };
   const path = name ? getScreenshotPath(name, testInfo!) : undefined;
-
   const box = await target.boundingBox();
+  const page = target.page();
+
+  // WebKit browsers do not support certain pseudo-elements.
+  const maskSelectors =
+    getBrowserName(page) === 'webkit' ? ['input[placeholder]', 'input[type="file"]', 'details'] : [];
+  const mergedMask = mask.concat(maskSelectors.map(v => target.locator(v)));
   // The screenshot dimensions from `element.screenshot()` are inconsistent,
   // so we're using `page.screenshot()` instead.
   // @see https://github.com/microsoft/playwright/issues/18827
@@ -112,9 +115,9 @@ export async function screenshot(
     clip: roundBox(box!),
     fullPage: true,
     animations: 'disabled',
-    type: type?.toLowerCase() as ScreenshotType,
+    type,
     maskColor: 'white',
-    ...rest,
+    mask: mergedMask,
   });
   return buffer;
 }
@@ -126,4 +129,13 @@ export function getPageErrors(page: Page) {
     if (message.type() === 'error') errors.push(new Error(message.text()));
   });
   return errors;
+}
+
+export async function pauseMedia(page: Page) {
+  await page.evaluate(() => {
+    document.querySelectorAll<HTMLMediaElement>('video,audio').forEach(node => {
+      node.pause();
+      node.currentTime = 0;
+    });
+  });
 }

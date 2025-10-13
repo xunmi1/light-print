@@ -1,5 +1,5 @@
 import type { Context } from './context';
-import { appendNode, createElementIterator, whichElement, getStyle } from './utils';
+import { appendNode, createElementIterator, whichElement, getStyle, isMediaElement } from './utils';
 
 const PSEUDO_ELECTORS = [
   '::before',
@@ -82,12 +82,18 @@ function cloneCanvas<T extends HTMLCanvasElement>(target: T, origin: T) {
   target.getContext('2d')!.drawImage(origin, 0, 0);
 }
 
+function cloneMedia<T extends HTMLMediaElement>(target: T, origin: T) {
+  target.pause();
+  target.currentTime = origin.currentTime;
+}
+
 function cloneElement(target: Element, origin: Element, context: Context) {
   cloneElementStyle(target, origin);
   // clone the associated pseudo-elements only when it's not `SVGElement`.
   // using `origin` because `target` is not in the current window, and `instanceof` cannot be used for judgment.
   if (!(origin instanceof SVGElement)) clonePseudoElementStyle(target, origin, context);
   if (whichElement(target, 'canvas')) cloneCanvas(target, origin as HTMLCanvasElement);
+  if (isMediaElement(target)) cloneMedia(target, origin as HTMLMediaElement);
 }
 
 export function cloneDocument(context: Context, hostElement: Node) {

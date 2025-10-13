@@ -21,6 +21,10 @@ export function whichElement<T extends keyof ElementNameMap>(node: Element, name
   return node.localName === name;
 }
 
+export function isMediaElement(node: Element) {
+  return whichElement(node, 'audio') || whichElement(node, 'video');
+}
+
 interface ElementIterator extends NodeIterator {
   nextNode(): Element | null;
   previousNode(): Element | null;
