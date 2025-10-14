@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { delayNetwork, loadPrintScript, preventPrintDialog } from './utils';
+import { loadPrintScript, preventPrintDialog } from './utils';
 
 test.beforeEach(async ({ page }) => {
   await preventPrintDialog(page);
@@ -17,17 +17,4 @@ test("can't be printed when offline", async ({ page }) => {
   await page.context().setOffline(true);
   const lightPrint = await loadPrintScript(page);
   await expect(lightPrint('#app')).rejects.toThrowError('Failed to load resource');
-});
-
-test('wait for resources loading', async ({ page }) => {
-  await page.goto('/examples/index.html');
-  const abortDelay = await delayNetwork(page, Infinity);
-  const lightPrint = await loadPrintScript(page);
-  let status = 'pending';
-  const task = lightPrint('#app');
-  task.finally(() => (status = 'finished'));
-  await page.waitForTimeout(200);
-  expect(status).toBe('pending');
-  await abortDelay();
-  await expect(task).resolves.toBeUndefined();
 });

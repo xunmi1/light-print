@@ -1,20 +1,5 @@
 import type { Locator, Page, PageScreenshotOptions, Route, TestInfo } from '@playwright/test';
 
-function delay(ms: number) {
-  if (ms === Infinity) return Promise.withResolvers<void>().promise;
-  return new Promise<void>(resolve => setTimeout(() => resolve(), ms));
-}
-
-export async function delayNetwork(page: Page, ms: number) {
-  const handler = async (route: Route) => {
-    await delay(ms);
-    await route.continue();
-  };
-  await page.route('**/*', handler);
-  const abort = () => page.unroute('**/*', handler);
-  return abort;
-}
-
 export function round(number: number, precision = 0) {
   return Math.round(number * 10 ** precision) / 10 ** precision;
 }

@@ -4,6 +4,13 @@
   box-sizing: border-box;
 }
 
+video,
+audio,
+canvas,
+iframe {
+  display: block;
+}
+
 @font-face {
   font-family: 'Bitcount Grid Double';
   font-weight: 400;

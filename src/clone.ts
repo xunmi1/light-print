@@ -83,8 +83,13 @@ function cloneCanvas<T extends HTMLCanvasElement>(target: T, origin: T) {
 }
 
 function cloneMedia<T extends HTMLMediaElement>(target: T, origin: T) {
-  target.pause();
+  if (!origin.currentSrc) return;
+  // In the new document, currentSrc isn’t populated right away and is read-only,
+  // so we explicitly assign src here.
+  target.src = origin.currentSrc;
   target.currentTime = origin.currentTime;
+  // Printing doesn’t need to play anything.
+  target.autoplay = false;
 }
 
 function cloneElement(target: Element, origin: Element, context: Context) {

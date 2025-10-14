@@ -93,19 +93,42 @@ describe('clone media', () => {
   test('currentTime', async () => {
     document.body.innerHTML = `
       <div id="app">
-         <audio controls></audio>
-         <video controls></video>
+         <audio src="https://example.com/audio.mp3"></audio>
+         <video src="https://example.com/video.mp4"></video>
       </div>
     `;
     document.querySelector('audio')!.currentTime = 10;
     document.querySelector('video')!.currentTime = 10;
     const context = setupContext();
     cloneDocument(context, document.querySelector('#app')!);
-    let [origin, target] = querySelectors(context, 'audio');
+    let [_, target] = querySelectors(context, 'audio');
     expect(target.currentTime).toBe(10);
 
-    [origin, target] = querySelectors(context, 'video');
+    [_, target] = querySelectors(context, 'video');
     expect(target.currentTime).toBe(10);
+  });
+
+  test('currentSrc', async () => {
+    const src = 'https://example.com/video.mp4';
+    document.body.innerHTML = `
+      <div id="app">
+        <video id="selfSrc" src="${src}"></video>
+         <video id="sourceSrc">
+            <source src="${src}" type="video/mp4" />
+         </video>
+          <video id="emptySrc"></video>
+      </div>
+    `;
+    const context = setupContext();
+    cloneDocument(context, document.querySelector('#app')!);
+    let [_, target] = querySelectors(context, '#selfSrc');
+    expect(target.currentSrc).toBe(src);
+
+    [_, target] = querySelectors(context, '#sourceSrc');
+    expect(target.currentSrc).toBe(src);
+
+    [_, target] = querySelectors(context, '#emptySrc');
+    expect(target.currentSrc).toBeFalsy();
   });
 });
 
