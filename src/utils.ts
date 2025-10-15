@@ -25,16 +25,38 @@ export function isMediaElement(node: Element) {
   return whichElement(node, 'audio') || whichElement(node, 'video');
 }
 
-interface ElementIterator extends NodeIterator {
-  nextNode(): Element | null;
-  previousNode(): Element | null;
+const NON_RENDERING_ELEMENTS: readonly string[] = ['source', 'track', 'param', 'template', 'slot', 'script'];
+export function isRenderingElement(node: Element) {
+  return NON_RENDERING_ELEMENTS.indexOf(node.localName) < 0;
 }
 
-const SHOW_ELEMENT = window.NodeFilter.SHOW_ELEMENT;
-export function createElementIterator(root: Node, filter?: NodeFilter) {
-  // IE requires four parameters (entityReferenceExpansion: false)
+export function isHidden(style: CSSStyleDeclaration) {
+  return !style.display || style.display === 'none';
+}
+
+const DISPLAY_INSIDE_BLOCK: readonly string[] = [
+  'block',
+  'inline-block',
+  'list-item',
+  'flow-root',
+  'table-caption',
+  'table-cell',
+];
+/** inset block element */
+export function isInsideBlock(style: CSSStyleDeclaration) {
+  return DISPLAY_INSIDE_BLOCK.indexOf(style.display) > -1;
+}
+
+export interface ElementWalker extends TreeWalker {
+  currentNode: Element;
+  nextNode(): Element | null;
+  nextSibling(): Element | null;
+}
+
+export function createElementWalker(root: Element) {
+  // IE requires four parameters (expandEntityReferences: false)
   // @ts-expect-error
-  return window.document.createNodeIterator(root, SHOW_ELEMENT, filter ?? null, false) as ElementIterator;
+  return window.document.createTreeWalker(root, window.NodeFilter.SHOW_ELEMENT, null, false) as ElementWalker;
 }
 
 export function setStyleProperty(

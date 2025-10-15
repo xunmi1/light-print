@@ -1,5 +1,16 @@
 import type { Context } from './context';
-import { appendNode, createElementIterator, whichElement, getStyle, isMediaElement } from './utils';
+import {
+  appendNode,
+  createElementWalker,
+  type ElementWalker,
+  whichElement,
+  getStyle,
+  isMediaElement,
+  removeNode,
+  isRenderingElement,
+  isHidden,
+  isInsideBlock,
+} from './utils';
 
 const PSEUDO_ELECTORS = [
   '::before',
@@ -25,12 +36,12 @@ function getStyleTextDiff(targetStyle: CSSStyleDeclaration, originStyle: CSSStyl
   return styleText;
 }
 
-function getElementNonInlineStyle<T extends Element>(target: T, origin: T) {
-  // identical inline styles are omitted.
-  return getStyleTextDiff(getStyle(target), getStyle(origin));
-}
-
-function getPseudoElementStyle<T extends Element>(target: T, origin: T, pseudoElt: (typeof PSEUDO_ELECTORS)[number]) {
+function getPseudoElementStyle<T extends Element>(
+  target: T,
+  origin: T,
+  originStyle: CSSStyleDeclaration,
+  pseudoElt: (typeof PSEUDO_ELECTORS)[number]
+) {
   if (pseudoElt === '::placeholder') {
     if (!whichElement(origin, 'input') && !whichElement(origin, 'textarea')) return;
   } else if (pseudoElt === '::file-selector-button') {
@@ -38,26 +49,24 @@ function getPseudoElementStyle<T extends Element>(target: T, origin: T, pseudoEl
   } else if (pseudoElt === '::details-content') {
     if (!whichElement(origin, 'details')) return;
   } else if (pseudoElt === '::marker') {
-    const display = getStyle(origin).display;
-    if (display !== 'list-item') return;
+    if (originStyle.display !== 'list-item') return;
   } else if (pseudoElt === '::first-letter' || pseudoElt === '::first-line') {
-    const display = getStyle(origin).display;
-    if (BLOCK_CONTAINERS.indexOf(display) < 0) return;
+    if (!isInsideBlock(originStyle)) return;
   }
 
-  const originStyle = getStyle(origin, pseudoElt);
+  const pseudoOriginStyle = getStyle(origin, pseudoElt);
   // replaced elements need to be checked for `content`.
   if (pseudoElt === '::before' || pseudoElt === '::after') {
-    const content = originStyle.content;
+    const content = pseudoOriginStyle.content;
     if (!content || content === 'normal' || content === 'none') return;
   }
-  const targetStyle = getStyle(target, pseudoElt);
-  return getStyleTextDiff(targetStyle, originStyle);
+  return getStyleTextDiff(getStyle(target, pseudoElt), pseudoOriginStyle);
 }
 
 /** clone element style */
-function cloneElementStyle<T extends Element>(target: T, origin: T) {
-  const nonInlineStyle = getElementNonInlineStyle(target, origin);
+function cloneElementStyle<T extends Element>(target: T, originStyle: CSSStyleDeclaration) {
+  // identical inline styles are omitted.
+  const nonInlineStyle = getStyleTextDiff(getStyle(target), originStyle);
   if (!nonInlineStyle) return;
   const inlineStyle = target.getAttribute('style') ?? '';
   // setting inline styles immediately triggers a layout recalculation,
@@ -65,10 +74,15 @@ function cloneElementStyle<T extends Element>(target: T, origin: T) {
   target.setAttribute('style', `${nonInlineStyle}${inlineStyle}`);
 }
 
-function clonePseudoElementStyle<T extends Element>(target: T, origin: T, context: Context) {
+function clonePseudoElementStyle<T extends Element>(
+  target: T,
+  origin: T,
+  originStyle: CSSStyleDeclaration,
+  context: Context
+) {
   let styleText = '';
   for (const pseudoElt of PSEUDO_ELECTORS) {
-    const style = getPseudoElementStyle(target, origin, pseudoElt);
+    const style = getPseudoElementStyle(target, origin, originStyle, pseudoElt);
     if (!style) continue;
     const selector = context.getSelector(target);
     styleText += `${selector}${pseudoElt}{${style}}`;
@@ -93,28 +107,50 @@ function cloneMedia<T extends HTMLMediaElement>(target: T, origin: T) {
 }
 
 function cloneElement(target: Element, origin: Element, context: Context) {
-  cloneElementStyle(target, origin);
-  // clone the associated pseudo-elements only when it's not `SVGElement`.
-  // using `origin` because `target` is not in the current window, and `instanceof` cannot be used for judgment.
-  if (!(origin instanceof SVGElement)) clonePseudoElementStyle(target, origin, context);
+  if (!isRenderingElement(target)) return true;
+  const originStyle = getStyle(origin);
+  // Ignore hidden element.
+  if (isHidden(originStyle)) return false;
+
+  cloneElementStyle(target, originStyle);
+  // Clone the associated pseudo-elements only when it's not `SVGElement`.
+  if (!(origin instanceof SVGElement)) clonePseudoElementStyle(target, origin, originStyle, context);
   if (whichElement(target, 'canvas')) cloneCanvas(target, origin as HTMLCanvasElement);
   if (isMediaElement(target)) cloneMedia(target, origin as HTMLMediaElement);
+  return true;
 }
 
-export function cloneDocument(context: Context, hostElement: Node) {
+function syncWalk(
+  whetherNext: (target: Element, origin: Element) => boolean,
+  targetWalker: ElementWalker,
+  originWalker: ElementWalker
+) {
+  while (true) {
+    const isNext = whetherNext(targetWalker.currentNode, originWalker.currentNode);
+    if (isNext) {
+      if (!(targetWalker.nextNode() && originWalker.nextNode())) break;
+    } else {
+      const skippedNode = targetWalker.currentNode;
+      let hasParent = true;
+      while (true) {
+        const hasSibling = targetWalker.nextSibling() && originWalker.nextSibling();
+        if (hasSibling) break;
+        // If the current element has no next sibling, move to the next sibling of its parent.
+        hasParent = !!(targetWalker.parentNode() && originWalker.parentNode());
+        if (!hasParent) break;
+      }
+      // Remove the skipped element and its subtree, to prevent any resources from being loaded.
+      removeNode(skippedNode);
+      if (!hasParent) break;
+    }
+  }
+}
+
+export function cloneDocument(context: Context, hostElement: Element) {
   const doc = context.document;
   // clone the `hostElement` structure to `body`, contains inline styles.
   appendNode(doc.body, doc.importNode(hostElement, true));
-
-  const originIterator = createElementIterator(hostElement);
-  // start from `body` node
-  const targetIterator = createElementIterator(doc.body);
-  // skip `body` node
-  targetIterator.nextNode();
-  while (true) {
-    const targetElement = targetIterator.nextNode();
-    const originElement = originIterator.nextNode();
-    if (!targetElement || !originElement) break;
-    cloneElement(targetElement, originElement, context);
-  }
+  const originWalker = createElementWalker(hostElement);
+  const targetWalker = createElementWalker(doc.body.firstElementChild!);
+  syncWalk((target, origin) => cloneElement(target, origin, context), targetWalker, originWalker);
 }
