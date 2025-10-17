@@ -1,35 +1,29 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
 import { createContext } from 'src/context';
 import { getStyle } from './utils';
 
-describe('context', () => {
-  test('create context', () => {
-    const context = createContext();
-    expect(context).toBeDefined();
+test('create context', () => {
+  const context = createContext();
+  expect(context).toBeDefined();
 
-    const newWindow = new Window();
-    context.window = newWindow;
-    expect(context.document).toBe(newWindow.document);
-  });
-
-  test('getSelector', () => {
-    const context = createContext();
-    context.window = window;
-    document.body.innerHTML = `
-      <div class="a">a</div>
-      <div class="b">b</div>
-    `;
-
-    const selector1 = context.getSelector(document.querySelector('.a')!);
-    expect(document.querySelector('.a')).toBe(document.querySelector(selector1));
-    const selector2 = context.getSelector(document.querySelector('.b')!);
-    expect(selector1).not.toBe(selector2);
-    const selector3 = context.getSelector(document.querySelector('.a')!);
-    expect(selector1).toBe(selector3);
-  });
+  const newWindow = new Window();
+  context.window = newWindow;
+  expect(context.document).toBe(newWindow.document);
 });
 
+test('getSelector', () => {
+  const context = createContext();
+  context.window = window;
+  document.body.innerHTML = `<div class="a">a</div><div class="b">b</div>`;
+
+  const selector1 = context.getSelector(document.querySelector('.a')!);
+  expect(document.querySelector('.a')).toBe(document.querySelector(selector1));
+  const selector2 = context.getSelector(document.querySelector('.b')!);
+  expect(selector1).not.toBe(selector2);
+  const selector3 = context.getSelector(document.querySelector('.a')!);
+  expect(selector1).toBe(selector3);
+});
 describe('style', () => {
   test('mount', () => {
     const context = createContext();
@@ -55,7 +49,7 @@ describe('style', () => {
     expect(getStyle(window, '.test').color).toBeFalsy();
   });
 
-  test('repeatedly append', () => {
+  test('repeated append', () => {
     const context = createContext();
     context.window = window;
     context.appendStyle('body { color: red; display: flex; }');
@@ -67,6 +61,15 @@ describe('style', () => {
     expect(style.position).toBe('absolute');
   });
 
+  test('repeated mount', () => {
+    const context = createContext();
+    context.window = window;
+    context.appendStyle('body { color: blue }');
+    context.mountStyle();
+    context.mountStyle();
+    expect(getStyle(window, 'body').color).toBe('blue');
+  });
+
   test('isolation', () => {
     const context1 = createContext();
     context1.window = window;
@@ -76,5 +79,24 @@ describe('style', () => {
     context2.window = new Window();
     context2.mountStyle();
     expect(getStyle(context2.window, 'body').color).toBeFalsy();
+  });
+});
+
+describe('tasks', () => {
+  test('addTask', () => {
+    const context = createContext();
+    expect(() => context.addTask(() => {})).not.toThrowError();
+    expect(context.addTask(() => {})).toBeUndefined();
+  });
+
+  test('flushTasks', () => {
+    const context = createContext();
+    const task = vi.fn();
+    context.addTask(task);
+    context.flushTasks();
+    expect(task).toBeCalledTimes(1);
+
+    context.flushTasks();
+    expect(task).toBeCalledTimes(1);
   });
 });

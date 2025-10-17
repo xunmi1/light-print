@@ -9,6 +9,7 @@ export const SELECTOR_NAME = 'data-print-id';
 
 export function createContext() {
   let styleNode: HTMLStyleElement | undefined;
+  let isMountedStyle = false;
   let printId = 1;
 
   function markId(node: Element) {
@@ -31,8 +32,19 @@ export function createContext() {
   }
 
   function mountStyle() {
-    if (!styleNode) return;
+    if (isMountedStyle || !styleNode) return;
     appendNode(context.document.head, styleNode);
+    isMountedStyle = true;
+  }
+
+  const tasks: (() => void)[] = [];
+  function addTask(task: () => void) {
+    tasks.push(task);
+  }
+
+  function flushTasks() {
+    tasks.forEach(task => task());
+    tasks.length = 0;
   }
 
   const context = {
@@ -43,6 +55,9 @@ export function createContext() {
     appendStyle,
     mountStyle,
     getSelector,
+
+    addTask,
+    flushTasks,
   };
 
   return context;

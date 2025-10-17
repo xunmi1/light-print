@@ -60,3 +60,113 @@ test.describe('canvas', () => {
     await expect(lightPrint('#app')).resolves.toBeUndefined();
   });
 });
+
+test.describe('form fields', () => {
+  test('input', async ({ page }) => {
+    await page.evaluate(() => {
+      document.body.innerHTML = `
+        <div id="app">
+          <input type="text" value="foo" />
+          <input type="radio" />
+          <input type="checkbox" />
+        </div>
+      `;
+      document.querySelector<HTMLInputElement>('input[type="text"]')!.value = 'bar';
+      document.querySelector<HTMLInputElement>('input[type="radio"]')!.checked = true;
+      const checkbox = document.querySelector<HTMLInputElement>('input[type="checkbox"]')!;
+      checkbox.checked = true;
+      checkbox.indeterminate = true;
+    });
+    const lightPrint = await loadPrintScript(page);
+    await lightPrint('#app');
+    const frame = getPrintContainter(page).contentFrame();
+
+    await Promise.all([
+      expect(frame.locator('input[type="text"]')).toHaveValue('bar'),
+      expect(frame.locator('input[type="radio"]')).toBeChecked(),
+      expect(frame.locator('input[type="checkbox"]')).toBeChecked(),
+      expect(frame.locator('input[type="checkbox"]')).toBeChecked({ indeterminate: true }),
+    ]);
+  });
+
+  test('select & option', async ({ page }) => {
+    await page.evaluate(() => {
+      document.body.innerHTML = `
+        <select>
+          <option value="foo">foo</option>
+          <option value="bar">bar</option>
+        </select>
+      `;
+      document.querySelector('select')!.value = 'bar';
+    });
+
+    const lightPrint = await loadPrintScript(page);
+    await lightPrint('select');
+    const frame = getPrintContainter(page).contentFrame();
+    await expect(frame.locator('select')).toHaveValue('bar');
+
+    const option = frame.locator('option[value="bar"]');
+    const selected = await option.evaluate<boolean, HTMLOptionElement>(el => el.selected);
+    expect(selected).toBe(true);
+  });
+
+  test('textarea', async ({ page }) => {
+    await page.evaluate(() => {
+      document.body.innerHTML = `<textarea>foo</textarea>`;
+      document.querySelector('textarea')!.value = 'bar';
+    });
+    const lightPrint = await loadPrintScript(page);
+    await lightPrint('textarea');
+    const frame = getPrintContainter(page).contentFrame();
+    await expect(frame.locator('textarea')).toHaveValue('bar');
+  });
+});
+
+test.describe('media', () => {
+  test('currentTime', async ({ page, browserName }, testInfo) => {
+    // @see https://playwright.dev/docs/browsers#media-codecs
+    test.skip(browserName === 'chromium', 'Chromium does not have media codecs');
+    await page.goto('/examples/nest.html');
+    await page.evaluate(() => {
+      document.body.innerHTML = `
+        <style>video { display: block; width: 240px; height: 80px; } </style>
+        <div id="app">
+          <video src="./assets/video.mp4" muted></video>
+        </div>
+      `;
+      const video = document.querySelector('video')!;
+      video.currentTime = 1;
+    });
+    const lightPrint = await loadPrintScript(page);
+    await lightPrint('#app');
+
+    const container = getPrintContainter(page);
+    await container.evaluate(element => (element.style = 'width: 300px; height: 100px'));
+    await screenshot(page.locator('video'), { fileName: 'video-time.png', testInfo });
+    const buffer = await screenshot(container.contentFrame().locator('video'));
+    expect(buffer).toMatchSnapshot('video-time.png');
+  });
+});
+
+test('scroll state', async ({ page }) => {
+  await page.evaluate(() => {
+    document.body.innerHTML = `
+      <div id="app" >
+        <div id="outer" style="width: 100px; height: 100px; overflow: auto">
+          <div id="inner" style="width: 200px; height: 200px; overflow: auto">
+            <div style="width: 300px; height: 300px"></div>
+          </div>
+        </div>
+      </div>
+    `;
+    const outer = document.querySelector('#outer')!;
+    outer.scrollTo({ top: 50, left: 60, behavior: 'instant' });
+  });
+  const lightPrint = await loadPrintScript(page);
+  await lightPrint('#app');
+  const frame = getPrintContainter(page).contentFrame();
+  let scrollState = await frame.locator('#outer').evaluate(el => ({ top: el.scrollTop, left: el.scrollLeft }));
+  expect(scrollState).toEqual({ top: 50, left: 60 });
+  scrollState = await frame.locator('#inner').evaluate(el => ({ top: el.scrollTop, left: el.scrollLeft }));
+  expect(scrollState).toEqual({ top: 0, left: 0 });
+});

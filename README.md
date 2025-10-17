@@ -10,7 +10,7 @@
 
 🚀 View an online [**usage example**](https://xunmi1.github.io/light-print/examples/index.html).
 
-- **Lightweight**: Zero Dependencies & 2KB minzipped
+- **Lightweight**: Zero Dependencies & 3KB minzipped
 - **Auto-Styled**: Preserves the existing styles without extra CSS setup
 - **Callback-Free**: Native promise handling for print workflows
 
@@ -62,7 +62,7 @@ lightPrint('#id', {
 <script setup>
 import { useTemplateRef } from 'vue';
 import lightPrint from 'light-print';
-// Prior to Vue v3.5, we could declare a `ref` matching the name of the template's ref attribute value.
+// Prior to Vue v3.5, we could declare a `ref` matching the name of the template’s ref attribute value.
 const targetRef = useTemplateRef('target');
 
 async function print() {

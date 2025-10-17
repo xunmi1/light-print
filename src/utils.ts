@@ -54,9 +54,10 @@ export interface ElementWalker extends TreeWalker {
 }
 
 export function createElementWalker(root: Element) {
+  // `1` is `NodeFilter.SHOW_ELEMENT`
   // IE requires four parameters (expandEntityReferences: false)
   // @ts-expect-error
-  return window.document.createTreeWalker(root, window.NodeFilter.SHOW_ELEMENT, null, false) as ElementWalker;
+  return window.document.createTreeWalker(root, 1, null, false) as ElementWalker;
 }
 
 export function setStyleProperty(

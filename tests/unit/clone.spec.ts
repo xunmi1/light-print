@@ -18,6 +18,7 @@ test('clone style', async () => {
   const context = setupContext();
   const newWindow = context.window!;
   cloneDocument(context, document.querySelector('#app')!);
+  context.mountStyle();
 
   let originStyle = getStyle(window, '.only-inline');
   let targetStyle = getStyle(newWindow, '.only-inline');
@@ -194,7 +195,7 @@ describe('clone media', () => {
 // https://github.com/capricorn86/happy-dom/issues/1836
 describe('clone pseudo element', () => {
   test('before and after', async () => {
-    // Due to happy-dom's lack of pseudo-element support in getComputedStyle,
+    // Due to happy-dom’s lack of pseudo-element support in getComputedStyle,
     // we manually implemented it with the limitation of requiring `SELECTOR_NAME` style targeting.
     document.body.innerHTML = `
       <style>
@@ -220,9 +221,108 @@ describe('clone pseudo element', () => {
   });
 });
 
+describe('clone form fields', () => {
+  test('input', async () => {
+    document.body.innerHTML = `
+      <div id="app">
+        <input type="text" value="foo" />
+      </div>
+    `;
+    document.querySelector('input')!.value = 'bar';
+    const context = setupContext();
+    cloneDocument(context, document.querySelector('#app')!);
+    expect(context.document.querySelector('input')!.value).toBe('bar');
+  });
+
+  test('radio', async () => {
+    document.body.innerHTML = `
+      <div id="app">
+        <input type="radio" name="foo" value="bar" />
+      </div>
+    `;
+    document.querySelector('input')!.checked = true;
+    const context = setupContext();
+    cloneDocument(context, document.querySelector('#app')!);
+    expect(context.document.querySelector('input')!.checked).toBe(true);
+  });
+
+  test('checkbox', async () => {
+    document.body.innerHTML = `
+      <div id="app">
+        <input type="checkbox" name="foo" value="foo">
+      </div>
+    `;
+    const context = setupContext();
+    const origin = document.querySelector('input')!;
+
+    origin.checked = true;
+    cloneDocument(context, document.querySelector('#app')!);
+    let target = context.document.querySelector('input')!;
+    expect(target.checked).toBe(true);
+    expect(target.indeterminate).toBe(false);
+    expect(target.value).toBe('foo');
+
+    origin.indeterminate = true;
+    const context1 = setupContext();
+    cloneDocument(context1, document.querySelector('#app')!);
+    target = context1.document.querySelector('input')!;
+    expect(target.indeterminate).toBe(true);
+  });
+
+  test('select', async () => {
+    document.body.innerHTML = `
+      <div id="app">
+        <select>
+          <option value="foo">foo</option>
+          <option value="bar">bar</option>
+        </select>
+      </div>
+    `;
+    document.querySelector('select')!.value = 'bar';
+    const context = setupContext();
+    cloneDocument(context, document.querySelector('#app')!);
+    let target = context.document.querySelector('select')!;
+    expect(target.value).toBe('bar');
+    expect(target.selectedIndex).toBe(1);
+
+    target = context.document.querySelector('option[value="foo"]')!;
+    expect(target.selected).toBe(false);
+    target = context.document.querySelector('option[value="bar"]')!;
+    expect(target.selected).toBe(true);
+  });
+
+  test('textarea', async () => {
+    document.body.innerHTML = `
+      <div id="app">
+        <textarea>foo</textarea>
+      </div>
+    `;
+    document.querySelector('textarea')!.value = 'bar';
+    const context = setupContext();
+    cloneDocument(context, document.querySelector('#app')!);
+    expect(context.document.querySelector('textarea')!.value).toBe('bar');
+  });
+});
+
+test('scroll state', async () => {
+  document.body.innerHTML = `
+    <div id="app" style="height: 100px; width: 100px overflow: auto">
+      <div id="foo" style="height: 200px; width: 200px"></div>
+    </div>
+  `;
+  const origin = document.querySelector('#foo')!;
+  origin.scrollTop = 10;
+  origin.scrollLeft = 10;
+  const context = setupContext();
+  cloneDocument(context, document.querySelector('#app')!);
+  const target = context.document.querySelector('#foo')!;
+  expect(target.scrollTop).toBe(origin.scrollTop);
+  expect(target.scrollLeft).toBe(origin.scrollLeft);
+});
+
 function setupContext() {
   const context = createContext();
-  context.window = new Window({ url: 'about:blank' });
+  context.window = new Window();
   return context;
 }
 

@@ -19,8 +19,13 @@ function checkLoaded(node: ResourceElement): Promise<void> | void {
   // load the resource as soon as possible.
   if (whichElement(node, 'img') || whichElement(node, 'iframe')) node.loading = 'eager';
   const { promise, resolve, reject } = withResolvers<void>();
-  const resolvedEventName = isMediaElement(node) ? 'canplay' : 'load';
-  bindOnceEvent(node, resolvedEventName, () => resolve());
+  if (isMediaElement(node)) {
+    // `2` is `HTMLMediaElement.HAVE_CURRENT_DATA`
+    if (node.readyState >= 2) resolve();
+    bindOnceEvent(node, 'canplay', () => resolve());
+  } else {
+    bindOnceEvent(node, 'load', () => resolve());
+  }
   bindOnceEvent(node, 'error', () =>
     reject(new Error(`Failed to load resource (${node.localName}: ${getResourceURL(node)}).`))
   );

@@ -20,7 +20,7 @@ describe('resources', () => {
         <image href="https://example.com"></image>
       </svg>
     `;
-    // `happy-dom` doesn't actually load resources.
+    // `happy-dom` doesn't actually load resources, so manually dispatch `load` and `canplay` events
     const result = waitResources(document);
     document
       .querySelectorAll('img, object, iframe, embed, image')
@@ -30,10 +30,13 @@ describe('resources', () => {
   });
 
   test('failed to load', async () => {
-    document.body.innerHTML = `<img src="https://example.com" />`;
+    document.body.innerHTML = `
+      <img class="error" src="1.png" />
+      <img class="success" src="2.png" />
+    `;
     const result = waitResources(document);
-    const resourceNodes = document.querySelectorAll('img');
-    resourceNodes.forEach(node => node.dispatchEvent(new Event('error')));
+    document.querySelector('.error')!.dispatchEvent(new Event('error'));
+    document.querySelector('.success')!?.dispatchEvent(new Event('load'));
     await expect(result).rejects.toThrowError('Failed to load resource');
   });
 
@@ -42,12 +45,20 @@ describe('resources', () => {
     await expect(waitResources(document)).resolves.toBeUndefined();
   });
 
-  test('already loaded', async () => {
+  test('image already loaded', async () => {
     document.body.innerHTML = `<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=" />`;
     const img = document.querySelector('img')!;
-    // `happy-dom` doesn't support checking whether images have loaded,
-    // so mock image resource is loaded.
+    // `happy-dom` doesn't support mocking image resource,
     Object.defineProperty(img, 'complete', { value: true });
+    await expect(waitResources(document)).resolves.toBeUndefined();
+  });
+
+  test('media already have data', async () => {
+    document.body.innerHTML = `<audio src="https://example.com"></audio>`;
+    const audio = document.querySelector('audio')!;
+    // `happy-dom` doesn't support mocking media data
+    // // `2` is `HTMLMediaElement.HAVE_CURRENT_DATA`
+    Object.defineProperty(audio, 'readyState', { value: 2 });
     await expect(waitResources(document)).resolves.toBeUndefined();
   });
 });

@@ -101,10 +101,14 @@ table {
   }
 }
 
-.text {
+.link {
   font-family: 'Bitcount Grid Double', system-ui, sans-serif;
   font-size: 14pt;
   color: red;
+
+  &:hover {
+    text-decoration-style: wavy;
+  }
 }
 
 #beforeAfter {
@@ -156,4 +160,15 @@ table {
       background-color: #a29bfe;
     }
   }
+}
+
+.math-wrapper {
+  /* In Playwright, `<math>` renders inconsistently in headless mode, so lock it to a fixed height. */
+  height: 54px;
+}
+
+#iframe-nest {
+  display: block;
+  border: 2px solid #a1a1a1;
+  border-radius: 8px;
 }
