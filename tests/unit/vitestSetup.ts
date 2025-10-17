@@ -44,7 +44,7 @@ function getContext(this: BrowserWindow, ...args: Parameters<HTMLCanvasElement['
 }
 HTMLCanvasElement.prototype.getContext = getContext;
 
-// Due to happy-dom's lack of pseudo-element support in getComputedStyle,
+// Due to `happy-dom`’s lack of pseudo-element support in getComputedStyle,
 // we manually implemented it with the limitation of requiring `SELECTOR_NAME` style targeting.
 // See https://github.com/capricorn86/happy-dom/issues/1773
 const _getComputedStyle = BrowserWindow.prototype.getComputedStyle;

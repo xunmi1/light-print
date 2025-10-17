@@ -35,7 +35,7 @@ function emitPrint(contentWindow: Window) {
   const { promise, resolve } = withResolvers<void>();
   // required for IE
   contentWindow.focus();
-  // When the browser's network cache is disabled,
+  // When the browser’s network cache is disabled,
   // the execution end time of `print()` will be later than the `afterprint` event.
   // Conversely, the 'afterprint' event will be fired later.
   // Thus, both need to be completed to indicate that the printing process has ended.

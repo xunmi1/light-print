@@ -8,7 +8,7 @@ export function getStyle(contentWindow: Window, selector: string, pseudoElt?: st
 }
 
 /**
- * The `happy-dom`'s CSSStyleDeclaration implementation is incorrect
+ * The `happy-dom`’s CSSStyleDeclaration implementation is incorrect
  * and fails to iterate over properties.
  */
 function toStyleRecord(style: CSSStyleDeclaration) {
