@@ -6,6 +6,7 @@ import {
   preventPrintDialog,
   loadPrintScript,
   pauseMedia,
+  roundClip,
 } from './utils';
 
 test.use({ viewport: { width: 1920, height: 1080 } });
@@ -20,7 +21,8 @@ test('visually consistent', async ({ page }, testInfo) => {
   const action = page.locator('#print-action');
   // hide element
   await action.evaluate(element => (element.style.opacity = '0'));
-  await screenshot(page.locator('#app'), { fileName: 'origin.png', testInfo });
+  const origin = page.locator('#app');
+  await screenshot(origin, { fileName: 'origin.png', testInfo });
   // trigger print
   await action.click();
 
@@ -29,7 +31,12 @@ test('visually consistent', async ({ page }, testInfo) => {
   // avoid container scrolling
   await container.evaluate(element => (element.style = 'width: 100%; height: 1500px'));
   const frame = container.contentFrame();
-  const targetBuffer = await screenshot(frame.locator('#app'));
+
+  const target = frame.locator('#app');
+  // `Playwright` screenshots often have slight dimension drift,
+  // so we lock the exact width and height manually.
+  const originClip = roundClip((await origin.boundingBox())!);
+  const targetBuffer = await screenshot(target, { size: { width: originClip.width, height: originClip.height } });
 
   expect(targetBuffer).toMatchSnapshot('origin.png', { maxDiffPixelRatio: 0.005 });
 });

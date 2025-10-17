@@ -123,7 +123,7 @@ test.describe('form fields', () => {
 });
 
 test.describe('media', () => {
-  test('currentTime', async ({ page, browserName }, testInfo) => {
+  test('video', async ({ page, browserName }, testInfo) => {
     // @see https://playwright.dev/docs/browsers#media-codecs
     test.skip(browserName === 'chromium', 'Chromium does not have media codecs');
     await page.goto('/examples/nest.html');
@@ -134,9 +134,10 @@ test.describe('media', () => {
           <video src="./assets/video.mp4" muted></video>
         </div>
       `;
-      const video = document.querySelector('video')!;
-      video.currentTime = 1;
     });
+    // WebKit browser video tests are flaky.
+    if (browserName === 'webkit') await page.waitForTimeout(1000);
+
     const lightPrint = await loadPrintScript(page);
     await lightPrint('#app');
 

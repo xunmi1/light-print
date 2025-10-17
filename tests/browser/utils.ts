@@ -4,7 +4,8 @@ export function round(number: number, precision = 0) {
   return Math.round(number * 10 ** precision) / 10 ** precision;
 }
 
-export function roundBox(rect: Record<string, number>, precision = 0) {
+type Clip = NonNullable<PageScreenshotOptions['clip']>;
+export function roundClip(rect: Clip, precision = 0) {
   return {
     x: round(rect.x, precision),
     y: round(rect.y, precision),
@@ -72,20 +73,21 @@ const FILE_PATTERN = /^(?<name>.*?)(?:\.(?<type>[^.]+))?$/;
 
 type ScreenshotType = PageScreenshotOptions['type'];
 type FileName = `${string}.${NonNullable<ScreenshotType>}`;
+type Size = { width: number; height: number };
 
-export function screenshot(target: Locator, options?: { mask?: Locator[] }): Promise<Buffer>;
+export function screenshot(target: Locator, options?: { mask?: Locator[]; size?: Size }): Promise<Buffer>;
 export function screenshot(
   target: Locator,
-  options?: { fileName: FileName; testInfo: TestInfo; mask?: Locator[] }
+  options?: { fileName: FileName; testInfo: TestInfo; mask?: Locator[]; size?: Size }
 ): Promise<Buffer>;
 export async function screenshot(
   target: Locator,
-  options?: { fileName?: FileName; testInfo?: TestInfo; mask?: Locator[] }
+  options?: { fileName?: FileName; testInfo?: TestInfo; mask?: Locator[]; size?: Size }
 ) {
-  const { fileName, testInfo, mask = [] } = options ?? {};
+  const { fileName, testInfo, mask = [], size } = options ?? {};
   const { name, type } = (fileName?.match(FILE_PATTERN)?.groups ?? {}) as { name?: string; type?: ScreenshotType };
   const path = name ? getScreenshotPath(name, testInfo!) : undefined;
-  const box = await target.boundingBox();
+  const roundedClip = roundClip((await target.boundingBox())!);
   const page = target.page();
 
   // WebKit browsers do not support certain pseudo-elements.
@@ -97,7 +99,7 @@ export async function screenshot(
   // @see https://github.com/microsoft/playwright/issues/18827
   const buffer = await page.screenshot({
     path,
-    clip: roundBox(box!),
+    clip: { ...roundedClip, ...size },
     fullPage: true,
     animations: 'disabled',
     type,
