@@ -41,7 +41,7 @@ function getPseudoElementStyle<T extends Element>(
   pseudoElt: (typeof PSEUDO_ELECTORS)[number]
 ) {
   if (pseudoElt === '::placeholder') {
-    if (!whichElement(origin, 'input') && !whichElement(origin, 'textarea')) return;
+    if (!((whichElement(origin, 'input') || whichElement(origin, 'textarea')) && origin.placeholder)) return;
   } else if (pseudoElt === '::file-selector-button') {
     if (!(whichElement(origin, 'input') && origin.type === 'file')) return;
   } else if (pseudoElt === '::details-content') {

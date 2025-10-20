@@ -1,4 +1,6 @@
-import type { CSSStyleDeclaration, Window } from 'happy-dom';
+import { type CSSStyleDeclaration, Window } from 'happy-dom';
+import { cloneDocument } from 'src/clone';
+import { createContext } from 'src/context';
 
 export function getStyle(contentWindow: Window, selector: string, pseudoElt?: string) {
   const node = contentWindow.document.querySelector(selector);
@@ -36,4 +38,12 @@ function getAllPropertyNames<T extends object>(object: T) {
   }
 
   return Array.from(props);
+}
+
+export function clone(selector: string) {
+  const context = createContext();
+  context.window = new Window();
+  cloneDocument(context, document.querySelector(selector)!);
+  context.mountStyle();
+  return context;
 }

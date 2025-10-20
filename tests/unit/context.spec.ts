@@ -24,17 +24,51 @@ test('getSelector', () => {
   const selector3 = context.getSelector(document.querySelector('.a')!);
   expect(selector1).toBe(selector3);
 });
+
 describe('style', () => {
-  test('mount', () => {
+  test('must be mounted to take effect', () => {
     const context = createContext();
     const newWindow = new Window();
     context.window = newWindow;
-
     newWindow.document.body.innerHTML = `<div class="test"></div>`;
-    window.document.body.innerHTML = `<div class="test"></div>`;
+
+    context.appendStyle('.test { color: red; }');
+    expect(getStyle(newWindow, '.test').color).toBeFalsy();
+
+    context.mountStyle();
+    expect(getStyle(newWindow, '.test').color).toBe('red');
+  });
+
+  test('must be appended before mounting', () => {
+    const context = createContext();
+    const newWindow = new Window();
+    context.window = newWindow;
+    newWindow.document.body.innerHTML = `<div class="test"></div>`;
 
     context.mountStyle();
     expect(getStyle(newWindow, '.test').color).toBeFalsy();
+
+    context.appendStyle('.test { color: red; }');
+    context.mountStyle();
+    expect(getStyle(newWindow, '.test').color).toBe('red');
+  });
+
+  test('doesn’t affect the current window', () => {
+    const context = createContext();
+    const newWindow = new Window();
+    context.window = newWindow;
+    window.document.body.innerHTML = `<div class="test"></div>`;
+
+    context.appendStyle('.test { color: red; }');
+    context.mountStyle();
+    expect(getStyle(window, '.test').color).toBeFalsy();
+  });
+
+  test('empty styles should not be appended', () => {
+    const context = createContext();
+    const newWindow = new Window();
+    context.window = newWindow;
+    newWindow.document.body.innerHTML = `<div class="test"></div>`;
 
     context.appendStyle();
     context.mountStyle();
@@ -42,11 +76,6 @@ describe('style', () => {
 
     context.appendStyle('.test { color: red; }');
     expect(getStyle(newWindow, '.test').color).toBeFalsy();
-
-    context.mountStyle();
-    expect(getStyle(newWindow, '.test').color).toBe('red');
-    // doesn't effect origin window
-    expect(getStyle(window, '.test').color).toBeFalsy();
   });
 
   test('repeated append', () => {
@@ -72,12 +101,12 @@ describe('style', () => {
 
   test('isolation', () => {
     const context1 = createContext();
-    context1.window = window;
+    context1.window = new Window();
     context1.appendStyle('body { color: red; }');
+    context1.mountStyle();
 
     const context2 = createContext();
     context2.window = new Window();
-    context2.mountStyle();
     expect(getStyle(context2.window, 'body').color).toBeFalsy();
   });
 });
@@ -95,8 +124,17 @@ describe('tasks', () => {
     context.addTask(task);
     context.flushTasks();
     expect(task).toBeCalledTimes(1);
+  });
 
+  test('flushTasks should clear the tasks', () => {
+    const context = createContext();
+    const task1 = vi.fn();
+    context.addTask(task1);
     context.flushTasks();
-    expect(task).toBeCalledTimes(1);
+    const task2 = vi.fn();
+    context.addTask(task2);
+    context.flushTasks();
+    expect(task1).toBeCalledTimes(1);
+    expect(task2).toBeCalledTimes(1);
   });
 });

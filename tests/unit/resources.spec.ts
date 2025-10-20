@@ -20,8 +20,9 @@ describe('resources', () => {
         <image href="https://example.com"></image>
       </svg>
     `;
-    // `happy-dom` doesn't actually load resources, so manually dispatch `load` and `canplay` events
+
     const result = waitResources(document);
+    // `happy-dom` doesn't actually load resources, so manually dispatch `load` and `canplay` events
     document
       .querySelectorAll('img, object, iframe, embed, image')
       .forEach(node => node.dispatchEvent(new Event('load')));

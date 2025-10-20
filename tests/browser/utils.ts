@@ -122,7 +122,7 @@ export async function pauseMedia(page: Page) {
   await page.evaluate(() => {
     document.querySelectorAll<HTMLMediaElement>('video,audio').forEach(node => {
       node.pause();
-      setTimeout(() => (node.currentTime = 0));
+      node.currentTime = 0;
     });
   });
 }
