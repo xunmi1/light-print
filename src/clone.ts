@@ -1,8 +1,6 @@
 import type { Context } from './context';
 import {
   appendNode,
-  createElementWalker,
-  type ElementWalker,
   whichElement,
   getStyle,
   isMediaElement,
@@ -10,6 +8,7 @@ import {
   isRenderingElement,
   isHidden,
   isInsideBlock,
+  toArray,
 } from './utils';
 
 function getStyleTextDiff(targetStyle: CSSStyleDeclaration, originStyle: CSSStyleDeclaration) {
@@ -152,38 +151,18 @@ function cloneElement(target: Element, origin: Element, context: Context) {
   return true;
 }
 
-function syncWalk(
-  whetherNext: (target: Element, origin: Element) => boolean,
-  targetWalker: ElementWalker,
-  originWalker: ElementWalker
-) {
-  while (true) {
-    const isNext = whetherNext(targetWalker.currentNode, originWalker.currentNode);
-    if (isNext) {
-      if (!(targetWalker.nextNode() && originWalker.nextNode())) break;
-    } else {
-      const skippedNode = targetWalker.currentNode;
-      let hasParent = true;
-      while (true) {
-        const hasSibling = targetWalker.nextSibling() && originWalker.nextSibling();
-        if (hasSibling) break;
-        // If the current element has no next sibling, move to the next sibling of its parent.
-        hasParent = !!(targetWalker.parentNode() && originWalker.parentNode());
-        if (!hasParent) break;
-      }
-      // Remove the skipped element and its subtree, to prevent any resources from being loaded.
-      removeNode(skippedNode);
-      if (!hasParent) break;
-    }
+function traverse(visitor: (target: Element, origin: Element) => boolean, target: Element, origin: Element) {
+  if (!visitor(target, origin)) return removeNode(target);
+  const children = toArray(target.children);
+  for (let i = 0; i < children.length; i++) {
+    traverse(visitor, children[i], origin.children[i]);
   }
 }
 
 export function cloneDocument(context: Context, hostElement: Element) {
   const doc = context.document;
-  // clone the `hostElement` structure to `body`, contains inline styles.
+  // clone the `hostElement` structure to `body`.
   appendNode(doc.body, doc.importNode(hostElement, true));
-  const originWalker = createElementWalker(hostElement);
-  const targetWalker = createElementWalker(doc.body.firstElementChild!);
-  syncWalk((target, origin) => cloneElement(target, origin, context), targetWalker, originWalker);
+  traverse((target, origin) => cloneElement(target, origin, context), doc.body.firstElementChild!, hostElement);
   context.flushTasks();
 }

@@ -4,9 +4,13 @@ export const isString = (val: unknown): val is string => typeof val === 'string'
 
 export const isElement = <T extends Element>(target: unknown): target is T => target instanceof Element;
 
-export const appendNode = <T extends Node>(parent: T, child: T) => parent.appendChild(child);
+export function appendNode<T extends Node>(parent: T, child: T) {
+  parent.appendChild(child);
+}
 
-export const removeNode = <T extends Node>(node: T) => node.parentNode?.removeChild(node);
+export function removeNode<T extends Node>(node: T) {
+  node.parentNode?.removeChild(node);
+}
 
 type SafeGet<Key, Map> = Key extends keyof Map ? Map[Key] : never;
 
@@ -45,19 +49,6 @@ const DISPLAY_INSIDE_BLOCK: readonly string[] = [
 /** inset block element */
 export function isInsideBlock(style: CSSStyleDeclaration) {
   return DISPLAY_INSIDE_BLOCK.indexOf(style.display) > -1;
-}
-
-export interface ElementWalker extends TreeWalker {
-  currentNode: Element;
-  nextNode(): Element | null;
-  nextSibling(): Element | null;
-}
-
-export function createElementWalker(root: Element) {
-  // `1` is `NodeFilter.SHOW_ELEMENT`
-  // IE requires four parameters (expandEntityReferences: false)
-  // @ts-expect-error
-  return window.document.createTreeWalker(root, 1, null, false) as ElementWalker;
 }
 
 export function setStyleProperty(
@@ -132,4 +123,8 @@ export function NOOP() {}
 
 export function getStyle(element: Element, pseudoElt?: string) {
   return element.ownerDocument.defaultView!.getComputedStyle(element, pseudoElt);
+}
+
+export function toArray<T>(arrayLike: ArrayLike<T>) {
+  return Array.prototype.slice.apply<ArrayLike<T>, T[]>(arrayLike);
 }
