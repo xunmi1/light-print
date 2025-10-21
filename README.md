@@ -132,9 +132,13 @@ function lightPrint(containerOrSelector: Element | string, options?: PrintOption
 
    Configure via [paged media](https://developer.chrome.com/blog/print-margins) in the `mediaPrintStyle`, or set page margins to zero and manually implement the DOM structure for headers/footers.
 
+4. Why are some styles missing after printing?
+
+   Because those styles may be inherited from the parent; you need to restate them (e.g., `background`) directly on the print-element container.
+
 ## Limitations
 
-- It is recommended to specify fixed dimensions (width and height) for the element container, as it cannot adapt to page dimensions when printing.
+- It is recommended to specify fixed dimensions (width and height) for the print-element container, as it cannot adapt to page dimensions when printing.
 - Automatic font loading is not supported for non-Chromium browsers. You can declare `@font-face` within the `mediaPrintStyle`, for example:
   ```js
   const mediaPrintStyle = `

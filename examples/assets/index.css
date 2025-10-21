@@ -1,3 +1,9 @@
+:root {
+  text-autospace: normal;
+  interpolate-size: allow-keywords;
+  print-color-adjust: exact;
+}
+
 *,
 ::before,
 ::after {
@@ -57,7 +63,6 @@ body {
 
 #app {
   background-color: white;
-  print-color-adjust: exact;
 }
 
 table {

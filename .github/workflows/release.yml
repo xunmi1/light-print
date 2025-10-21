@@ -1,3 +1,6 @@
+# Use trusted publishing
+# https://docs.npmjs.com/trusted-publishers#how-trusted-publishing-works
+
 name: Release
 
 on:
@@ -8,7 +11,6 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    # https://docs.npmjs.com/generating-provenance-statements
     permissions:
       contents: read
       id-token: write
@@ -20,6 +22,10 @@ jobs:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
 
+      # npm >= 11.5.1
+      - name: Update npm
+        run: npm install -g npm@latest
+
       - name: Install dependencies
         run: npm ci
 
@@ -27,6 +33,4 @@ jobs:
         run: npm run build
 
       - name: Publish Packages
-        run: npm publish --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish
