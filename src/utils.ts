@@ -38,17 +38,21 @@ export function isHidden(style: CSSStyleDeclaration) {
   return !style.display || style.display === 'none';
 }
 
-const DISPLAY_INSIDE_BLOCK: readonly string[] = [
+const BLOCK_CONTAINER_DISPLAY: readonly string[] = [
   'block',
   'inline-block',
   'list-item',
   'flow-root',
   'table-caption',
   'table-cell',
+  'table-column',
+  'table-column-group',
 ];
-/** inset block element */
-export function isInsideBlock(style: CSSStyleDeclaration) {
-  return DISPLAY_INSIDE_BLOCK.indexOf(style.display) > -1;
+/** Block container
+ * @see https://developer.mozilla.org/docs/Web/CSS/CSS_display/Visual_formatting_model#block_containers
+ */
+export function isBlockContainer(style: CSSStyleDeclaration) {
+  return BLOCK_CONTAINER_DISPLAY.indexOf(style.display) > -1;
 }
 
 export function setStyleProperty(

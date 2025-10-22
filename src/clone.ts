@@ -7,7 +7,7 @@ import {
   removeNode,
   isRenderingElement,
   isHidden,
-  isInsideBlock,
+  isBlockContainer,
   toArray,
 } from './utils';
 
@@ -48,7 +48,7 @@ function getPseudoElementStyle<T extends Element>(
   } else if (pseudoElt === '::marker') {
     if (originStyle.display !== 'list-item') return;
   } else if (pseudoElt === '::first-letter' || pseudoElt === '::first-line') {
-    if (!isInsideBlock(originStyle)) return;
+    if (!isBlockContainer(originStyle)) return;
   }
 
   const pseudoOriginStyle = getStyle(origin, pseudoElt);
