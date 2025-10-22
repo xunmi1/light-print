@@ -45,6 +45,23 @@ describe('clone style', () => {
     const context = clone('#app');
     expect(getStyle(context.window, '#app').color).toBe('red');
   });
+
+  // Accurate testing is impossible in a mock environment; precise validation happens in E2E tests.
+  test('table width', async () => {
+    document.body.innerHTML = `
+      <style>table { table-layout: fixed; width: 20px }</style>
+      <div id="app" style="width: 100px">
+        <table>
+          <tr>
+            <td class="test">light-print</td>
+          </tr>
+        </table>
+      </div>
+    `;
+    const context = clone('#app');
+    const targetStyle = getStyle(context.window, 'table');
+    expect(targetStyle.width).toBe('20px');
+  });
 });
 
 test('clone attributes', async () => {

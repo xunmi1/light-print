@@ -18,6 +18,9 @@ function getStyleTextDiff(targetStyle: CSSStyleDeclaration, originStyle: CSSStyl
     const value = originStyle.getPropertyValue(property);
     if (value && value !== targetStyle.getPropertyValue(property)) styleText += `${property}:${value};`;
   }
+  // Table layout is always influenced by content;
+  // whether `table-layout` is `auto` or `fixed`, we must give the table an explicit width to ensure accuracy.
+  if (originStyle.display === 'table') styleText += `width:${originStyle.width};`;
 
   return styleText;
 }
@@ -61,7 +64,7 @@ function getPseudoElementStyle<T extends Element>(
 }
 
 // equip: HTMLElement | SVGElement | MathMLElement
-type ElementWithStyle = HTMLElement | SVGElement | MathMLElement;
+type ElementWithStyle = Element & ElementCSSInlineStyle;
 
 /** clone element style */
 function cloneElementStyle(target: ElementWithStyle, originStyle: CSSStyleDeclaration, context: Context) {
