@@ -60,21 +60,24 @@ function getPseudoElementStyle<T extends Element>(
   return getStyleTextDiff(getStyle(target, pseudoElt), pseudoOriginStyle);
 }
 
+// equip: HTMLElement | SVGElement | MathMLElement
+type ElementWithStyle = HTMLElement | SVGElement | MathMLElement;
+
 /** clone element style */
-function cloneElementStyle<T extends Element>(target: T, originStyle: CSSStyleDeclaration, context: Context) {
+function cloneElementStyle(target: ElementWithStyle, originStyle: CSSStyleDeclaration, context: Context) {
   // identical inline styles are omitted.
-  const nonInlineStyle = getStyleTextDiff(getStyle(target), originStyle);
-  if (!nonInlineStyle) return;
-  const inlineStyle = target.getAttribute('style') ?? '';
+  const injectionStyle = getStyleTextDiff(getStyle(target), originStyle);
+  if (!injectionStyle) return;
+  const cssText = `${target.style.cssText}${injectionStyle}`;
   // Inline style trigger an immediate layout reflow,
   // after which fewer and correct rules have to be resolved for the children; in practice this is measurably faster.
   // The downside is their sky-high specificity: overriding them with mediaPrintStyle is painful,
   // We therefore strip the inline declarations once cloning finishes and hand the job over to a clean style sheet.
-  target.setAttribute('style', `${nonInlineStyle}${inlineStyle}`);
-  const styleText = `${context.getSelector(target)}{${nonInlineStyle}}`;
+  target.setAttribute('style', cssText);
+  const styleRule = `${context.getSelector(target)}{${cssText}}`;
   context.addTask(() => {
-    target.setAttribute('style', inlineStyle);
-    context.appendStyle(styleText);
+    target.removeAttribute('style');
+    context.appendStyle(styleRule);
   });
 }
 
@@ -84,15 +87,15 @@ function clonePseudoElementStyle<T extends Element>(
   originStyle: CSSStyleDeclaration,
   context: Context
 ) {
-  let styleText = '';
+  let styleRules = '';
   let selector: string | undefined;
   for (const pseudoElt of PSEUDO_ELECTORS) {
     const style = getPseudoElementStyle(target, origin, originStyle, pseudoElt);
     if (!style) continue;
     selector ??= context.getSelector(target);
-    styleText += `${selector}${pseudoElt}{${style}}`;
+    styleRules += `${selector}${pseudoElt}{${style}}`;
   }
-  context.appendStyle(styleText);
+  context.appendStyle(styleRules);
 }
 
 /** clone canvas */
@@ -142,7 +145,7 @@ function cloneElement(target: Element, origin: Element, context: Context) {
   // Ignore hidden element.
   if (isHidden(originStyle)) return false;
 
-  cloneElementStyle(target, originStyle, context);
+  cloneElementStyle(target as ElementWithStyle, originStyle, context);
   if (!(origin instanceof SVGElement)) clonePseudoElementStyle(target, origin, originStyle, context);
 
   cloneElementProperties(target, origin);
