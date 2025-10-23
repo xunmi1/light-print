@@ -6,10 +6,6 @@ test.beforeEach(async ({ page }) => {
   await preventDestroyContainer(page);
 });
 
-function getWidth(locator: Locator) {
-  return locator.evaluate(el => getComputedStyle(el).width);
-}
-
 test.describe('display: table', () => {
   test('table-layout: fixed', async ({ page }) => {
     await page.evaluate(() => {
@@ -29,15 +25,15 @@ test.describe('display: table', () => {
         </div>
       `;
     });
-    const originWidth = await getWidth(page.locator('table'));
-    expect(originWidth).toBe('50px');
+    const originRect = await page.locator('table').evaluate(el => el.getBoundingClientRect());
+    expect(originRect.width).toBe(50);
 
     const lightPrint = await loadPrintScript(page);
     await lightPrint('#app');
     const frame = getPrintContainter(page).contentFrame();
 
-    const targetWidth = await getWidth(frame.locator('table'));
-    expect(targetWidth).toBe('50px');
+    const targetRect = await frame.locator('table').evaluate(el => el.getBoundingClientRect());
+    expect(targetRect.width).toBe(50);
   });
 
   test('table-layout: auto', async ({ page }) => {
@@ -58,14 +54,14 @@ test.describe('display: table', () => {
         </div>
       `;
     });
-    const originWidth = await getWidth(page.locator('table'));
-    expect(originWidth).toBe('100px');
+    const originRect = await page.locator('table').evaluate(el => el.getBoundingClientRect());
+    expect(originRect.width).toBe(100);
 
     const lightPrint = await loadPrintScript(page);
     await lightPrint('#app');
     const frame = getPrintContainter(page).contentFrame();
 
-    const targetWidth = await getWidth(frame.locator('table'));
-    expect(targetWidth).toBe('100px');
+    const targetRect = await frame.locator('table').evaluate(el => el.getBoundingClientRect());
+    expect(targetRect.width).toBe(100);
   });
 });

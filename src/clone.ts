@@ -18,10 +18,19 @@ function getStyleTextDiff(targetStyle: CSSStyleDeclaration, originStyle: CSSStyl
     const value = originStyle.getPropertyValue(property);
     if (value && value !== targetStyle.getPropertyValue(property)) styleText += `${property}:${value};`;
   }
-  // Table layout is always influenced by content;
-  // whether `table-layout` is `auto` or `fixed`, we must give the table an explicit width to ensure accuracy.
-  if (originStyle.display === 'table') styleText += `width:${originStyle.width};`;
+  return styleText;
+}
 
+function fixEdgeCaseStyle(styleText: string, origin: ElementWithStyle, originStyle: CSSStyleDeclaration) {
+  //By default, the SVG element’s aspect ratio is dictated by its `viewBox`.
+  if (whichElement(origin, 'svg') && origin.getAttribute('viewBox')) {
+    styleText += `width:${originStyle.width};height:${originStyle.height};`;
+  }
+  // The `table` layout is always influenced by content;
+  // whether `table-layout` is `auto` or `fixed`, we must give the table an explicit width to ensure accuracy.
+  if (originStyle.display === 'table') {
+    styleText += `width:${originStyle.width};`;
+  }
   return styleText;
 }
 
@@ -67,11 +76,17 @@ function getPseudoElementStyle<T extends Element>(
 type ElementWithStyle = Element & ElementCSSInlineStyle;
 
 /** clone element style */
-function cloneElementStyle(target: ElementWithStyle, originStyle: CSSStyleDeclaration, context: Context) {
+function cloneElementStyle<T extends ElementWithStyle>(
+  target: T,
+  origin: T,
+  originStyle: CSSStyleDeclaration,
+  context: Context
+) {
   // identical inline styles are omitted.
-  const injectionStyle = getStyleTextDiff(getStyle(target), originStyle);
+  let injectionStyle = getStyleTextDiff(getStyle(target), originStyle);
+  injectionStyle = fixEdgeCaseStyle(injectionStyle, origin, originStyle);
   if (!injectionStyle) return;
-  const cssText = `${target.style.cssText}${injectionStyle}`;
+  const cssText = `${origin.style.cssText}${injectionStyle}`;
   // Inline style trigger an immediate layout reflow,
   // after which fewer and correct rules have to be resolved for the children; in practice this is measurably faster.
   // The downside is their sky-high specificity: overriding them with mediaPrintStyle is painful,
@@ -148,7 +163,7 @@ function cloneElement(target: Element, origin: Element, context: Context) {
   // Ignore hidden element.
   if (isHidden(originStyle)) return false;
 
-  cloneElementStyle(target as ElementWithStyle, originStyle, context);
+  cloneElementStyle(target as ElementWithStyle, origin as ElementWithStyle, originStyle, context);
   if (!(origin instanceof SVGElement)) clonePseudoElementStyle(target, origin, originStyle, context);
 
   cloneElementProperties(target, origin);

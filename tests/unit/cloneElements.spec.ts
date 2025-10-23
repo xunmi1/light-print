@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from 'vitest';
-import { clone } from './utils';
+import { clone, getStyle } from './utils';
 
 test('iframe', async () => {
   document.body.innerHTML = `
@@ -170,5 +170,37 @@ describe('form fields', () => {
     document.querySelector('textarea')!.value = 'bar';
     const context = clone('#app');
     expect(context.document.querySelector('textarea')!.value).toBe('bar');
+  });
+});
+
+describe('svg', () => {
+  test('size with viewBox', () => {
+    document.body.innerHTML = `
+      <style>svg { display: block; width: 48px; height: 24px }</style>
+      <div id="app" style="width: 24px">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+        </svg>
+      </div>
+    `;
+    const context = clone('#app');
+    const targetStyle = getStyle(context.window, 'svg');
+    expect(targetStyle.width).toBe('48px');
+    expect(targetStyle.height).toBe('24px');
+  });
+
+  test('size without viewBox', () => {
+    document.body.innerHTML = `
+      <style>svg { display: block; width: 48px; height: 56px }</style>
+      <div id="app">
+        <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+        </svg>
+      </div>
+    `;
+    const context = clone('#app');
+    const targetStyle = getStyle(context.window, 'svg');
+    expect(targetStyle.width).toBe('48px');
+    expect(targetStyle.height).toBe('56px');
   });
 });
