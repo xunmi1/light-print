@@ -90,18 +90,19 @@ describe('ignore', () => {
   test('non-rendering element', async () => {
     const size = 100;
     document.body.innerHTML = `
+      <style>.ignore { font-size: ${size}px }</style>
       <div id="app">
-        <style>.ignore { font-size: ${size}px }</style>
         <source class="ignore" src="https://example.com/video.mp4" type="video/mp4" />
         <track class="ignore" src="https://example.com/captions.vtt" kind="captions" srclang="en" />
-        <script class="ignore"></script>
-        <template class="ignore"></template>
-        <slot class="ignore"></slot>
-        <param class="ignore"></param>
+        <param class="ignore" />
+        <meta class="ignore" />
+        <link class="ignore" />
+        <base class="ignore" />
+        <wbr class="ignore" />
       </div>
     `;
     const context = clone('#app');
-    ['source', 'track', 'script', 'template', 'slot', 'param'].forEach(type => {
+    ['source', 'track', 'param', 'link', 'meta', 'base', 'wbr'].forEach(type => {
       expect(getStyle(context.window, type).fontSize).not.toBe(size);
     });
   });

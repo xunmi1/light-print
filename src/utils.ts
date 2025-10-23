@@ -29,7 +29,8 @@ export function isMediaElement(node: Element) {
   return whichElement(node, 'audio') || whichElement(node, 'video');
 }
 
-const NON_RENDERING_ELEMENTS: readonly string[] = ['source', 'track', 'param', 'template', 'slot', 'script'];
+// `slot`, `style`, etc. default to `display: none` but can still be rendered if override their display.
+const NON_RENDERING_ELEMENTS: readonly string[] = ['source', 'track', 'param', 'link', 'meta', 'base', 'wbr'];
 export function isRenderingElement(node: Element) {
   return NON_RENDERING_ELEMENTS.indexOf(node.localName) < 0;
 }
@@ -93,7 +94,7 @@ type EventMapRegistry = [
 
 type EventMap<T> = FindRegistry<T, EventMapRegistry>;
 type EventName<T> = keyof EventMap<T> & string;
-type EventFor<T, K extends keyof EventMap<T>> = EventMap<T>[K];
+type EventFor<T, K extends EventName<T>> = EventMap<T>[K];
 
 export function bindOnceEvent<Target extends EventTarget | GlobalEventHandlers, Name extends EventName<Target>>(
   target: Target,
