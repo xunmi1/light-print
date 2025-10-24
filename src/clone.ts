@@ -160,7 +160,7 @@ function cloneElementProperties(target: Element, origin: Element) {
 function cloneElement(target: Element, origin: Element, context: Context) {
   if (!isRenderingElement(target)) return true;
   const originStyle = getStyle(origin);
-  // Ignore hidden element.
+  // Remove hidden element.
   if (isHidden(originStyle)) return false;
 
   cloneElementStyle(target as ElementWithStyle, origin as ElementWithStyle, originStyle, context);

@@ -3,7 +3,7 @@ import { Event } from 'happy-dom';
 
 import { waitResources } from 'src/resources';
 
-describe('resources', () => {
+describe('normal resources', () => {
   test('successfully loaded', async () => {
     document.body.innerHTML = `
       <img src="https://example.com" loading="lazy" />
@@ -61,5 +61,18 @@ describe('resources', () => {
     // // `2` is `HTMLMediaElement.HAVE_CURRENT_DATA`
     Object.defineProperty(audio, 'readyState', { value: 2 });
     await expect(waitResources(document)).resolves.toBeUndefined();
+  });
+});
+
+describe('ignore link[ref="stylesheet"]', () => {
+  test('ignore whether it has loaded', async () => {
+    document.body.innerHTML = `
+      <link rel="stylesheet" href="style.css">
+      <link rel="stylesheet" href="style.css" media="all">
+      <link rel="preload" as="style" href="style.css">
+    `;
+    const result = waitResources(document);
+    document.querySelectorAll('link').forEach(node => node.dispatchEvent(new Event('error')));
+    await expect(result).resolves.toBeUndefined();
   });
 });

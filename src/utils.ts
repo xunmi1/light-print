@@ -30,7 +30,7 @@ export function isMediaElement(node: Element) {
 }
 
 // `slot`, `style`, etc. default to `display: none` but can still be rendered if override their display.
-const NON_RENDERING_ELEMENTS: readonly string[] = ['source', 'track', 'param', 'link', 'meta', 'base', 'wbr'];
+const NON_RENDERING_ELEMENTS: readonly string[] = ['source', 'track', 'wbr'];
 export function isRenderingElement(node: Element) {
   return NON_RENDERING_ELEMENTS.indexOf(node.localName) < 0;
 }

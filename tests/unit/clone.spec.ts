@@ -6,7 +6,7 @@ describe('clone style', () => {
     document.body.innerHTML = `
       <style>.test { color: white; display: flex; }</style>
       <div id="app">
-        <style>.test { background: blue }</style>
+        <style>.test { padding: 8px }</style>
         <div class="only-inline" style="height: 10rem">style</div>
         <div class="no-inline test">style</div>
         <div class="has-inline test" style="color: red; font-size: 2rem">style</div>
@@ -86,28 +86,25 @@ test('clone attributes', async () => {
   expect(target.open).toBe(true);
 });
 
-describe('ignore', () => {
-  test('non-rendering element', async () => {
+describe('some special elements', () => {
+  test('skip non-rendering element', () => {
     const size = 100;
     document.body.innerHTML = `
       <style>.ignore { font-size: ${size}px }</style>
       <div id="app">
         <source class="ignore" src="https://example.com/video.mp4" type="video/mp4" />
         <track class="ignore" src="https://example.com/captions.vtt" kind="captions" srclang="en" />
-        <param class="ignore" />
-        <meta class="ignore" />
-        <link class="ignore" />
-        <base class="ignore" />
         <wbr class="ignore" />
       </div>
     `;
     const context = clone('#app');
-    ['source', 'track', 'param', 'link', 'meta', 'base', 'wbr'].forEach(type => {
+    ['source', 'track', 'wbr'].forEach(type => {
+      expect(context.document.querySelector(type)).toBeTruthy();
       expect(getStyle(context.window, type).fontSize).not.toBe(size);
     });
   });
 
-  test('hidden element', async () => {
+  test('remove hidden element', () => {
     document.body.innerHTML = `
       <style>.hidden { display: none }</style>
       <div id="app">
@@ -124,5 +121,64 @@ describe('ignore', () => {
     expect(context.document.querySelector('#app')).toBeTruthy();
     expect(context.document.querySelector('#root-hidden')).toBeFalsy();
     expect(context.document.querySelector('#nest-hidden')).toBeFalsy();
+  });
+
+  test('elements removed by default', () => {
+    document.body.innerHTML = `
+      <div id="app">
+        <link>
+        <param>
+        <meta>
+        <base>
+        <template></template>
+        <script></script>
+      </div>
+    `;
+    const context = clone('#app');
+    ['link', 'param', 'meta', 'base', 'template', 'script'].forEach(type => {
+      expect(context.document.querySelector(type)).toBeFalsy();
+    });
+  });
+
+  test('made visible again via styling', () => {
+    document.body.innerHTML = `
+      <style>.visible { display: block; height: 10px }</style>
+      <div id="app">
+        <link class="visible">
+        <param class="visible">
+        <meta class="visible">
+        <base class="visible">
+        <template class="visible"></template>
+        <script class="visible"></script>
+      </div>
+    `;
+    const context = clone('#app');
+    ['link', 'param', 'meta', 'base', 'template', 'script'].forEach(type => {
+      expect(context.document.querySelector(type)).toBeTruthy();
+    });
+  });
+});
+
+describe('styles still apply even if removed', () => {
+  test('style', () => {
+    document.body.innerHTML = `
+      <div id="app">
+        <style>.test { color: red }</style>
+        <div class="test">style</div>
+      </div>
+    `;
+    const context = clone('#app');
+    expect(context.document.querySelector('link')).toBeFalsy();
+    expect(getStyle(context.window, '.test').color).toBe('red');
+  });
+
+  test('link', () => {
+    document.body.innerHTML = `
+      <div id="app">
+        <link rel="stylesheet" href="style.css">
+      </div>
+    `;
+    const context = clone('#app');
+    expect(context.document.querySelector('link')).toBeFalsy();
   });
 });
