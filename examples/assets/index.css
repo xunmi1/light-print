@@ -12,6 +12,7 @@
 
 video,
 audio,
+img,
 canvas,
 iframe {
   display: block;

@@ -1,4 +1,5 @@
-import { test, expect, type Locator } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
 import { loadPrintScript, preventPrintDialog, preventDestroyContainer, getPrintContainter, screenshot } from './utils';
 
 test.beforeEach(async ({ page }) => {
@@ -63,5 +64,53 @@ test.describe('display: table', () => {
 
     const targetRect = await frame.locator('table').evaluate(el => el.getBoundingClientRect());
     expect(targetRect.width).toBe(100);
+  });
+});
+
+test.describe('aspectRatio', () => {
+  test('style: aspect-ratio', async ({ page }) => {
+    await page.evaluate(() => {
+      document.body.innerHTML = `
+        <style>
+          #ratio1 { width: 20px !important; height: 10px }
+          #ratio2 { width: 20px !important; }
+        </style>
+        <div id="app" style="aspect-ratio: 1; width: 10px;">
+          <div id="ratio1" style="aspect-ratio: 1; width: 10px;"></div>
+          <div id="ratio2" style="aspect-ratio: 1; width: 10px;"></div>
+        </div>
+      `;
+    });
+    const lightPrint = await loadPrintScript(page);
+    await lightPrint('#app');
+    const frame = getPrintContainter(page).contentFrame();
+
+    let targetRect = await frame.locator('#ratio1').evaluate(el => el.getBoundingClientRect());
+    expect(targetRect.width).toBe(20);
+    expect(targetRect.height).toBe(10);
+    targetRect = await frame.locator('#ratio2').evaluate(el => el.getBoundingClientRect());
+    expect(targetRect.width).toBe(20);
+    expect(targetRect.height).toBe(20);
+  });
+
+  test('image with intrinsic aspect ratio', async ({ page }) => {
+    // The image’s intrinsic aspect ratio: 13 / 4
+    const imageBuffer = await readFile('examples/assets/light-print-black.svg');
+    const dataURL = `data:image/svg+xml;base64,${imageBuffer.toString('base64')}`;
+
+    await page.evaluate(dataURL => {
+      document.body.innerHTML = `
+        <style>img { display: block; width: 130px; height: 60px; } </style>
+        <div id="app">
+          <img src="${dataURL}" height="40" />
+        </div>
+      `;
+    }, dataURL);
+    const lightPrint = await loadPrintScript(page);
+    await lightPrint('#app');
+    const frame = getPrintContainter(page).contentFrame();
+    const targetRect = await frame.locator('img').evaluate(el => el.getBoundingClientRect());
+    expect(targetRect.width).toBe(130);
+    expect(targetRect.height).toBe(60);
   });
 });

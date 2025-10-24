@@ -9,6 +9,8 @@ import {
   isHidden,
   isBlockContainer,
   toArray,
+  type ElementWithStyle,
+  hasIntrinsicAspectRatio,
 } from './utils';
 
 function getStyleTextDiff(targetStyle: CSSStyleDeclaration, originStyle: CSSStyleDeclaration) {
@@ -22,8 +24,9 @@ function getStyleTextDiff(targetStyle: CSSStyleDeclaration, originStyle: CSSStyl
 }
 
 function fixEdgeCaseStyle(styleText: string, origin: ElementWithStyle, originStyle: CSSStyleDeclaration) {
-  //By default, the SVG element’s aspect ratio is dictated by its `viewBox`.
-  if (whichElement(origin, 'svg') && origin.getAttribute('viewBox')) {
+  // For elements with an aspect ratio, always supply both width and height
+  // to prevent incorrect auto-sizing based on that ratio.
+  if (hasIntrinsicAspectRatio(origin)) {
     styleText += `width:${originStyle.width};height:${originStyle.height};`;
   }
   // The `table` layout is always influenced by content;
@@ -71,9 +74,6 @@ function getPseudoElementStyle<T extends Element>(
   }
   return getStyleTextDiff(getStyle(target, pseudoElt), pseudoOriginStyle);
 }
-
-// equip: HTMLElement | SVGElement | MathMLElement
-type ElementWithStyle = Element & ElementCSSInlineStyle;
 
 /** clone element style */
 function cloneElementStyle<T extends ElementWithStyle>(

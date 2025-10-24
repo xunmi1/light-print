@@ -133,3 +133,15 @@ export function getStyle(element: Element, pseudoElt?: string) {
 export function toArray<T>(arrayLike: ArrayLike<T>) {
   return Array.prototype.slice.apply<ArrayLike<T>, T[]>(arrayLike);
 }
+
+// Equal to: HTMLElement | SVGElement | MathMLElement
+export type ElementWithStyle = Element & ElementCSSInlineStyle;
+
+/** Whether the element has intrinsic aspect ratio */
+export function hasIntrinsicAspectRatio(el: ElementWithStyle) {
+  // SVG element’s aspect ratio is dictated by its `viewBox` by default.
+  if (whichElement(el, 'img') || whichElement(el, 'video') || (whichElement(el, 'svg') && el.getAttribute('viewBox')))
+    return true;
+  const ratio = el.style.aspectRatio;
+  return ratio && ratio !== 'auto' && ratio !== 'unset' && ratio !== 'initial';
+}

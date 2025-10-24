@@ -45,23 +45,44 @@ describe('clone style', () => {
     const context = clone('#app');
     expect(getStyle(context.window, '#app').color).toBe('red');
   });
+});
 
-  // Accurate testing is impossible in a mock environment; precise validation happens in E2E tests.
-  test('table width', async () => {
-    document.body.innerHTML = `
-      <style>table { table-layout: fixed; width: 20px }</style>
-      <div id="app" style="width: 100px">
-        <table>
-          <tr>
-            <td class="test">light-print</td>
-          </tr>
-        </table>
+// Accurate testing is impossible in a mock environment; precise validation happens in E2E tests.
+test('table width', async () => {
+  document.body.innerHTML = `
+    <style>table { table-layout: fixed; width: 20px }</style>
+    <div id="app" style="width: 100px">
+      <table>
+        <tr><td class="test">light-print</td></tr>
+      </table>
+    </div>
+  `;
+  const context = clone('#app');
+  const targetStyle = getStyle(context.window, 'table');
+  expect(targetStyle.width).toBe('20px');
+});
+
+// Accurate testing is impossible in a mock environment; precise validation happens in E2E tests.
+test('style: aspect-ratio', async () => {
+  document.body.innerHTML = `
+      <style>
+        #ratio1 { width: 20px !important; height: 10px }
+        #ratio2 { width: 20px !important }
+      </style>
+      <div id="app" style="aspect-ratio: 1; width: 10px;">
+        <div id="ratio1" style="aspect-ratio: 1; width: 10px;"></div>
+        <div id="ratio2" style="aspect-ratio: 1; width: 10px;"></div>
       </div>
     `;
-    const context = clone('#app');
-    const targetStyle = getStyle(context.window, 'table');
-    expect(targetStyle.width).toBe('20px');
-  });
+  const context = clone('#app');
+  let targetStyle = getStyle(context.window, '#ratio1');
+  expect(targetStyle.width).toBe('20px');
+  // `happy-dom` does not support auto-sizing, so the height is still `10px`
+  expect(targetStyle.height).toBe('10px');
+  targetStyle = getStyle(context.window, '#ratio2');
+  expect(targetStyle.width).toBe('20px');
+  // the height should be `20px`, unable to test in `happy-dom`
+  // expect(targetStyle.height).toBe('20px');
 });
 
 test('clone attributes', async () => {
