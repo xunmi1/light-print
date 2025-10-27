@@ -1,4 +1,5 @@
 import { expect, describe, test, beforeEach } from 'vitest';
+import { Event } from 'happy-dom';
 
 import lightPrint from 'src';
 
@@ -27,6 +28,18 @@ describe('print target', () => {
     await expect(lightPrint({})).rejects.toThrowError('Invalid HTML element');
     const element = document.querySelector('#app')!;
     await expect(lightPrint(element)).resolves.toBeUndefined();
+  });
+
+  test('disabled iframe', async () => {
+    const originalAppendChild = document.body.appendChild;
+    document.body.appendChild = function (node) {
+      // @ts-expect-error
+      if (node.localName === 'iframe') {
+        node.dispatchEvent(new Event('error'));
+      }
+      return originalAppendChild.call(this, node);
+    };
+    await expect(lightPrint('body')).rejects.toThrowError();
   });
 });
 

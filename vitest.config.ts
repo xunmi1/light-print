@@ -18,7 +18,7 @@ export default defineConfig({
     setupFiles: ['tests/unit/vitestSetup.ts'],
     onConsoleLog(log, type) {
       // `happy-dom` doesn't actually send requests, so relevant error logs can be ignored.
-      return !(type === 'stderr' && log.includes('happy-dom') && log.includes('fetch'));
+      return !(type === 'stderr' && log.search(/fetch|connect/i) > -1);
     },
   },
 });
