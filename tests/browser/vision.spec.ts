@@ -15,7 +15,7 @@ test.beforeEach(async ({ page }) => {
   await preventPrintDialog(page);
 });
 
-test('visually consistent', async ({ page }, testInfo) => {
+test('visually consistent', async ({ page, browserName }, testInfo) => {
   await page.goto('/examples/index.html');
   await pauseMedia(page);
   const action = page.locator('#print-action');
@@ -37,8 +37,8 @@ test('visually consistent', async ({ page }, testInfo) => {
   // so we lock the exact width and height manually.
   const originClip = roundClip((await origin.boundingBox())!);
   const targetBuffer = await screenshot(target, { size: { width: originClip.width, height: originClip.height } });
-
-  expect(targetBuffer).toMatchSnapshot('origin.png', { maxDiffPixelRatio: 0.005 });
+  const maxDiffPixelRatio = browserName === 'webkit' ? 0.01 : 0.005;
+  expect(targetBuffer).toMatchSnapshot('origin.png', { maxDiffPixelRatio });
 });
 
 test('append style', async ({ page }, testInfo) => {

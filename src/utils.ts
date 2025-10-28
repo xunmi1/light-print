@@ -126,8 +126,12 @@ export function withResolvers<T>() {
 
 export function NOOP() {}
 
+export function getOwnerWindow(element: Element) {
+  return element.ownerDocument.defaultView!;
+}
+
 export function getStyle(element: Element, pseudoElt?: string) {
-  return element.ownerDocument.defaultView!.getComputedStyle(element, pseudoElt);
+  return getOwnerWindow(element).getComputedStyle(element, pseudoElt);
 }
 
 export function toArray<T>(arrayLike: ArrayLike<T>) {

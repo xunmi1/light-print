@@ -36,6 +36,7 @@ describe('print target', () => {
       // @ts-expect-error
       if (node.localName === 'iframe') {
         node.dispatchEvent(new Event('error'));
+        return node;
       }
       return originalAppendChild.call(this, node);
     };

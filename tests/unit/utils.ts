@@ -1,6 +1,6 @@
-import { type CSSStyleDeclaration, Window } from 'happy-dom';
+import { type CSSStyleDeclaration, type Document, Window } from 'happy-dom';
 import { cloneDocument } from 'src/clone';
-import { createContext } from 'src/context';
+import { createContext, type Context } from 'src/context';
 
 export function getStyle(contentWindow: Window, selector: string, pseudoElt?: string) {
   const node = contentWindow.document.querySelector(selector);
@@ -45,5 +45,5 @@ export function clone(selector: string) {
   context.window = new Window();
   cloneDocument(context, document.querySelector(selector)!);
   context.mountStyle();
-  return context;
+  return context as Omit<Context, 'window' | 'document'> & { readonly document: Document; window: Window };
 }

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, test } from 'vitest';
+import type { HTMLCanvasElement, HTMLOptionElement, HTMLVideoElement } from 'happy-dom';
 import { clone, getStyle } from './utils';
 
 test('iframe', async () => {
@@ -8,7 +9,7 @@ test('iframe', async () => {
       </div>
     `;
   const context = clone('#app');
-  const target = context.document.querySelector('iframe');
+  const target = context.document.querySelector('iframe')!;
   expect(target.src).toBe('https://example.com/other.html');
 });
 
@@ -22,7 +23,7 @@ describe('canvas', () => {
     `;
 
     const context = clone('#app');
-    const target = context.document.querySelector('canvas');
+    const target = context.document.querySelector('canvas')!;
     expect(target.width).toBe(50);
     expect(target.height).toBe(60);
   });
@@ -35,11 +36,11 @@ describe('canvas', () => {
       </div>
     `;
     const context = clone('#app');
-    let target = context.document.querySelector('#zeroHeight');
+    let target = context.document.querySelector('#zeroHeight') as HTMLCanvasElement;
     expect(target.width).toBe(50);
     expect(target.height).toBe(0);
 
-    target = context.document.querySelector('#zeroWidth');
+    target = context.document.querySelector('#zeroWidth') as HTMLCanvasElement;
     expect(target.width).toBe(0);
     expect(target.height).toBe(50);
   });
@@ -76,13 +77,13 @@ describe('media', () => {
       </div>
     `;
     const context = clone('#app');
-    let target = context.document.querySelector('#selfSrc');
+    let target = context.document.querySelector('#selfSrc') as HTMLVideoElement;
     expect(target.currentSrc).toBe(src);
 
-    target = context.document.querySelector('#sourceSrc');
+    target = context.document.querySelector('#sourceSrc') as HTMLVideoElement;
     expect(target.currentSrc).toBe(src);
 
-    target = context.document.querySelector('#emptySrc');
+    target = context.document.querySelector('#emptySrc') as HTMLVideoElement;
     expect(target.currentSrc).toBeFalsy();
   });
 });
@@ -154,9 +155,9 @@ describe('form fields', () => {
 
     test('selected', async () => {
       const context = clone('#app');
-      let target = context.document.querySelector('option[value="foo"]')!;
+      let target = context.document.querySelector('option[value="foo"]') as HTMLOptionElement;
       expect(target.selected).toBe(false);
-      target = context.document.querySelector('option[value="bar"]')!;
+      target = context.document.querySelector('option[value="bar"]') as HTMLOptionElement;
       expect(target.selected).toBe(true);
     });
   });

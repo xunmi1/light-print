@@ -35,6 +35,12 @@
               </td>
             </tr>
             <tr>
+              <td>web component</td>
+              <td>
+                <time-now><span slot="label">time</span></time-now>
+              </td>
+            </tr>
+            <tr>
               <td>pseudoElement</td>
               <td>
                 <div style="display: flex; flex-direction: column; gap: 0.5rem">
@@ -112,8 +118,9 @@
       <button id="print-action" autofocus>🖨️ Print it</button>
     </div>
   </body>
+  <script src="./assets/time-now.js"></script>
   <!-- easy to use in online demo  -->
-  <script src="../dist/light-print.global.js" type="text/javascript"></script>
+  <script src="../dist/light-print.global.js"></script>
 
   <script type="module">
     import lightPrint from '../dist/light-print.js';

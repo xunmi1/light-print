@@ -12,6 +12,7 @@ import {
   type ElementWithStyle,
   hasIntrinsicAspectRatio,
 } from './utils';
+import { isOpenShadowElement, cloneShadowRoot } from './shadowDOM';
 
 function getStyleTextDiff(targetStyle: CSSStyleDeclaration, originStyle: CSSStyleDeclaration) {
   let styleText = '';
@@ -134,6 +135,15 @@ function cloneMedia<T extends HTMLMediaElement>(target: T, origin: T) {
   target.autoplay = false;
 }
 
+function setScrollState(target: Element, origin: Element) {
+  const scrollTop = origin.scrollTop;
+  const scrollLeft = origin.scrollLeft;
+  if (scrollTop || scrollLeft) {
+    target.scrollTop = scrollTop;
+    target.scrollLeft = scrollLeft;
+  }
+}
+
 // clone element properties
 function cloneElementProperties(target: Element, origin: Element) {
   // The only thing that doesn’t get copied is the `<select> / <option>` ’s current state.
@@ -148,13 +158,11 @@ function cloneElementProperties(target: Element, origin: Element) {
     target.checked = _origin.checked;
     target.indeterminate = _origin.indeterminate;
   }
-  // Sync scroll state
-  const scrollTop = origin.scrollTop;
-  const scrollLeft = origin.scrollLeft;
-  if (scrollTop || scrollLeft) {
-    target.scrollTop = scrollTop;
-    target.scrollLeft = scrollLeft;
-  }
+
+  if (whichElement(target, 'canvas')) cloneCanvas(target, origin as HTMLCanvasElement);
+  if (isMediaElement(target)) cloneMedia(target, origin as HTMLMediaElement);
+
+  setScrollState(target, origin);
 }
 
 function cloneElement(target: Element, origin: Element, context: Context) {
@@ -166,9 +174,8 @@ function cloneElement(target: Element, origin: Element, context: Context) {
   cloneElementStyle(target as ElementWithStyle, origin as ElementWithStyle, originStyle, context);
   if (!(origin instanceof SVGElement)) clonePseudoElementStyle(target, origin, originStyle, context);
 
+  if (isOpenShadowElement(origin)) cloneShadowRoot(target, origin, cloneElementProperties);
   cloneElementProperties(target, origin);
-  if (whichElement(target, 'canvas')) cloneCanvas(target, origin as HTMLCanvasElement);
-  if (isMediaElement(target)) cloneMedia(target, origin as HTMLMediaElement);
   return true;
 }
 
@@ -183,6 +190,7 @@ function traverse(visitor: (target: Element, origin: Element) => boolean, target
 export function cloneDocument(context: Context, hostElement: Element) {
   const doc = context.document;
   // clone the `hostElement` structure to `body`.
+  doc.importNode(hostElement, true);
   appendNode(doc.body, doc.importNode(hostElement, true));
   traverse((target, origin) => cloneElement(target, origin, context), doc.body.firstElementChild!, hostElement);
   context.flushTasks();

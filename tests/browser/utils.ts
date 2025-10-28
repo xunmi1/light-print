@@ -121,6 +121,7 @@ export function getPageErrors(page: Page) {
 export async function pauseMedia(page: Page) {
   await page.evaluate(() => {
     document.querySelectorAll<HTMLMediaElement>('video,audio').forEach(node => {
+      node.autoplay = false;
       node.pause();
       node.currentTime = 0;
     });
