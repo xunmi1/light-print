@@ -1,12 +1,14 @@
 import { getOwnerWindow, isElement } from './utils';
 
-type ShadowElement<T extends Element = Element> = T & { shadowRoot: ShadowRoot };
+type ShadowElement<E extends Element = Element, Mode extends ShadowRoot['mode'] = ShadowRoot['mode']> = E & {
+  shadowRoot: Omit<ShadowRoot, 'mode'> & { mode: Mode };
+};
 
-function traverse(visitor: (origin: Node) => Node, current: Node, childNodes: NodeListOf<Node>) {
+function traverse(visitor: (origin: Node) => Node, parent: Node, childNodes: NodeListOf<Node>) {
   childNodes.forEach(node => {
     const newNode = visitor(node);
     traverse(visitor, newNode, node.childNodes);
-    current.appendChild(newNode);
+    parent.appendChild(newNode);
   });
 }
 
@@ -26,22 +28,27 @@ function cloneSheets(target: ShadowElement, origin: ShadowElement) {
 }
 
 /**
- * Clone element with shadow root.
+ * Clone element with shadow root (mode: 'open').
  * Only modern browsers, not IE
  */
-export function cloneShadowRoot<T extends Element = Element>(
+export function cloneOpenShadowRoot<T extends Element = Element>(
   target: T,
-  origin: ShadowElement<T>,
+  origin: ShadowElement<T, 'open'>,
   visitor: (target: Element, origin: Element) => void
 ) {
   // Should the shadowRoot be clonable, delegate its cloning to the earlier `importNode` for uniform handling.
   if (!origin.shadowRoot.clonable) {
     const shadowRoot = target.shadowRoot ?? attachShadow(target, origin);
     const ownerDocument = target.ownerDocument!;
+    // Clone all nodes rather than reconstructing styles with `getComputedStyle`.
     traverse(
       node => {
         const newNode = ownerDocument.importNode(node, false);
-        if (isElement(node)) visitor(newNode as Element, node);
+        if (isElement(node)) {
+          const _newNode = newNode as Element;
+          if (isOpenShadowElement(node)) cloneOpenShadowRoot(_newNode, node, visitor);
+          visitor(_newNode, node);
+        }
         return newNode;
       },
       shadowRoot,
@@ -51,6 +58,6 @@ export function cloneShadowRoot<T extends Element = Element>(
   cloneSheets(target as ShadowElement, origin);
 }
 
-export function isOpenShadowElement<T extends Element>(el: T): el is ShadowElement<T> {
+export function isOpenShadowElement<T extends Element>(el: T): el is ShadowElement<T, 'open'> {
   return el.shadowRoot?.mode === 'open';
 }

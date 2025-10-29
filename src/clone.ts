@@ -12,7 +12,7 @@ import {
   type ElementWithStyle,
   hasIntrinsicAspectRatio,
 } from './utils';
-import { isOpenShadowElement, cloneShadowRoot } from './shadowDOM';
+import { isOpenShadowElement, cloneOpenShadowRoot } from './shadowDOM';
 
 function getStyleTextDiff(targetStyle: CSSStyleDeclaration, originStyle: CSSStyleDeclaration) {
   let styleText = '';
@@ -174,7 +174,7 @@ function cloneElement(target: Element, origin: Element, context: Context) {
   cloneElementStyle(target as ElementWithStyle, origin as ElementWithStyle, originStyle, context);
   if (!(origin instanceof SVGElement)) clonePseudoElementStyle(target, origin, originStyle, context);
 
-  if (isOpenShadowElement(origin)) cloneShadowRoot(target, origin, cloneElementProperties);
+  if (isOpenShadowElement(origin)) cloneOpenShadowRoot(target, origin, cloneElementProperties);
   cloneElementProperties(target, origin);
   return true;
 }
