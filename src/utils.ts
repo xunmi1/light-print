@@ -39,7 +39,11 @@ export function isHidden(style: CSSStyleDeclaration) {
   return !style.display || style.display === 'none';
 }
 
-const BLOCK_CONTAINER_DISPLAY: readonly string[] = [
+/**
+ * @internal
+ * Exporting this constant is solely for the convenience of testing.
+ */
+export const BLOCK_CONTAINER_DISPLAY: readonly string[] = [
   'block',
   'inline-block',
   'list-item',

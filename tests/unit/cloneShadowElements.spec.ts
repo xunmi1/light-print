@@ -89,3 +89,31 @@ test('shadow root is clonable', () => {
   const target = context.document.querySelector('#app')!;
   expect(target.shadowRoot!.querySelectorAll('span')).toHaveLength(1);
 });
+
+test('shadow elements within shadow elements', () => {
+  document.body.innerHTML = `<div id="app"></div>`;
+  const internal = document.createElement('div');
+  internal.id = 'internal';
+  internal.attachShadow({ mode: 'open' }).appendChild(document.createElement('span'));
+  document.querySelector('#app')!.attachShadow({ mode: 'open' }).appendChild(internal);
+
+  const context = clone('#app');
+  const target = context.document.querySelector('#app')!;
+  const clonedInternal = target.shadowRoot!.querySelector('#internal')!;
+  expect(clonedInternal).toBeTruthy();
+  expect(clonedInternal.shadowRoot!.querySelectorAll('span')).toBeTruthy();
+});
+
+test('nested shadow elements', () => {
+  document.body.innerHTML = `<div id="app"></div>`;
+  document.querySelector('#app')!.attachShadow({ mode: 'open' }).appendChild(document.createElement('slot'));
+  const nested = document.createElement('div');
+  nested.id = 'nested';
+  nested.attachShadow({ mode: 'open' }).appendChild(document.createElement('span'));
+  document.querySelector('#app')!.appendChild(nested);
+
+  const context = clone('#app');
+  const clonedNested = context.document.querySelector('#nested')!;
+  expect(clonedNested).toBeTruthy();
+  expect(clonedNested.shadowRoot!.querySelector('span')).toBeTruthy();
+});

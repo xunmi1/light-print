@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 import { getStyle, clone } from './utils';
 
 import { SELECTOR_NAME } from 'src/context';
+import { BLOCK_CONTAINER_DISPLAY } from 'src/utils';
 
 // `happy-dom` doesn't support pseudo element.
 // https://github.com/capricorn86/happy-dom/issues/1836
@@ -36,36 +37,6 @@ describe.each([{ type: '::before' }, { type: '::after' }])('$type', ({ type }) =
   });
 });
 
-test('::after', async () => {
-  // Due to `happy-dom`’s lack of pseudo-element support in getComputedStyle,
-  // we manually implemented it with the limitation of requiring `SELECTOR_NAME` style targeting.
-  document.body.innerHTML = `
-    <style>
-      [${SELECTOR_NAME}="1"]::after { color: red; }
-      [${SELECTOR_NAME}="2"]::after { content: 'before'; color: red; }
-    </style>
-    <div id="app">
-      <div ${SELECTOR_NAME}="1"></div>
-      <div ${SELECTOR_NAME}="2"></div>
-    </div>
-  `;
-  const context = clone('#app');
-  const newWindow = context.window!;
-  expect(getStyle(newWindow, `[${SELECTOR_NAME}="1"]`, '::after')?.color).toBeFalsy();
-  expect(getStyle(newWindow, `[${SELECTOR_NAME}="2"]`, '::after')?.color).toBe('red');
-});
-
-const PSEUDO_ELECTORS = [
-  '::before',
-  '::after',
-  '::marker',
-  '::first-letter',
-  '::first-line',
-  '::placeholder',
-  '::file-selector-button',
-  '::details-content',
-] as const;
-
 describe('::marker', () => {
   test('element’s display should be "list-item"', () => {
     document.body.innerHTML = `
@@ -96,8 +67,8 @@ describe('::marker', () => {
 });
 
 describe.each([{ type: '::first-letter' }, { type: '::first-line' }])('$type', ({ type }) => {
-  test('element’s inside display should be "block"', () => {
-    const displays = ['block', 'inline-block', 'list-item', 'flow-root', 'table-caption', 'table-cell'];
+  test('element’s display should be "block"', () => {
+    const displays = BLOCK_CONTAINER_DISPLAY;
 
     document.body.innerHTML = `
       <style>
@@ -114,7 +85,7 @@ describe.each([{ type: '::first-letter' }, { type: '::first-line' }])('$type', (
     });
   });
 
-  test('element’s outside display is not "block"', () => {
+  test('element’s display is not "block"', () => {
     document.body.innerHTML = `
       <style>
         [${SELECTOR_NAME}="1"]${type} { color: red; }

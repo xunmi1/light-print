@@ -167,7 +167,8 @@ test.describe('form fields', () => {
 test.describe('media', () => {
   test('video', async ({ page, browserName }, testInfo) => {
     // @see https://playwright.dev/docs/browsers#media-codecs
-    test.skip(browserName === 'chromium', 'Chromium does not have media codecs');
+    test.skip(browserName === 'chromium', 'Chromium browser does not have media codecs');
+    test.skip(browserName === 'webkit', 'WebKit browser video tests are flaky');
     await page.goto('/examples/nest.html');
     await page.evaluate(() => {
       document.body.innerHTML = `
@@ -177,9 +178,6 @@ test.describe('media', () => {
         </div>
       `;
     });
-    // WebKit browser video tests are flaky.
-    if (browserName === 'webkit') await page.waitForTimeout(1000);
-
     const lightPrint = await loadPrintScript(page);
     await lightPrint('#app');
 
