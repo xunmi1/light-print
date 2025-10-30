@@ -75,7 +75,7 @@ test.describe('aspectRatio', () => {
           #ratio1 { width: 20px !important; height: 10px }
           #ratio2 { width: 20px !important; }
         </style>
-        <div id="app" style="aspect-ratio: 1; width: 10px;">
+        <div id="app">
           <div id="ratio1" style="aspect-ratio: 1; width: 10px;"></div>
           <div id="ratio2" style="aspect-ratio: 1; width: 10px;"></div>
         </div>
@@ -113,4 +113,28 @@ test.describe('aspectRatio', () => {
     expect(targetRect.width).toBe(130);
     expect(targetRect.height).toBe(60);
   });
+});
+
+test('padding/border affect size', async ({ page }) => {
+  const size = 36;
+  const padding = 8;
+  page.evaluate(
+    ({ size, padding }) => {
+      document.body.innerHTML = `
+        <style>
+          #app { padding: 0px !important; border: 0px !important; width: ${size}px; height: ${size}px; }
+        </style>
+        <div id="app" style="padding: ${padding}px; border: ${padding}px solid black; display: inline-block; box-sizing: border-box;">
+          <div style="width: ${size - padding * 4}px; height: ${size - padding * 4}px; box-sizing: border-box;"></div>
+        </div>
+      `;
+    },
+    { size, padding }
+  );
+  const lightPrint = await loadPrintScript(page);
+  await lightPrint('#app');
+  const frame = getPrintContainter(page).contentFrame();
+  const rect = await frame.locator('#app').evaluate(el => el.getBoundingClientRect());
+  expect(rect.width).toBe(size);
+  expect(rect.height).toBe(size);
 });

@@ -1,0 +1,136 @@
+import { describe, expect, test } from 'vitest';
+import { getStyle, clone } from './utils';
+
+describe('inline & non-inline style', () => {
+  test('basic', async () => {
+    document.body.innerHTML = `
+      <style>.test { color: white; display: flex; }</style>
+      <div id="app">
+        <style>.test { padding: 8px }</style>
+        <div class="only-inline" style="height: 10rem">style</div>
+        <div class="no-inline test">style</div>
+        <div class="has-inline test" style="color: red; font-size: 2rem">style</div>
+      </div>
+    `;
+    const context = clone('#app');
+    const newWindow = context.window!;
+
+    let originStyle = getStyle(window, '.only-inline');
+    let targetStyle = getStyle(newWindow, '.only-inline');
+    expect(targetStyle).toEqual(originStyle);
+
+    originStyle = getStyle(window, '.no-inline');
+    targetStyle = getStyle(newWindow, '.no-inline');
+    expect(targetStyle).toEqual(originStyle);
+
+    originStyle = getStyle(window, '.has-inline');
+    targetStyle = getStyle(newWindow, '.has-inline');
+    expect(targetStyle).toEqual(originStyle);
+  });
+
+  test('non-inline style !important', async () => {
+    document.body.innerHTML = `
+      <style>#app { color: blue !important }</style>
+      <div id="app" style="color: red"></div>
+    `;
+    const context = clone('#app');
+    expect(getStyle(context.window, '#app').color).toBe('blue');
+  });
+
+  test('inline style !important', async () => {
+    document.body.innerHTML = `
+      <style>#app { color: blue }</style>
+      <div id="app" style="color: red !important"></div>
+    `;
+    const context = clone('#app');
+    expect(getStyle(context.window, '#app').color).toBe('red');
+  });
+});
+
+test('style still apply even if removed', () => {
+  document.body.innerHTML = `
+    <div id="app">
+      <style id="style">.test { color: red }</style>
+      <div class="test">style</div>
+    </div>
+  `;
+  const context = clone('#app');
+  expect(context.document.querySelector('#style')).toBeFalsy();
+  expect(getStyle(context.window, '.test').color).toBe('red');
+});
+
+// Accurate testing is impossible in a mock environment; precise validation happens in E2E tests.
+test('table width', async () => {
+  document.body.innerHTML = `
+    <style>table { table-layout: fixed; width: 20px }</style>
+    <div id="app" style="width: 100px">
+      <table>
+        <tr><td class="test">light-print</td></tr>
+      </table>
+    </div>
+  `;
+  const context = clone('#app');
+  const targetStyle = getStyle(context.window, 'table');
+  expect(targetStyle.width).toBe('20px');
+});
+
+// Accurate testing is impossible in a mock environment; precise validation happens in E2E tests.
+test('style: aspect-ratio', async () => {
+  document.body.innerHTML = `
+    <style>
+      #ratio1 { width: 20px !important; height: 10px }
+      #ratio2 { width: 20px !important }
+    </style>
+    <div id="app">
+      <div id="ratio1" style="aspect-ratio: 1; width: 10px;"></div>
+      <div id="ratio2" style="aspect-ratio: 1; width: 10px;"></div>
+    </div>
+  `;
+  const context = clone('#app');
+  let targetStyle = getStyle(context.window, '#ratio1');
+  expect(targetStyle.width).toBe('20px');
+  // `happy-dom` does not support auto-sizing, so the height is still `10px`
+  expect(targetStyle.height).toBe('10px');
+  targetStyle = getStyle(context.window, '#ratio2');
+  expect(targetStyle.width).toBe('20px');
+  // the height should be `20px`, unable to test in `happy-dom`
+  // expect(targetStyle.height).toBe('20px');
+});
+
+describe('effect box size', () => {
+  test('padding', () => {
+    const size = 36;
+    const padding = 8;
+    document.body.innerHTML = `
+      <style>
+        #app { padding: 0px !important; width: ${size}px; height: ${size}px; }
+      </style>
+      <div id="app" style="padding: ${padding}px; display: inline-block; box-sizing: border-box;">
+        <div style="width: ${size - padding * 2}px; height: ${size - padding * 2}px; box-sizing: border-box;"></div>
+      </div>
+    `;
+
+    const context = clone('#app');
+    const targetStyle = getStyle(context.window, '#app');
+    expect(targetStyle.width).toBe(`${size}px`);
+    expect(targetStyle.height).toBe(`${size}px`);
+  });
+
+  test('border-width', () => {
+    const size = 36;
+    const borderWidth = 8;
+    document.body.innerHTML = `
+      <style>
+        #app { border: none !important; width: ${size}px; height: ${size}px; }
+      </style>
+      <div id="app" style="border: ${borderWidth}px solid black; display: inline-block; box-sizing: border-box;">
+        <div style="width: ${size - borderWidth * 2}px; height: ${size - borderWidth * 2}px; box-sizing: border-box;"></div>
+      </div>
+    `;
+
+    const context = clone('#app');
+    const targetStyle = getStyle(context.window, '#app');
+    expect(targetStyle.width).toBe(`${size}px`);
+    expect(targetStyle.height).toBe(`${size}px`);
+  });
+});

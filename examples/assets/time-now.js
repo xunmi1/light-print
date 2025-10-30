@@ -24,10 +24,6 @@ class TimeNow extends HTMLElement {
       time.textContent = now;
       this.title = now;
     }, 1000);
-
-    const sheet = new CSSStyleSheet();
-    sheet.replaceSync(` .time { color: red;  }`.trim());
-    this.shadowRoot.adoptedStyleSheets.push(sheet);
   }
 
   disconnectedCallback() {

@@ -24,10 +24,16 @@ function getStyleTextDiff(targetStyle: CSSStyleDeclaration, originStyle: CSSStyl
   return styleText;
 }
 
+// Changing `padding` or `border-width` alters the element’s size.
+const SIZE_CHANGED_PATTERN = /padding-(top|right|bottom|left):|border-(top|right|bottom|left)-width:/;
+function isSizeChanged(styleText: string) {
+  return SIZE_CHANGED_PATTERN.test(styleText);
+}
+
 function fixEdgeCaseStyle(styleText: string, origin: ElementWithStyle, originStyle: CSSStyleDeclaration) {
   // For elements with an aspect ratio, always supply both width and height
   // to prevent incorrect auto-sizing based on that ratio.
-  if (hasIntrinsicAspectRatio(origin)) {
+  if (hasIntrinsicAspectRatio(origin) || isSizeChanged(styleText)) {
     styleText += `width:${originStyle.width};height:${originStyle.height};`;
   }
   // The `table` layout is always influenced by content;
@@ -95,6 +101,7 @@ function cloneElementStyle<T extends ElementWithStyle>(
   target.setAttribute('style', cssText);
   const styleRule = `${context.getSelector(target)}{${cssText}}`;
   context.addTask(() => {
+    // Inline style carry higher specificity; strip them to let the `injectionStyle` (non-inline) prevail.
     target.removeAttribute('style');
     context.appendStyle(styleRule);
   });
