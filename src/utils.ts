@@ -21,22 +21,28 @@ export type ElementNameMap = {
     | SafeGet<K, MathMLElementTagNameMap>;
 };
 
-export function whichElement<T extends keyof ElementNameMap>(node: Element, name: T): node is ElementNameMap[T] {
-  return node.localName === name;
+export function whichElement<T extends keyof ElementNameMap>(el: Element, name: T): el is ElementNameMap[T] {
+  return el.localName === name;
 }
 
-export function isMediaElement(node: Element) {
-  return whichElement(node, 'audio') || whichElement(node, 'video');
+export function isMediaElement(el: Element) {
+  return whichElement(el, 'audio') || whichElement(el, 'video');
 }
 
 // `slot`, `style`, etc. default to `display: none` but can still be rendered if override their display.
-const NON_RENDERING_ELEMENTS: readonly string[] = ['source', 'track', 'wbr'];
-export function isRenderingElement(node: Element) {
-  return NON_RENDERING_ELEMENTS.indexOf(node.localName) < 0;
+const NON_RENDERING_ELEMENTS = ['source', 'track', 'wbr'] as const;
+export function isRenderingElement(el: Element): el is ElementNameMap[(typeof NON_RENDERING_ELEMENTS)[number]] {
+  return (NON_RENDERING_ELEMENTS as readonly string[]).indexOf(el.localName) < 0;
 }
 
 export function isHidden(style: CSSStyleDeclaration) {
   return !style.display || style.display === 'none';
+}
+
+type ExternalStyleElement = HTMLStyleElement | (HTMLLinkElement & { rel: 'stylesheet' });
+
+export function isExternalStyleElement(el: Element): el is ExternalStyleElement {
+  return whichElement(el, 'style') || (whichElement(el, 'link') && el.rel === 'stylesheet');
 }
 
 /**

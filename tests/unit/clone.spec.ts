@@ -38,29 +38,33 @@ describe('hidden elements', () => {
     });
   });
 
-  test('remove hidden element', () => {
+  test('explicitly set to hidden', () => {
     document.body.innerHTML = `
       <style>.hidden { display: none }</style>
       <div id="app">
-        <div id="root-hidden" class="hidden"></div>
+        <div id="start" class="hidden"></div>
         <div>
+          <div id="hasSibling" class="hidden"></div>
           <div>
             <p>text</p>
-            <div id="nest-hidden" class="hidden"></div>
+            <div id="notSibling" class="hidden"></div>
           </div>
         </div>
       </div>
     `;
     const context = clone('#app');
     expect(context.document.querySelector('#app')).toBeTruthy();
-    expect(context.document.querySelector('#root-hidden')).toBeFalsy();
-    expect(context.document.querySelector('#nest-hidden')).toBeFalsy();
+    expect(context.document.querySelector('#start')).toBeFalsy();
+    expect(context.document.querySelector('#hasSibling')).toBeFalsy();
+    expect(context.document.querySelector('#notSibling')).toBeFalsy();
   });
 
-  test('elements removed by default', () => {
+  test('hidden by default', () => {
     document.body.innerHTML = `
       <div id="app">
-        <link>
+        <style></style>
+        <link rel="stylesheet" href="style.css">
+        <link rel="preload" as="style">
         <param>
         <meta>
         <base>
@@ -69,7 +73,7 @@ describe('hidden elements', () => {
       </div>
     `;
     const context = clone('#app');
-    ['link', 'param', 'meta', 'base', 'template', 'script'].forEach(type => {
+    ['link[rel="preload"]', 'param', 'meta', 'base', 'template', 'script'].forEach(type => {
       expect(context.document.querySelector(type)).toBeFalsy();
     });
   });

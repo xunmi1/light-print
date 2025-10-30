@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest';
 import { getStyle, clone } from './utils';
 
-describe('inline & non-inline style', () => {
-  test('basic', async () => {
+describe('inline & external style', () => {
+  test('basic', () => {
     document.body.innerHTML = `
       <style>.test { color: white; display: flex; }</style>
       <div id="app">
@@ -28,7 +28,7 @@ describe('inline & non-inline style', () => {
     expect(targetStyle).toEqual(originStyle);
   });
 
-  test('non-inline style !important', async () => {
+  test('external style !important', () => {
     document.body.innerHTML = `
       <style>#app { color: blue !important }</style>
       <div id="app" style="color: red"></div>
@@ -37,7 +37,7 @@ describe('inline & non-inline style', () => {
     expect(getStyle(context.window, '#app').color).toBe('blue');
   });
 
-  test('inline style !important', async () => {
+  test('inline style !important', () => {
     document.body.innerHTML = `
       <style>#app { color: blue }</style>
       <div id="app" style="color: red !important"></div>
@@ -47,20 +47,38 @@ describe('inline & non-inline style', () => {
   });
 });
 
-test('style still apply even if removed', () => {
-  document.body.innerHTML = `
-    <div id="app">
-      <style id="style">.test { color: red }</style>
-      <div class="test">style</div>
-    </div>
-  `;
-  const context = clone('#app');
-  expect(context.document.querySelector('#style')).toBeFalsy();
-  expect(getStyle(context.window, '.test').color).toBe('red');
+describe('style position', () => {
+  test('outside', () => {
+    document.body.innerHTML = `
+      <style>.test { color: red }</style>
+      <div id="app">
+        <div class="test">style</div>
+      </div>
+      <style>.test { background: red }</style>
+    `;
+    const context = clone('#app');
+    const targetStyle = getStyle(context.window, '.test');
+    expect(targetStyle.color).toBe('red');
+    expect(targetStyle.background).toBe('red');
+  });
+
+  test('inside', () => {
+    document.body.innerHTML = `
+      <div id="app">
+        <style>.test { color: red }</style>
+        <div class="test">style</div>
+        <style>.test { background: red }</style>
+      </div>
+    `;
+    const context = clone('#app');
+    const targetStyle = getStyle(context.window, '.test');
+    expect(targetStyle.color).toBe('red');
+    expect(targetStyle.background).toBe('red');
+  });
 });
 
 // Accurate testing is impossible in a mock environment; precise validation happens in E2E tests.
-test('table width', async () => {
+test('table width', () => {
   document.body.innerHTML = `
     <style>table { table-layout: fixed; width: 20px }</style>
     <div id="app" style="width: 100px">
@@ -75,7 +93,7 @@ test('table width', async () => {
 });
 
 // Accurate testing is impossible in a mock environment; precise validation happens in E2E tests.
-test('style: aspect-ratio', async () => {
+test('style: aspect-ratio', () => {
   document.body.innerHTML = `
     <style>
       #ratio1 { width: 20px !important; height: 10px }

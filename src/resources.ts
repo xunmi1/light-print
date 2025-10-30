@@ -1,7 +1,6 @@
 import { whichElement, bindOnceEvent, withResolvers, type ElementNameMap, NOOP, isMediaElement } from './utils';
 import { waitFonts } from './fonts';
 
-// `style` and `link` are not needed because of the use of `getComputedStyle`
 // `source` element is not needed because it depends on other elements.
 const RESOURCE_ELECTORS = ['img', 'audio', 'video', 'iframe', 'object', 'embed', 'image'] as const;
 

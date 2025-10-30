@@ -7,6 +7,7 @@ import {
   removeNode,
   isRenderingElement,
   isHidden,
+  isExternalStyleElement,
   isBlockContainer,
   toArray,
   type ElementWithStyle,
@@ -101,7 +102,7 @@ function cloneElementStyle<T extends ElementWithStyle>(
   target.setAttribute('style', cssText);
   const styleRule = `${context.getSelector(target)}{${cssText}}`;
   context.addTask(() => {
-    // Inline style carry higher specificity; strip them to let the `injectionStyle` (non-inline) prevail.
+    // Inline style carry higher specificity; strip them to let the `injectionStyle` (external style) prevail.
     target.removeAttribute('style');
     context.appendStyle(styleRule);
   });
@@ -176,7 +177,7 @@ function cloneElement(target: Element, origin: Element, context: Context) {
   if (!isRenderingElement(target)) return true;
   const originStyle = getStyle(origin);
   // Remove hidden element.
-  if (isHidden(originStyle)) return false;
+  if (isHidden(originStyle) && !isExternalStyleElement(origin)) return false;
 
   cloneElementStyle(target as ElementWithStyle, origin as ElementWithStyle, originStyle, context);
   if (!(origin instanceof SVGElement)) clonePseudoElementStyle(target, origin, originStyle, context);
