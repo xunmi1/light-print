@@ -20,7 +20,7 @@ describe.each([{ type: '::before' }, { type: '::after' }])('$type', ({ type }) =
       </div>
     `;
     const context = clone('#app');
-    expect(getStyle(context.window!, `[${SELECTOR_NAME}="1"]`, type)?.color).toBe('red');
+    expect(getStyle(context.document, `[${SELECTOR_NAME}="1"]`, type)?.color).toBe('red');
   });
 
   test('no "content"', () => {
@@ -33,7 +33,7 @@ describe.each([{ type: '::before' }, { type: '::after' }])('$type', ({ type }) =
       </div>
     `;
     const context = clone('#app');
-    expect(getStyle(context.window!, `[${SELECTOR_NAME}="1"]`, type)?.color).toBeFalsy();
+    expect(getStyle(context.document, `[${SELECTOR_NAME}="1"]`, type)?.color).toBeFalsy();
   });
 });
 
@@ -48,7 +48,7 @@ describe('::marker', () => {
       </div>
     `;
     const context = clone('#app');
-    expect(getStyle(context.window!, `[${SELECTOR_NAME}="1"]`, '::marker')?.color).toBe('red');
+    expect(getStyle(context.document, `[${SELECTOR_NAME}="1"]`, '::marker')?.color).toBe('red');
   });
 
   test('element’s display is not "list-item"', () => {
@@ -62,7 +62,7 @@ describe('::marker', () => {
     `;
 
     const context = clone('#app');
-    expect(getStyle(context.window!, `[${SELECTOR_NAME}="1"]`, '::marker')?.color).toBeFalsy();
+    expect(getStyle(context.document, `[${SELECTOR_NAME}="1"]`, '::marker')?.color).toBeFalsy();
   });
 });
 
@@ -81,7 +81,7 @@ describe.each([{ type: '::first-letter' }, { type: '::first-line' }])('$type', (
     const context = clone('#app');
     displays.forEach((_, i) => {
       const selector = `[${SELECTOR_NAME}="${i + 1}"]`;
-      expect(getStyle(context.window!, selector, type)?.color).toBe('red');
+      expect(getStyle(context.document, selector, type)?.color).toBe('red');
     });
   });
 
@@ -95,7 +95,7 @@ describe.each([{ type: '::first-letter' }, { type: '::first-line' }])('$type', (
       </div>
     `;
     const context = clone('#app');
-    expect(getStyle(context.window!, `[${SELECTOR_NAME}="1"]`, type)?.color).toBeFalsy();
+    expect(getStyle(context.document, `[${SELECTOR_NAME}="1"]`, type)?.color).toBeFalsy();
   });
 });
 
@@ -112,8 +112,8 @@ describe('::placeholder', () => {
       </div>
     `;
     const context = clone('#app');
-    expect(getStyle(context.window!, `[${SELECTOR_NAME}="1"]`, '::placeholder')?.color).toBe('red');
-    expect(getStyle(context.window!, `[${SELECTOR_NAME}="2"]`, '::placeholder')?.color).toBe('blue');
+    expect(getStyle(context.document, `[${SELECTOR_NAME}="1"]`, '::placeholder')?.color).toBe('red');
+    expect(getStyle(context.document, `[${SELECTOR_NAME}="2"]`, '::placeholder')?.color).toBe('blue');
   });
 
   test('no placeholder', () => {
@@ -126,7 +126,7 @@ describe('::placeholder', () => {
       </div>
     `;
     const context = clone('#app');
-    expect(getStyle(context.window!, `[${SELECTOR_NAME}="1"]`, '::placeholder')?.color).toBeFalsy();
+    expect(getStyle(context.document, `[${SELECTOR_NAME}="1"]`, '::placeholder')?.color).toBeFalsy();
   });
 
   test('neither input nor textarea', () => {
@@ -139,7 +139,7 @@ describe('::placeholder', () => {
       </div>
     `;
     const context = clone('#app');
-    expect(getStyle(context.window!, `[${SELECTOR_NAME}="1"]`, '::placeholder')?.color).toBeFalsy();
+    expect(getStyle(context.document, `[${SELECTOR_NAME}="1"]`, '::placeholder')?.color).toBeFalsy();
   });
 });
 
@@ -154,7 +154,7 @@ describe('::file-selector-button', () => {
       </div>
     `;
     const context = clone('#app');
-    expect(getStyle(context.window!, `[${SELECTOR_NAME}="1"]`, '::file-selector-button')?.color).toBe('red');
+    expect(getStyle(context.document, `[${SELECTOR_NAME}="1"]`, '::file-selector-button')?.color).toBe('red');
   });
 
   test('input’s type is not "file"', () => {
@@ -167,7 +167,7 @@ describe('::file-selector-button', () => {
       </div>
     `;
     const context = clone('#app');
-    expect(getStyle(context.window!, `[${SELECTOR_NAME}="1"]`, '::file-selector-button')?.color).toBeFalsy();
+    expect(getStyle(context.document, `[${SELECTOR_NAME}="1"]`, '::file-selector-button')?.color).toBeFalsy();
   });
 
   test('no input element', () => {
@@ -180,7 +180,7 @@ describe('::file-selector-button', () => {
       </div>
     `;
     const context = clone('#app');
-    expect(getStyle(context.window!, `[${SELECTOR_NAME}="1"]`, '::file-selector-button')?.color).toBeFalsy();
+    expect(getStyle(context.document, `[${SELECTOR_NAME}="1"]`, '::file-selector-button')?.color).toBeFalsy();
   });
 });
 
@@ -197,7 +197,7 @@ describe('::details-content', () => {
       </div>
     `;
     const context = clone('#app');
-    expect(getStyle(context.window!, `[${SELECTOR_NAME}="1"]`, '::details-content')?.color).toBe('red');
+    expect(getStyle(context.document, `[${SELECTOR_NAME}="1"]`, '::details-content')?.color).toBe('red');
   });
 
   test('no details element', () => {
@@ -210,6 +210,6 @@ describe('::details-content', () => {
       </div>
     `;
     const context = clone('#app');
-    expect(getStyle(context.window!, `[${SELECTOR_NAME}="1"]`, '::details-content')?.color).toBeFalsy();
+    expect(getStyle(context.document, `[${SELECTOR_NAME}="1"]`, '::details-content')?.color).toBeFalsy();
   });
 });

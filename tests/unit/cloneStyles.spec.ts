@@ -13,18 +13,17 @@ describe('inline & external style', () => {
       </div>
     `;
     const context = clone('#app');
-    const newWindow = context.window!;
 
-    let originStyle = getStyle(window, '.only-inline');
-    let targetStyle = getStyle(newWindow, '.only-inline');
+    let originStyle = getStyle(document, '.only-inline');
+    let targetStyle = getStyle(context.document, '.only-inline');
     expect(targetStyle).toEqual(originStyle);
 
-    originStyle = getStyle(window, '.no-inline');
-    targetStyle = getStyle(newWindow, '.no-inline');
+    originStyle = getStyle(document, '.no-inline');
+    targetStyle = getStyle(context.document, '.no-inline');
     expect(targetStyle).toEqual(originStyle);
 
-    originStyle = getStyle(window, '.has-inline');
-    targetStyle = getStyle(newWindow, '.has-inline');
+    originStyle = getStyle(document, '.has-inline');
+    targetStyle = getStyle(context.document, '.has-inline');
     expect(targetStyle).toEqual(originStyle);
   });
 
@@ -34,7 +33,7 @@ describe('inline & external style', () => {
       <div id="app" style="color: red"></div>
     `;
     const context = clone('#app');
-    expect(getStyle(context.window, '#app').color).toBe('blue');
+    expect(getStyle(context.document, '#app').color).toBe('blue');
   });
 
   test('inline style !important', () => {
@@ -43,7 +42,7 @@ describe('inline & external style', () => {
       <div id="app" style="color: red !important"></div>
     `;
     const context = clone('#app');
-    expect(getStyle(context.window, '#app').color).toBe('red');
+    expect(getStyle(context.document, '#app').color).toBe('red');
   });
 });
 
@@ -57,7 +56,7 @@ describe('style position', () => {
       <style>.test { background: red }</style>
     `;
     const context = clone('#app');
-    const targetStyle = getStyle(context.window, '.test');
+    const targetStyle = getStyle(context.document, '.test');
     expect(targetStyle.color).toBe('red');
     expect(targetStyle.background).toBe('red');
   });
@@ -71,7 +70,7 @@ describe('style position', () => {
       </div>
     `;
     const context = clone('#app');
-    const targetStyle = getStyle(context.window, '.test');
+    const targetStyle = getStyle(context.document, '.test');
     expect(targetStyle.color).toBe('red');
     expect(targetStyle.background).toBe('red');
   });
@@ -88,7 +87,7 @@ test('table width', () => {
     </div>
   `;
   const context = clone('#app');
-  const targetStyle = getStyle(context.window, 'table');
+  const targetStyle = getStyle(context.document, 'table');
   expect(targetStyle.width).toBe('20px');
 });
 
@@ -105,11 +104,11 @@ test('style: aspect-ratio', () => {
     </div>
   `;
   const context = clone('#app');
-  let targetStyle = getStyle(context.window, '#ratio1');
+  let targetStyle = getStyle(context.document, '#ratio1');
   expect(targetStyle.width).toBe('20px');
   // `happy-dom` does not support auto-sizing, so the height is still `10px`
   expect(targetStyle.height).toBe('10px');
-  targetStyle = getStyle(context.window, '#ratio2');
+  targetStyle = getStyle(context.document, '#ratio2');
   expect(targetStyle.width).toBe('20px');
   // the height should be `20px`, unable to test in `happy-dom`
   // expect(targetStyle.height).toBe('20px');
@@ -129,7 +128,7 @@ describe('effect box size', () => {
     `;
 
     const context = clone('#app');
-    const targetStyle = getStyle(context.window, '#app');
+    const targetStyle = getStyle(context.document, '#app');
     expect(targetStyle.width).toBe(`${size}px`);
     expect(targetStyle.height).toBe(`${size}px`);
   });
@@ -147,7 +146,7 @@ describe('effect box size', () => {
     `;
 
     const context = clone('#app');
-    const targetStyle = getStyle(context.window, '#app');
+    const targetStyle = getStyle(context.document, '#app');
     expect(targetStyle.width).toBe(`${size}px`);
     expect(targetStyle.height).toBe(`${size}px`);
   });

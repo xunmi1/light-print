@@ -8,13 +8,13 @@ test('create context', () => {
   expect(context).toBeDefined();
 
   const newWindow = new Window();
-  context.window = newWindow;
+  context.bind(newWindow.document);
   expect(context.document).toBe(newWindow.document);
 });
 
 test('getSelector', () => {
   const context = createContext();
-  context.window = window;
+  context.bind(document);
   document.body.innerHTML = `<div class="a">a</div><div class="b">b</div>`;
 
   const selector1 = context.getSelector(document.querySelector('.a')!);
@@ -28,63 +28,60 @@ test('getSelector', () => {
 describe('style', () => {
   test('must be mounted to take effect', () => {
     const context = createContext();
-    const newWindow = new Window();
-    context.window = newWindow;
-    newWindow.document.body.innerHTML = `<div class="test"></div>`;
+    context.bind(new Window().document);
+    context.document.body.innerHTML = `<div class="test"></div>`;
 
     context.appendStyle('.test { color: red; }');
-    expect(getStyle(newWindow, '.test').color).toBeFalsy();
+    expect(getStyle(context.document, '.test').color).toBeFalsy();
 
     context.mountStyle();
-    expect(getStyle(newWindow, '.test').color).toBe('red');
+    expect(getStyle(context.document, '.test').color).toBe('red');
   });
 
   test('must be appended before mounting', () => {
     const context = createContext();
-    const newWindow = new Window();
-    context.window = newWindow;
-    newWindow.document.body.innerHTML = `<div class="test"></div>`;
+    context.bind(new Window().document);
+    context.document.body.innerHTML = `<div class="test"></div>`;
 
     context.mountStyle();
-    expect(getStyle(newWindow, '.test').color).toBeFalsy();
+    expect(getStyle(context.document, '.test').color).toBeFalsy();
 
     context.appendStyle('.test { color: red; }');
     context.mountStyle();
-    expect(getStyle(newWindow, '.test').color).toBe('red');
+    expect(getStyle(context.document, '.test').color).toBe('red');
   });
 
   test('doesn’t affect the current window', () => {
     const context = createContext();
     const newWindow = new Window();
-    context.window = newWindow;
+    context.bind(newWindow.document);
     window.document.body.innerHTML = `<div class="test"></div>`;
 
     context.appendStyle('.test { color: red; }');
     context.mountStyle();
-    expect(getStyle(window, '.test').color).toBeFalsy();
+    expect(getStyle(document, '.test').color).toBeFalsy();
   });
 
   test('empty styles should not be appended', () => {
     const context = createContext();
-    const newWindow = new Window();
-    context.window = newWindow;
-    newWindow.document.body.innerHTML = `<div class="test"></div>`;
+    context.bind(new Window().document);
+    context.document.body.innerHTML = `<div class="test"></div>`;
 
     context.appendStyle();
     context.mountStyle();
-    expect(getStyle(newWindow, '.test').color).toBeFalsy();
+    expect(getStyle(context.document, '.test').color).toBeFalsy();
 
     context.appendStyle('.test { color: red; }');
-    expect(getStyle(newWindow, '.test').color).toBeFalsy();
+    expect(getStyle(context.document, '.test').color).toBeFalsy();
   });
 
   test('repeated append', () => {
     const context = createContext();
-    context.window = window;
+    context.bind(document);
     context.appendStyle('body { color: red; display: flex; }');
     context.appendStyle('body { color: blue; position: absolute; }');
     context.mountStyle();
-    const style = getStyle(window, 'body');
+    const style = getStyle(document, 'body');
     expect(style.color).toBe('blue');
     expect(style.display).toBe('flex');
     expect(style.position).toBe('absolute');
@@ -92,22 +89,22 @@ describe('style', () => {
 
   test('repeated mount', () => {
     const context = createContext();
-    context.window = window;
+    context.bind(document);
     context.appendStyle('body { color: blue }');
     context.mountStyle();
     context.mountStyle();
-    expect(getStyle(window, 'body').color).toBe('blue');
+    expect(getStyle(document, 'body').color).toBe('blue');
   });
 
   test('isolation', () => {
     const context1 = createContext();
-    context1.window = new Window();
+    context1.bind(document);
     context1.appendStyle('body { color: red; }');
     context1.mountStyle();
 
     const context2 = createContext();
-    context2.window = new Window();
-    expect(getStyle(context2.window, 'body').color).toBeFalsy();
+    context2.bind(new Window().document);
+    expect(getStyle(context2.document, 'body').color).toBeFalsy();
   });
 });
 

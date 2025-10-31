@@ -1,6 +1,14 @@
 // @ts-check
 import terser from '@rollup/plugin-terser';
+import replace from '@rollup/plugin-replace';
 import pkg from '../package.json' with { type: 'json' };
+
+const replacePlugin = replace({
+  values: {
+    'import.meta.env.PROD': 'true',
+  },
+  preventAssignment: true,
+});
 
 const currentYear = new Date().getFullYear();
 const banner = `/*!
@@ -34,5 +42,6 @@ const output = outputFileList.map(({ name, format, min }) => {
  * @type {import('rollup').RollupOptions}
  */
 export default {
+  plugins: [replacePlugin],
   output,
 };

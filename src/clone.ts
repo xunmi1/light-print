@@ -2,86 +2,15 @@ import type { Context } from './context';
 import {
   appendNode,
   whichElement,
-  getStyle,
   isMediaElement,
-  removeNode,
   isRenderingElement,
   isHidden,
   isExternalStyleElement,
-  isBlockContainer,
-  toArray,
+  traverse,
   type ElementWithStyle,
-  hasIntrinsicAspectRatio,
 } from './utils';
-import { isOpenShadowElement, cloneOpenShadowRoot } from './shadowDOM';
-
-function getStyleTextDiff(targetStyle: CSSStyleDeclaration, originStyle: CSSStyleDeclaration) {
-  let styleText = '';
-  for (let index = 0; index < originStyle.length; index++) {
-    const property = originStyle[index];
-    const value = originStyle.getPropertyValue(property);
-    if (value && value !== targetStyle.getPropertyValue(property)) styleText += `${property}:${value};`;
-  }
-  return styleText;
-}
-
-// Changing `padding` or `border-width` alters the element’s size.
-const SIZE_CHANGED_PATTERN = /padding-(top|right|bottom|left):|border-(top|right|bottom|left)-width:/;
-function isSizeChanged(styleText: string) {
-  return SIZE_CHANGED_PATTERN.test(styleText);
-}
-
-function fixEdgeCaseStyle(styleText: string, origin: ElementWithStyle, originStyle: CSSStyleDeclaration) {
-  // For elements with an aspect ratio, always supply both width and height
-  // to prevent incorrect auto-sizing based on that ratio.
-  if (hasIntrinsicAspectRatio(origin) || isSizeChanged(styleText)) {
-    styleText += `width:${originStyle.width};height:${originStyle.height};`;
-  }
-  // The `table` layout is always influenced by content;
-  // whether `table-layout` is `auto` or `fixed`, we must give the table an explicit width to ensure accuracy.
-  if (originStyle.display === 'table') {
-    styleText += `width:${originStyle.width};`;
-  }
-  return styleText;
-}
-
-const PSEUDO_ELECTORS = [
-  '::before',
-  '::after',
-  '::marker',
-  '::first-letter',
-  '::first-line',
-  '::placeholder',
-  '::file-selector-button',
-  '::details-content',
-] as const;
-
-function getPseudoElementStyle<T extends Element>(
-  target: T,
-  origin: T,
-  originStyle: CSSStyleDeclaration,
-  pseudoElt: (typeof PSEUDO_ELECTORS)[number]
-) {
-  if (pseudoElt === '::placeholder') {
-    if (!((whichElement(origin, 'input') || whichElement(origin, 'textarea')) && origin.placeholder)) return;
-  } else if (pseudoElt === '::file-selector-button') {
-    if (!(whichElement(origin, 'input') && origin.type === 'file')) return;
-  } else if (pseudoElt === '::details-content') {
-    if (!whichElement(origin, 'details')) return;
-  } else if (pseudoElt === '::marker') {
-    if (originStyle.display !== 'list-item') return;
-  } else if (pseudoElt === '::first-letter' || pseudoElt === '::first-line') {
-    if (!isBlockContainer(originStyle)) return;
-  }
-
-  const pseudoOriginStyle = getStyle(origin, pseudoElt);
-  // replaced elements need to be checked for `content`.
-  if (pseudoElt === '::before' || pseudoElt === '::after') {
-    const content = pseudoOriginStyle.content;
-    if (!content || content === 'normal' || content === 'none') return;
-  }
-  return getStyleTextDiff(getStyle(target, pseudoElt), pseudoOriginStyle);
-}
+import { getStyle, getElementStyle, getPseudoElementStyle, PSEUDO_ELECTORS } from './style';
+import { isOpenShadowElement, cloneOpenShadowRoot, type ShadowElement } from './shadowDOM';
 
 /** clone element style */
 function cloneElementStyle<T extends ElementWithStyle>(
@@ -91,8 +20,7 @@ function cloneElementStyle<T extends ElementWithStyle>(
   context: Context
 ) {
   // identical inline styles are omitted.
-  let injectionStyle = getStyleTextDiff(getStyle(target), originStyle);
-  injectionStyle = fixEdgeCaseStyle(injectionStyle, origin, originStyle);
+  const injectionStyle = getElementStyle(target, origin, originStyle);
   if (!injectionStyle) return;
   const cssText = `${origin.style.cssText}${injectionStyle}`;
   // Inline style trigger an immediate layout reflow,
@@ -114,6 +42,7 @@ function clonePseudoElementStyle<T extends Element>(
   originStyle: CSSStyleDeclaration,
   context: Context
 ) {
+  if (origin instanceof SVGElement) return;
   let styleRules = '';
   let selector: string | undefined;
   for (const pseudoElt of PSEUDO_ELECTORS) {
@@ -173,26 +102,28 @@ function cloneElementProperties(target: Element, origin: Element) {
   setScrollState(target, origin);
 }
 
-function cloneElement(target: Element, origin: Element, context: Context) {
-  if (!isRenderingElement(target)) return true;
-  const originStyle = getStyle(origin);
-  // Remove hidden element.
-  if (isHidden(originStyle) && !isExternalStyleElement(origin)) return false;
-
-  cloneElementStyle(target as ElementWithStyle, origin as ElementWithStyle, originStyle, context);
-  if (!(origin instanceof SVGElement)) clonePseudoElementStyle(target, origin, originStyle, context);
-
-  if (isOpenShadowElement(origin)) cloneOpenShadowRoot(target, origin, cloneElementProperties);
-  cloneElementProperties(target, origin);
-  return true;
+function cloneShadowElement(innerTarget: Element, innerOrigin: ShadowElement<Element, 'open'>) {
+  cloneOpenShadowRoot(innerTarget, innerOrigin, (target, origin, context) => {
+    // If an element has the `part` attribute, external `::part()` rules can reach into the shadow tree,
+    // so we must re-clone its styles. (https://developer.mozilla.org/docs/Web/CSS/::part)
+    // Conversely, styles inside the shadow tree are governed by its own <style>, so cloning them is unnecessary.
+    const shouldCloneStyle = !!origin.part?.value;
+    return cloneElement(target, origin, context, shouldCloneStyle);
+  });
 }
 
-function traverse(visitor: (target: Element, origin: Element) => boolean, target: Element, origin: Element) {
-  if (!visitor(target, origin)) return removeNode(target);
-  const children = toArray(target.children);
-  for (let i = 0; i < children.length; i++) {
-    traverse(visitor, children[i], origin.children[i]);
+function cloneElement(target: Element, origin: Element, context: Context, shouldCloneStyle = true) {
+  if (!isRenderingElement(target)) return true;
+  if (shouldCloneStyle) {
+    const originStyle = getStyle(origin);
+    // Remove hidden element.
+    if (isHidden(originStyle) && !isExternalStyleElement(origin)) return false;
+    cloneElementStyle(target as ElementWithStyle, origin as ElementWithStyle, originStyle, context);
+    clonePseudoElementStyle(target, origin, originStyle, context);
   }
+  if (isOpenShadowElement(origin)) cloneShadowElement(target, origin);
+  cloneElementProperties(target, origin);
+  return true;
 }
 
 export function cloneDocument(context: Context, hostElement: Element) {

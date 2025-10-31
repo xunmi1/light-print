@@ -10,14 +10,15 @@ test('open mode', async ({ page }) => {
   await page.evaluate(() => {
     document.body.innerHTML = `<div id="app"></div>`;
     const shadow = document.querySelector('#app')!.attachShadow({ mode: 'open' });
-    const span = document.createElement('span');
-    span.textContent = 'shadow DOM';
-    shadow.appendChild(span);
+    shadow.innerHTML = `
+      <style> #foo { color: rgb(2, 2, 2) !important; }</style>
+      <div id="foo" style="color: rgb(1, 1, 1)"></div>
+    `;
   });
   const lightPrint = await loadPrintScript(page);
   await lightPrint('#app');
   const frame = getPrintContainter(page).contentFrame();
-  await expect(frame.locator('span')).toHaveText('shadow DOM');
+  await expect(frame.locator('#foo')).toHaveCSS('color', 'rgb(2, 2, 2)');
 });
 
 test('contains inputs', async ({ page }) => {
@@ -98,4 +99,24 @@ test('nested shadow elements', async ({ page }) => {
   const frame = getPrintContainter(page).contentFrame();
   await expect(frame.locator('#nested')).toBeAttached();
   await expect(frame.locator('#nested').locator('span')).toBeAttached();
+});
+
+test('part attribute', async ({ page }) => {
+  await page.evaluate(() => {
+    document.body.innerHTML = `
+      <style> ::part(foo) { color: rgb(2, 2, 2) }</style>
+      <div id="app"></div>
+    `;
+    const shadow = document.querySelector('#app')!.attachShadow({ mode: 'open' });
+    shadow.innerHTML = `
+      <style> .test { color: rgb(1, 1, 1) }</style>
+      <div part="foo" class="test"></div>
+    `;
+  });
+
+  const lightPrint = await loadPrintScript(page);
+  await lightPrint('#app');
+  const frame = getPrintContainter(page).contentFrame();
+  const color = await frame.locator('.test').evaluate(el => getComputedStyle(el).color);
+  expect(color).toBe('rgb(2, 2, 2)');
 });

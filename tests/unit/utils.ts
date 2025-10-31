@@ -2,10 +2,10 @@ import { type CSSStyleDeclaration, type Document, Window } from 'happy-dom';
 import { cloneDocument } from 'src/clone';
 import { createContext, type Context } from 'src/context';
 
-export function getStyle(contentWindow: Window, selector: string, pseudoElt?: string) {
-  const node = contentWindow.document.querySelector(selector);
+export function getStyle(doc: Document, selector: string, pseudoElt?: string) {
+  const node = doc.querySelector(selector);
   if (!node) return {};
-  const style = contentWindow.getComputedStyle(node, pseudoElt);
+  const style = doc.defaultView!.getComputedStyle(node, pseudoElt);
   return toStyleRecord(style);
 }
 
@@ -42,8 +42,8 @@ function getAllPropertyNames<T extends object>(object: T) {
 
 export function clone(selector: string) {
   const context = createContext();
-  context.window = new Window();
+  context.bind(new Window().document);
   cloneDocument(context, document.querySelector(selector)!);
   context.mountStyle();
-  return context as Omit<Context, 'window' | 'document'> & { readonly document: Document; window: Window };
+  return context as Omit<Context, 'document'> & { readonly document: Document };
 }

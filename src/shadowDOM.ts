@@ -1,19 +1,18 @@
-import { getOwnerWindow, isElement } from './utils';
+import { createContext, type Context } from './context';
+import { getOwnerWindow, isElement, traverse } from './utils';
 
-type ShadowElement<E extends Element = Element, Mode extends ShadowRoot['mode'] = ShadowRoot['mode']> = E & {
+export type ShadowElement<E extends Element = Element, Mode extends ShadowRoot['mode'] = ShadowRoot['mode']> = E & {
   shadowRoot: Omit<ShadowRoot, 'mode'> & { mode: Mode };
 };
 
-function traverse(visitor: (origin: Node) => Node, parent: Node, childNodes: NodeListOf<Node>) {
-  childNodes.forEach(node => {
-    const newNode = visitor(node);
-    traverse(visitor, newNode, node.childNodes);
-    parent.appendChild(newNode);
-  });
-}
-
 function attachShadow(target: Element, origin: ShadowElement) {
   return target.attachShadow({ mode: 'open', delegatesFocus: origin.shadowRoot.delegatesFocus });
+}
+
+function cloneNode(ownerDocument: Document, shadowRoot: ShadowRoot) {
+  const fragment = ownerDocument.createDocumentFragment();
+  shadowRoot.childNodes.forEach(node => fragment.appendChild(ownerDocument.importNode(node, true)));
+  return fragment;
 }
 
 function cloneSheets(target: ShadowElement, origin: ShadowElement) {
@@ -34,26 +33,30 @@ function cloneSheets(target: ShadowElement, origin: ShadowElement) {
 export function cloneOpenShadowRoot<T extends Element = Element>(
   target: T,
   origin: ShadowElement<T, 'open'>,
-  visitor: (target: Element, origin: Element) => void
+  visitor: (target: Element, origin: Element, context: Context) => boolean
 ) {
   // Should the shadowRoot be clonable, delegate its cloning to the earlier `importNode` for uniform handling.
   if (!origin.shadowRoot.clonable) {
-    const shadowRoot = target.shadowRoot ?? attachShadow(target, origin);
     const ownerDocument = target.ownerDocument!;
-    // Clone all nodes rather than reconstructing styles with `getComputedStyle`.
+    const context = createContext();
+    context.bind(ownerDocument);
+    // `happy-dom` BUG in unit tests; clones the `shadowRoot` when cloning a custom element
+    if (import.meta.env.PROD || !target.shadowRoot) attachShadow(target, origin);
+    else target.shadowRoot!.replaceChildren();
+    const shadowRoot = target.shadowRoot!;
+    shadowRoot.appendChild(cloneNode(ownerDocument, origin.shadowRoot));
+
     traverse(
-      node => {
-        const newNode = ownerDocument.importNode(node, false);
-        if (isElement(node)) {
-          const _newNode = newNode as Element;
-          if (isOpenShadowElement(node)) cloneOpenShadowRoot(_newNode, node, visitor);
-          visitor(_newNode, node);
-        }
-        return newNode;
+      (innerTarget, innerOrigin) => {
+        if (!isElement(innerOrigin)) return true;
+        return visitor(innerTarget as Element, innerOrigin, context);
       },
       shadowRoot,
-      origin.shadowRoot.childNodes
+      origin.shadowRoot
     );
+
+    context.flushTasks();
+    context.mountStyle(shadowRoot);
   }
   cloneSheets(target as ShadowElement, origin);
 }

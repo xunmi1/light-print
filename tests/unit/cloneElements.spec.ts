@@ -185,7 +185,7 @@ describe('svg', () => {
       </div>
     `;
     const context = clone('#app');
-    const targetStyle = getStyle(context.window, 'svg');
+    const targetStyle = getStyle(context.document, 'svg');
     expect(targetStyle.width).toBe('48px');
     expect(targetStyle.height).toBe('24px');
   });
@@ -200,7 +200,7 @@ describe('svg', () => {
       </div>
     `;
     const context = clone('#app');
-    const targetStyle = getStyle(context.window, 'svg');
+    const targetStyle = getStyle(context.document, 'svg');
     expect(targetStyle.width).toBe('48px');
     expect(targetStyle.height).toBe('56px');
   });

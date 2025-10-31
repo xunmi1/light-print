@@ -140,10 +140,6 @@ export function getOwnerWindow(element: Element) {
   return element.ownerDocument.defaultView!;
 }
 
-export function getStyle(element: Element, pseudoElt?: string) {
-  return getOwnerWindow(element).getComputedStyle(element, pseudoElt);
-}
-
 export function toArray<T>(arrayLike: ArrayLike<T>) {
   return Array.prototype.slice.apply<ArrayLike<T>, T[]>(arrayLike);
 }
@@ -158,4 +154,16 @@ export function hasIntrinsicAspectRatio(el: ElementWithStyle) {
     return true;
   const ratio = el.style.aspectRatio;
   return ratio && ratio !== 'auto' && ratio !== 'unset' && ratio !== 'initial';
+}
+
+export function traverse<T extends ParentNode>(
+  visitor: <U extends Element | T>(target: U, origin: U) => boolean,
+  target: T,
+  origin: T
+) {
+  if (!visitor(target, origin)) return removeNode(target);
+  const children = toArray(target.children);
+  for (let i = 0; i < children.length; i++) {
+    traverse(visitor, children[i], origin.children[i]);
+  }
 }

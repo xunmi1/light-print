@@ -34,7 +34,7 @@ describe('hidden elements', () => {
     const context = clone('#app');
     ['source', 'track', 'wbr'].forEach(type => {
       expect(context.document.querySelector(type)).toBeTruthy();
-      expect(getStyle(context.window, type).fontSize).not.toBe(size);
+      expect(getStyle(context.document, type).fontSize).not.toBe(size);
     });
   });
 

@@ -14,6 +14,7 @@ export default defineConfig({
     },
     coverage: {
       include: ['src/**/*.ts'],
+      exclude: ['src/**/*.d.ts'],
     },
     setupFiles: ['tests/unit/vitestSetup.ts'],
     onConsoleLog(log, type) {

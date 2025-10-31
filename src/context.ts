@@ -7,10 +7,15 @@ import { appendNode } from './utils';
  */
 export const SELECTOR_NAME = 'data-print-id';
 
-export function createContext() {
+export function createContext<T extends Document>() {
   let styleNode: HTMLStyleElement | undefined;
   let isMountedStyle = false;
   let printId = 1;
+  let doc: T;
+
+  function bind(ownerDocument: T) {
+    doc = ownerDocument;
+  }
 
   function markId(node: Element) {
     let id = node.getAttribute(SELECTOR_NAME);
@@ -27,13 +32,13 @@ export function createContext() {
 
   function appendStyle(text?: string) {
     if (!text) return;
-    styleNode ??= context.document.createElement('style');
+    styleNode ??= doc.createElement('style');
     styleNode.textContent += text;
   }
 
-  function mountStyle() {
+  function mountStyle(parent?: Node) {
     if (isMountedStyle || !styleNode) return;
-    appendNode(context.document.head, styleNode);
+    appendNode(parent || doc.head, styleNode);
     isMountedStyle = true;
   }
 
@@ -47,11 +52,11 @@ export function createContext() {
     tasks.length = 0;
   }
 
-  const context = {
-    window: undefined as Window | undefined,
+  return {
     get document() {
-      return this.window!.document;
+      return doc;
     },
+    bind,
     appendStyle,
     mountStyle,
     getSelector,
@@ -59,8 +64,6 @@ export function createContext() {
     addTask,
     flushTasks,
   };
-
-  return context;
 }
 
 export type Context = ReturnType<typeof createContext>;

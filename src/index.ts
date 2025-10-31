@@ -68,9 +68,9 @@ function lightPrint(containerOrSelector: Element | string, options: PrintOptions
   // must be mounted and loaded before using `contentWindow` for Firefox.
   return mount(container, window.document.body)
     .then(() => {
-      context.window = container.contentWindow!;
+      const doc = container.contentWindow!.document;
+      context.bind(doc);
 
-      const doc = context.document;
       doc.title = options.documentTitle ?? window.document.title;
       setStyleProperty(doc.documentElement, 'zoom', options.zoom ?? 1);
       // remove the default margin.
@@ -84,7 +84,7 @@ function lightPrint(containerOrSelector: Element | string, options: PrintOptions
       context.mountStyle();
     })
     .then(() => waitResources(context.document))
-    .then(() => emitPrint(context.window!))
+    .then(() => emitPrint(context.document.defaultView!))
     .finally(() =>
       // The container can only be destroyed after the printing process has been completed.
       removeNode(container)
