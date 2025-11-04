@@ -7,6 +7,8 @@ import { appendNode } from './utils';
  */
 export const SELECTOR_NAME = 'data-print-id';
 
+type Task = () => void;
+
 export function createContext<T extends Document>() {
   let styleNode: HTMLStyleElement | undefined;
   let isMountedStyle = false;
@@ -42,8 +44,8 @@ export function createContext<T extends Document>() {
     isMountedStyle = true;
   }
 
-  const tasks: (() => void)[] = [];
-  function addTask(task: () => void) {
+  const tasks: Task[] = [];
+  function addTask(task: Task) {
     tasks.push(task);
   }
 

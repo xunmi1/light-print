@@ -140,10 +140,6 @@ export function getOwnerWindow(element: Element) {
   return element.ownerDocument.defaultView!;
 }
 
-export function toArray<T>(arrayLike: ArrayLike<T>) {
-  return Array.prototype.slice.apply<ArrayLike<T>, T[]>(arrayLike);
-}
-
 // Equal to: HTMLElement | SVGElement | MathMLElement
 export type ElementWithStyle = Element & ElementCSSInlineStyle;
 
@@ -156,14 +152,43 @@ export function hasIntrinsicAspectRatio(el: ElementWithStyle) {
   return ratio && ratio !== 'auto' && ratio !== 'unset' && ratio !== 'initial';
 }
 
+export interface ElementWalker extends TreeWalker {
+  currentNode: Element;
+  nextNode(): Element | null;
+  nextSibling(): Element | null;
+}
+
+function createElementWalker(root: Node) {
+  // `1` is `NodeFilter.SHOW_ELEMENT`
+  // IE requires four parameters (expandEntityReferences: false)
+  // @ts-expect-error
+  return window.document.createTreeWalker(root, 1, null, false) as ElementWalker;
+}
+
 export function traverse<T extends ParentNode>(
   visitor: <U extends Element | T>(target: U, origin: U) => boolean,
   target: T,
   origin: T
 ) {
-  if (!visitor(target, origin)) return removeNode(target);
-  const children = toArray(target.children);
-  for (let i = 0; i < children.length; i++) {
-    traverse(visitor, children[i], origin.children[i]);
+  const targetWalker = createElementWalker(target);
+  const originWalker = createElementWalker(origin);
+  while (true) {
+    const isNext = visitor(targetWalker.currentNode, originWalker.currentNode);
+    if (isNext) {
+      if (!(targetWalker.nextNode() && originWalker.nextNode())) break;
+    } else {
+      const skippedNode = targetWalker.currentNode;
+      let hasParent = true;
+      while (true) {
+        const hasSibling = targetWalker.nextSibling() && originWalker.nextSibling();
+        if (hasSibling) break;
+        // If the current element has no next sibling, move to the next sibling of its parent.
+        hasParent = !!(targetWalker.parentNode() && originWalker.parentNode());
+        if (!hasParent) break;
+      }
+      // Remove the skipped element and its subtree, to prevent any resources from being loaded.
+      removeNode(skippedNode);
+      if (!hasParent) break;
+    }
   }
 }

@@ -16,13 +16,13 @@ function cloneNode(ownerDocument: Document, shadowRoot: ShadowRoot) {
 }
 
 function cloneSheets(target: ShadowElement, origin: ShadowElement) {
-  const cssTexts = origin.shadowRoot.adoptedStyleSheets
+  const cssText = origin.shadowRoot.adoptedStyleSheets
     .flatMap(sheet => Array.from(sheet.cssRules).map(rule => rule.cssText))
     .join('\n');
-  if (!cssTexts) return;
+  if (!cssText) return;
   const ownerWindow = getOwnerWindow(target);
   const sheet = new ownerWindow.CSSStyleSheet();
-  sheet.replaceSync(cssTexts);
+  sheet.replaceSync(cssText);
   target.shadowRoot.adoptedStyleSheets.push(sheet);
 }
 

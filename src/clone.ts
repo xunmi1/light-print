@@ -107,12 +107,11 @@ function cloneShadowElement(innerTarget: Element, innerOrigin: ShadowElement<Ele
     // If an element has the `part` attribute, external `::part()` rules can reach into the shadow tree,
     // so we must re-clone its styles. (https://developer.mozilla.org/docs/Web/CSS/::part)
     // Conversely, styles inside the shadow tree are governed by its own <style>, so cloning them is unnecessary.
-    const shouldCloneStyle = !!origin.part?.value;
-    return cloneElement(target, origin, context, shouldCloneStyle);
+    return cloneElement(target, origin, context, !!origin.part?.value);
   });
 }
 
-function cloneElement(target: Element, origin: Element, context: Context, shouldCloneStyle = true) {
+function cloneElement(target: Element, origin: Element, context: Context, shouldCloneStyle: boolean) {
   if (!isRenderingElement(target)) return true;
   if (shouldCloneStyle) {
     const originStyle = getStyle(origin);
@@ -131,6 +130,6 @@ export function cloneDocument(context: Context, hostElement: Element) {
   // clone the `hostElement` structure to `body`.
   doc.importNode(hostElement, true);
   appendNode(doc.body, doc.importNode(hostElement, true));
-  traverse((target, origin) => cloneElement(target, origin, context), doc.body.firstElementChild!, hostElement);
+  traverse((target, origin) => cloneElement(target, origin, context, true), doc.body.firstElementChild!, hostElement);
   context.flushTasks();
 }
