@@ -1,5 +1,5 @@
 import { createContext, type Context } from './context';
-import { getOwnerWindow, isElement, traverse } from './utils';
+import { getOwnerWindow, traverse } from './utils';
 
 export type ShadowElement<E extends Element = Element, Mode extends ShadowRoot['mode'] = ShadowRoot['mode']> = E & {
   shadowRoot: Omit<ShadowRoot, 'mode'> & { mode: Mode };
@@ -42,14 +42,14 @@ export function cloneOpenShadowRoot<T extends Element = Element>(
     context.bind(ownerDocument);
     // `happy-dom` BUG in unit tests; clones the `shadowRoot` when cloning a custom element
     if (import.meta.env.PROD || !target.shadowRoot) attachShadow(target, origin);
-    else target.shadowRoot!.replaceChildren();
+    else target.shadowRoot.replaceChildren();
     const shadowRoot = target.shadowRoot!;
     shadowRoot.appendChild(cloneNode(ownerDocument, origin.shadowRoot));
 
     traverse(
       (innerTarget, innerOrigin) => {
-        if (!isElement(innerOrigin)) return true;
-        return visitor(innerTarget as Element, innerOrigin, context);
+        if (innerTarget === shadowRoot) return true;
+        return visitor(innerTarget as Element, innerOrigin as Element, context);
       },
       shadowRoot,
       origin.shadowRoot

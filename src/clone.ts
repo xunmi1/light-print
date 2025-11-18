@@ -107,7 +107,7 @@ function cloneShadowElement(innerTarget: Element, innerOrigin: ShadowElement<Ele
     // If an element has the `part` attribute, external `::part()` rules can reach into the shadow tree,
     // so we must re-clone its styles. (https://developer.mozilla.org/docs/Web/CSS/::part)
     // Conversely, styles inside the shadow tree are governed by its own <style>, so cloning them is unnecessary.
-    return cloneElement(target, origin, context, !!origin.part?.value);
+    return cloneElement(target, origin, context, !!origin.part.value);
   });
 }
 

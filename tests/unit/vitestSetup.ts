@@ -1,12 +1,14 @@
 import {
   BrowserWindow,
+  Element,
   HTMLCanvasElement,
   Window,
   Event,
   type Document,
-  type Element,
   type CSSStyleDeclaration,
 } from 'happy-dom';
+import DOMTokenList from 'happy-dom/lib/dom/DOMTokenList';
+import { illegalConstructor } from 'happy-dom/lib/PropertySymbol';
 import { SELECTOR_NAME } from 'src/context';
 
 type WindowConstructorOptions = ConstructorParameters<typeof Window>[0];
@@ -36,6 +38,7 @@ function print(this: BrowserWindow) {
 BrowserWindow.prototype.print = print;
 window.print = print;
 
+// mock `drawImage`
 const _getContext = HTMLCanvasElement.prototype.getContext;
 function getContext(this: BrowserWindow, ...args: Parameters<HTMLCanvasElement['getContext']>) {
   const context = _getContext.call(this, ...args) ?? {};
@@ -68,3 +71,17 @@ function getStyleBySelector(currentWindow: BrowserWindow, selector: string) {
 
 BrowserWindow.prototype.getComputedStyle = getComputedStyle;
 window.getComputedStyle = getComputedStyle;
+
+// `happy-dom` doesn't support `part` attribute
+declare module 'happy-dom' {
+  interface Element {
+    part: DOMTokenList;
+  }
+}
+
+const partKey = Symbol('part');
+Object.defineProperty(Element.prototype, 'part', {
+  get() {
+    return (this[partKey] ??= new DOMTokenList(illegalConstructor, this, 'part'));
+  },
+});

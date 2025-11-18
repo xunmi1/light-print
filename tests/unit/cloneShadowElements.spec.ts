@@ -1,7 +1,5 @@
 import { expect, test } from 'vitest';
 import { CSSStyleSheet, HTMLElement } from 'happy-dom';
-import DOMTokenList from 'happy-dom/lib/dom/DOMTokenList';
-import * as PropertySymbol from 'happy-dom/lib/PropertySymbol';
 
 import { clone } from './utils';
 
@@ -123,12 +121,6 @@ test('nested shadow elements', () => {
   expect(clonedNested.shadowRoot!.querySelector('span')).toBeTruthy();
 });
 
-declare module 'happy-dom' {
-  interface Element {
-    part: DOMTokenList;
-  }
-}
-
 test('part attribute', () => {
   document.body.innerHTML = `
     <style> ::part(foo) { color: red; }</style>
@@ -136,14 +128,9 @@ test('part attribute', () => {
   `;
   const shadow = document.querySelector('#app')!.attachShadow({ mode: 'open' });
   shadow.innerHTML = `
-    <div id="foo" style="display: block"></div>
-    <div style="display: none"></div>
+    <div id="foo" style="display: block" part="foo"></div>
+    <div style="display: none" part="foo"></div>
   `;
-  shadow.querySelectorAll('*').forEach((el, i) => {
-    // `happy-dom` doesn't support `part` attribute
-    el.part = new DOMTokenList(PropertySymbol.illegalConstructor, el, 'part');
-    el.part.add(`part-${i}`);
-  });
 
   const context = clone('#app');
   const shadowRoot = context.document.querySelector('#app')!.shadowRoot!;

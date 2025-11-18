@@ -152,17 +152,18 @@ export function hasIntrinsicAspectRatio(el: ElementWithStyle) {
   return ratio && ratio !== 'auto' && ratio !== 'unset' && ratio !== 'initial';
 }
 
-export interface ElementWalker extends TreeWalker {
-  currentNode: Element;
+export interface ElementWalker<Root extends Node> extends TreeWalker {
+  currentNode: Element | Root;
   nextNode(): Element | null;
   nextSibling(): Element | null;
+  parentNode(): Element | null;
 }
 
-function createElementWalker(root: Node) {
+function createElementWalker<T extends Node>(root: T) {
   // `1` is `NodeFilter.SHOW_ELEMENT`
   // IE requires four parameters (expandEntityReferences: false)
   // @ts-expect-error
-  return window.document.createTreeWalker(root, 1, null, false) as ElementWalker;
+  return window.document.createTreeWalker(root, 1, null, false) as ElementWalker<T>;
 }
 
 export function traverse<T extends ParentNode>(

@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from 'vitest';
 import { bindOnceEvent, isHidden, normalizeNode, traverse } from 'src/utils';
-import { Element, HTMLCollection, HTMLDivElement } from 'happy-dom';
+import { type Element, type HTMLCollection, HTMLDivElement } from 'happy-dom';
 
 test('normalizeNode', () => {
   const element = document.createElement('div');
@@ -48,13 +48,16 @@ describe('traverse', () => {
 
   test('prune children', () => {
     const origin = document.createElement('div');
-    origin.appendChild(document.createElement('div'));
-    const fn = vi.fn(() => false);
+    const nested = document.createElement('div');
+    nested.id = 'nested';
+    nested.appendChild(document.createElement('div'));
+    origin.appendChild(nested);
+    const fn = vi.fn((target: Element) => target.id !== 'nested');
     traverse(fn, origin.cloneNode(true), origin);
-    expect(fn).toBeCalledTimes(1);
+    expect(fn).toBeCalledTimes(2);
   });
 
-  test('override children', () => {
+  test('override children attribute', () => {
     class XElement extends HTMLDivElement {
       get children(): HTMLCollection<Element> {
         throw new Error('Not allowed');
@@ -62,6 +65,24 @@ describe('traverse', () => {
     }
     window.customElements.define('x-element', XElement);
     const origin = document.createElement('x-element');
-    expect(() => traverse(() => true, origin.cloneNode(true), origin)).not.toThrowError();
+    const fn = vi.fn(() => true);
+    traverse(fn, origin.cloneNode(true), origin);
+    expect(fn).toBeCalledTimes(1);
+  });
+
+  test('children must be element', () => {
+    const origin = document.createElement('div');
+    origin.append(document.createTextNode('foo'), document.createElement('div'));
+    const fn = vi.fn(() => true);
+    traverse(fn, origin.cloneNode(true), origin);
+    expect(fn).toBeCalledTimes(2);
+  });
+
+  test('root can be non-element', () => {
+    const origin = document.createDocumentFragment();
+    origin.appendChild(document.createElement('div'));
+    const fn = vi.fn(() => true);
+    traverse(fn, origin.cloneNode(true), origin);
+    expect(fn).toBeCalledTimes(2);
   });
 });
