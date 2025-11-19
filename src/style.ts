@@ -34,7 +34,7 @@ function fixEdgeCaseStyle(styleText: string, origin: ElementWithStyle, originSty
   }
   // The `table` layout is always influenced by content;
   // whether `table-layout` is `auto` or `fixed`, we must give the table an explicit width to ensure accuracy.
-  if (originStyle.display === 'table') {
+  else if (originStyle.display === 'table') {
     styleText += `width:${originStyle.width};`;
   }
   return styleText;

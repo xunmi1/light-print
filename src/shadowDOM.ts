@@ -37,7 +37,7 @@ export function cloneOpenShadowRoot<T extends Element = Element>(
 ) {
   // Should the shadowRoot be clonable, delegate its cloning to the earlier `importNode` for uniform handling.
   if (!origin.shadowRoot.clonable) {
-    const ownerDocument = target.ownerDocument!;
+    const ownerDocument = target.ownerDocument;
     const context = createContext();
     context.bind(ownerDocument);
     // `happy-dom` BUG in unit tests; clones the `shadowRoot` when cloning a custom element

@@ -5,7 +5,7 @@ export function tryImportFonts(doc: Document) {
   try {
     // If `document.fonts.forEach(...)` is used,
     // the console will still display uncaught exception messages.
-    const iterator = window.document.fonts.values();
+    const iterator = window.document.fonts!.values();
     while (true) {
       const font = iterator.next().value;
       if (!font) break;
