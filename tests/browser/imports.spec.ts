@@ -2,7 +2,8 @@ import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { getPageErrors, preventPrintDialog } from './utils';
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, browserName }) => {
+  test.skip(browserName !== 'chromium');
   await preventPrintDialog(page);
 });
 

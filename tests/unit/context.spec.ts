@@ -12,17 +12,42 @@ test('create context', () => {
   expect(context.document).toBe(newWindow.document);
 });
 
-test('getSelector', () => {
-  const context = createContext();
-  context.bind(document);
-  document.body.innerHTML = `<div class="a">a</div><div class="b">b</div>`;
+describe('getSelector', () => {
+  test('selector is valid', () => {
+    const context = createContext();
+    context.bind(document);
+    const app = document.createElement('div');
+    document.body.appendChild(app);
+    expect(document.querySelector(context.getSelector(app))).toBe(app);
+  });
 
-  const selector1 = context.getSelector(document.querySelector('.a')!);
-  expect(document.querySelector('.a')).toBe(document.querySelector(selector1));
-  const selector2 = context.getSelector(document.querySelector('.b')!);
-  expect(selector1).not.toBe(selector2);
-  const selector3 = context.getSelector(document.querySelector('.a')!);
-  expect(selector1).toBe(selector3);
+  test('doesn’t affect common attributes', () => {
+    const context = createContext();
+    context.bind(document);
+    document.body.innerHTML = `<div id="app" class="foo"></div>`;
+    const app = document.querySelector('#app')!;
+    context.getSelector(app);
+    expect(app.id).toBe('app');
+    expect(app.className).toBe('foo');
+  });
+
+  test('different elements, different selectors', () => {
+    const context = createContext();
+    context.bind(document);
+    document.body.innerHTML = `<div class="a">a</div><div class="b">b</div>`;
+    const selector1 = context.getSelector(document.querySelector('.a')!);
+    const selector2 = context.getSelector(document.querySelector('.b')!);
+    expect(selector1).not.toBe(selector2);
+  });
+
+  test('same elements, same selectors', () => {
+    const context = createContext();
+    context.bind(document);
+    document.body.innerHTML = `<div class="a">a</div>`;
+    const selector1 = context.getSelector(document.querySelector('.a')!);
+    const selector2 = context.getSelector(document.querySelector('.a')!);
+    expect(selector1).toBe(selector2);
+  });
 });
 
 describe('style', () => {
@@ -49,6 +74,15 @@ describe('style', () => {
     context.appendStyle('.test { color: red; }');
     context.mountStyle();
     expect(getStyle(context.document, '.test').color).toBe('red');
+  });
+
+  test('change mount location', () => {
+    const context = createContext();
+    context.bind(document);
+    document.body.innerHTML = `<div class="test"></div>`;
+    context.appendStyle('.test { color: red; }');
+    context.mountStyle(document.body);
+    expect(getStyle(document, '.test').color).toBe('red');
   });
 
   test('doesn’t affect the current window', () => {

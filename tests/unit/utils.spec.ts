@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from 'vitest';
 import { bindOnceEvent, isHidden, normalizeNode, traverse } from 'src/utils';
-import { type Element, type HTMLCollection, HTMLDivElement } from 'happy-dom';
+import { type Element, HTMLDivElement } from 'happy-dom';
 
 test('normalizeNode', () => {
   const element = document.createElement('div');
@@ -49,25 +49,32 @@ describe('traverse', () => {
   test('prune children', () => {
     const origin = document.createElement('div');
     const nested = document.createElement('div');
+    origin.appendChild(nested).appendChild(document.createElement('div'));
     nested.id = 'nested';
-    nested.appendChild(document.createElement('div'));
-    origin.appendChild(nested);
+    const target = origin.cloneNode(true);
     const fn = vi.fn((target: Element) => target.id !== 'nested');
-    traverse(fn, origin.cloneNode(true), origin);
+    traverse(fn, target, origin);
     expect(fn).toBeCalledTimes(2);
+    expect(target.querySelector('#nested')).toBeNull();
+    expect(origin.querySelector('#nested')).toBe(nested);
   });
 
   test('override children attribute', () => {
     class XElement extends HTMLDivElement {
-      get children(): HTMLCollection<Element> {
+      get children(): HTMLDivElement['children'] {
+        throw new Error('Not allowed');
+      }
+
+      get childNodes(): HTMLDivElement['childNodes'] {
         throw new Error('Not allowed');
       }
     }
     window.customElements.define('x-element', XElement);
     const origin = document.createElement('x-element');
+    origin.appendChild(document.createElement('div'));
     const fn = vi.fn(() => true);
     traverse(fn, origin.cloneNode(true), origin);
-    expect(fn).toBeCalledTimes(1);
+    expect(fn).toBeCalledTimes(2);
   });
 
   test('children must be element', () => {
