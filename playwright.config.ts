@@ -25,7 +25,7 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        launchOptions: { args: ['--enable-precise-memory-info'] },
+        launchOptions: { args: ['--enable-precise-memory-info', '--enable-gpu'] },
       },
     },
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },

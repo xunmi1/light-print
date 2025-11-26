@@ -18,6 +18,10 @@ test.beforeEach(async ({ page }) => {
 test('visually consistent', async ({ page, browserName }, testInfo) => {
   await page.goto('/examples/index.html');
   await pauseMedia(page);
+  // `Chrome for Testing` cannot render multiple videos
+  if (browserName === 'chromium') {
+    await page.evaluate(() => document.querySelectorAll('video').forEach(el => (el.style.display = 'none')));
+  }
   const action = page.locator('#print-action');
   // hide element
   await action.evaluate(element => (element.style.opacity = '0'));

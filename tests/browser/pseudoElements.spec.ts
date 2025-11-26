@@ -134,6 +134,7 @@ test('::details-content', async ({ page, browserName }, testInfo) => {
     document.body.innerHTML = `
       <style>
         details::details-content { background: blue; color: white; }
+        summary { font-size: 2rem; }
         details > div { line-height: 1.5rem; padding: 1rem; }
       </style>
       <div id="app" style="width: 200px;">

@@ -37,13 +37,13 @@ test('GitHub Repository', async ({ page }, testInfo) => {
   page.evaluate(() => {
     document.body.id = 'app';
     const style = document.createElement('style');
-    // `.markdown-heading` has margin collapse problem.
-    style.textContent = `* { box-sizing: border-box } .markdown-heading { overflow: auto }`;
+    style.textContent = `* { box-sizing: border-box }`;
     document.body.prepend(style);
   });
   await screenshot(page.locator('#app'), { fileName: 'github.png', testInfo });
   const lightPrint = await loadPrintScript(page);
-  await lightPrint('#app');
+  // `.markdown-heading` has margin collapse problem.
+  await lightPrint('#app', { mediaPrintStyle: '.markdown-heading { height: unset }' });
   const container = getPrintContainter(page);
   await container.evaluate(el => (el.style = 'width: 100%; height: 5000px; border: none'));
   const buffer = await screenshot(container.contentFrame().locator('#app'));

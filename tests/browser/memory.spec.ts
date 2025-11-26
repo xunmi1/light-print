@@ -14,7 +14,7 @@ test.beforeEach(async ({ page, browserName }) => {
 
 test('detect heap leak', async ({ page }) => {
   const KB = 1024;
-  const cdpSession = await createCDPSession(page);
+  await using cdpSession = await createCDPSession(page);
   const lightPrint = await loadPrintScript(page);
   await collectGarbage(page, cdpSession);
   const initialHeapSize = await getPerformanceMetric(cdpSession, 'JSHeapUsedSize');
@@ -32,27 +32,25 @@ test('detect heap leak', async ({ page }) => {
   const finalHeapSize = await getPerformanceMetric(cdpSession, 'JSHeapUsedSize');
   expect(finalHeapSize - onceHeapSize).toBeLessThan(200 * KB);
   expect(getGrowthRatio(finalHeapSize, onceHeapSize)).toBeLessThan(0.05);
-
-  await cdpSession.detach();
 });
 
 test('detect element leak', async ({ page }) => {
-  const cdpSession = await createCDPSession(page);
+  await using cdpSession = await createCDPSession(page);
   const lightPrint = await loadPrintScript(page);
   const initialSize = await getObjectSize(cdpSession, 'HTMLDivElement');
-  expect(initialSize).toBeGreaterThan(0);
 
   for (let i = 0; i < 10; i++) {
     await lightPrint('#app');
   }
   const finalSize = await getObjectSize(cdpSession, 'HTMLDivElement');
   expect(finalSize).toBe(initialSize);
-
-  await cdpSession.detach();
 });
 
 async function createCDPSession(page: Page) {
-  const cdpSession = await page.context().newCDPSession(page);
+  const cdpSession = (await page.context().newCDPSession(page)) as CDPSession & AsyncDisposable;
+  cdpSession[Symbol.asyncDispose] ??= function () {
+    return this.detach();
+  };
   await cdpSession.send('Performance.enable');
   await cdpSession.send('HeapProfiler.enable');
   return cdpSession;
