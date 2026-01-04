@@ -150,7 +150,7 @@ test('CSS counters', async ({ page }, testInfo) => {
           font-weight: bold;
           width: 100px;
         }
-        #app li:before {
+        #app li::before {
           content: counter(x) ': ';
           counter-increment: x;
         }

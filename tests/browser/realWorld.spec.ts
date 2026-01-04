@@ -22,8 +22,8 @@ test('Google Search', async ({ page }, testInfo) => {
     document.body.prepend(style);
   });
   // Hide `Choose Chrome` popup
-  const popupLocator = page.locator('div').filter({ hasText: 'Choose Chrome' });
-  if ((await popupLocator.count()) > 0) await popupLocator.evaluate(el => (el.style.opacity = '0'));
+  const popupLocator = page.locator('div', { hasText: 'Choose Chrome' });
+  if ((await popupLocator.count()) > 0) await popupLocator.first().evaluate(el => (el.style.opacity = '0'));
 
   await screenshot(page.locator('#app'), { fileName: 'google.png', testInfo });
   const lightPrint = await loadPrintScript(page);

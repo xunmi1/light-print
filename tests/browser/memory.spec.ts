@@ -22,15 +22,14 @@ test('detect heap leak', async ({ page }) => {
   await lightPrint('#app');
   await collectGarbage(page, cdpSession);
   const onceHeapSize = await getPerformanceMetric(cdpSession, 'JSHeapUsedSize');
-  expect(onceHeapSize - initialHeapSize).toBeLessThan(500 * KB);
-  expect(getGrowthRatio(onceHeapSize, initialHeapSize)).toBeLessThan(0.1);
+  expect(onceHeapSize - initialHeapSize).toBeLessThan(200 * KB);
 
   for (let i = 0; i < 10; i++) {
     await lightPrint('#app');
   }
   await collectGarbage(page, cdpSession);
   const finalHeapSize = await getPerformanceMetric(cdpSession, 'JSHeapUsedSize');
-  expect(finalHeapSize - onceHeapSize).toBeLessThan(200 * KB);
+  expect(finalHeapSize - onceHeapSize).toBeLessThan(100 * KB);
   expect(getGrowthRatio(finalHeapSize, onceHeapSize)).toBeLessThan(0.05);
 });
 

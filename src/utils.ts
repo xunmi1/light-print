@@ -197,7 +197,3 @@ export function traverse<T extends ParentNode>(
     }
   }
 }
-
-export function toArray<T>(arrayLike: ArrayLike<T>): T[] {
-  return Array.prototype.slice.call(arrayLike);
-}

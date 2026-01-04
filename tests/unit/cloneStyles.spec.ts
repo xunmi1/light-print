@@ -151,3 +151,33 @@ describe('effect box size', () => {
     expect(targetStyle.height).toBe(`${size}px`);
   });
 });
+
+test('CSS counters', () => {
+  document.body.innerHTML = `
+    <style>
+      #app {
+        list-style-type: none;
+        counter-reset: x;
+      }
+      #app li::before {
+        content: counter(x) ': ';
+        counter-increment: x;
+      }
+      .set {
+        counter-set: x 10;
+      }
+      .increment {
+        counter-increment: x 20;
+      }
+    </style>
+    <ol id="app">
+      <li>1</li>
+      <li class="set">11</li>
+      <li class="increment">32</li>
+    </ol>
+  `;
+  const context = clone('#app');
+  expect(getStyle(context.document, '#app').counterReset).toBe('x');
+  expect(getStyle(context.document, '.set').counterSet).toBe('x 10');
+  expect(getStyle(context.document, '.increment').counterIncrement).toBe('x 20');
+});
