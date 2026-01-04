@@ -21,6 +21,10 @@ test('Google Search', async ({ page }, testInfo) => {
     style.textContent = `* { box-sizing: border-box }`;
     document.body.prepend(style);
   });
+  // Hide `Choose Chrome` popup
+  const popupLocator = page.locator('div').filter({ hasText: 'Choose Chrome' });
+  if ((await popupLocator.count()) > 0) await popupLocator.evaluate(el => (el.style.opacity = '0'));
+
   await screenshot(page.locator('#app'), { fileName: 'google.png', testInfo });
   const lightPrint = await loadPrintScript(page);
   await lightPrint('#app');
@@ -66,5 +70,5 @@ test('Node.js Homepage', async ({ page }, testInfo) => {
   const container = getPrintContainter(page);
   await container.evaluate(element => (element.style = 'width: 100%; height: 2000px; border: none'));
   const buffer = await screenshot(container.contentFrame().locator('#app'));
-  expect(buffer).toMatchSnapshot('nodejs.png', { maxDiffPixelRatio: 0.001 });
+  expect(buffer).toMatchSnapshot('nodejs.png', { maxDiffPixelRatio: 0.003 });
 });

@@ -138,3 +138,41 @@ test('padding/border affect size', async ({ page }) => {
   expect(rect.width).toBe(size);
   expect(rect.height).toBe(size);
 });
+
+test('CSS counters', async ({ page }, testInfo) => {
+  await page.evaluate(() => {
+    document.body.innerHTML = `
+      <style>
+        #app {
+          list-style-type: none;
+          counter-reset: x;
+          font-size: 20px;
+          font-weight: bold;
+          width: 100px;
+        }
+        #app li:before {
+          content: counter(x) ': ';
+          counter-increment: x;
+        }
+        .set {
+          counter-set: x 10;
+        }
+        .increment {
+          counter-increment: x 20;
+        }
+      </style>
+      <ol id="app">
+        <li>1</li>
+        <li class="set">11</li>
+        <li class="increment">32</li>
+      </ol>
+    `;
+  });
+  const lightPrint = await loadPrintScript(page);
+  await lightPrint('#app');
+  const container = getPrintContainter(page);
+  await container.evaluate(element => (element.style = 'width: 200px; height: 200px'));
+  await screenshot(page.locator('#app'), { fileName: 'counters.png', testInfo });
+  const buffer = await screenshot(container.contentFrame().locator('#app'));
+  expect(buffer).toMatchSnapshot('counters.png');
+});

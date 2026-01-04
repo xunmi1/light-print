@@ -4,6 +4,11 @@ export const isString = (val: unknown): val is string => typeof val === 'string'
 
 export const isElement = <T extends Element>(target: unknown): target is T => target instanceof Element;
 
+export function includes<T>(value: T, array: readonly T[]) {
+  // Need to be compatible with `IE`
+  return array.indexOf(value) >= 0;
+}
+
 export function appendNode<T extends Node>(parent: T, child: T) {
   parent.appendChild(child);
 }
@@ -31,8 +36,8 @@ export function isMediaElement(el: Element) {
 
 // `slot`, `style`, etc. default to `display: none` but can still be rendered if override their display.
 const NON_RENDERING_ELEMENTS = ['source', 'track', 'wbr'] as const;
-export function isRenderingElement(el: Element): el is ElementNameMap[(typeof NON_RENDERING_ELEMENTS)[number]] {
-  return (NON_RENDERING_ELEMENTS as readonly string[]).indexOf(el.localName) < 0;
+export function isRenderingElement(el: Element) {
+  return !includes(el.localName, NON_RENDERING_ELEMENTS);
 }
 
 export function isHidden(style: CSSStyleDeclaration) {
@@ -63,7 +68,7 @@ export const BLOCK_CONTAINER_DISPLAY: readonly string[] = [
  * @see https://developer.mozilla.org/docs/Web/CSS/CSS_display/Visual_formatting_model#block_containers
  */
 export function isBlockContainer(style: CSSStyleDeclaration) {
-  return BLOCK_CONTAINER_DISPLAY.indexOf(style.display) > -1;
+  return includes(style.display, BLOCK_CONTAINER_DISPLAY);
 }
 
 export function setStyleProperty(
@@ -142,14 +147,13 @@ export function getOwnerWindow(element: Element) {
 
 // Equal to: HTMLElement | SVGElement | MathMLElement
 export type ElementWithStyle = Element & ElementCSSInlineStyle;
-
+const INVALID_ASPECT_RATIO = ['', 'auto', 'unset', 'initial'] as const;
 /** Whether the element has intrinsic aspect ratio */
 export function hasIntrinsicAspectRatio(el: ElementWithStyle) {
   // SVG element’s aspect ratio is dictated by its `viewBox` by default.
   if (whichElement(el, 'img') || whichElement(el, 'video') || (whichElement(el, 'svg') && el.getAttribute('viewBox')))
     return true;
-  const ratio = el.style.aspectRatio;
-  return ratio && ratio !== 'auto' && ratio !== 'unset' && ratio !== 'initial';
+  return !includes(el.style.aspectRatio, INVALID_ASPECT_RATIO);
 }
 
 export interface ElementWalker<Root extends Node> extends TreeWalker {
@@ -192,4 +196,8 @@ export function traverse<T extends ParentNode>(
       if (!hasParent) break;
     }
   }
+}
+
+export function toArray<T>(arrayLike: ArrayLike<T>): T[] {
+  return Array.prototype.slice.call(arrayLike);
 }

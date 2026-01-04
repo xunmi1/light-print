@@ -4,16 +4,21 @@ import {
   type ElementWithStyle,
   hasIntrinsicAspectRatio,
   getOwnerWindow,
+  toArray,
 } from './utils';
 
 export function getStyle(element: Element, pseudoElt?: string) {
   return getOwnerWindow(element).getComputedStyle(element, pseudoElt);
 }
 
+// When accessing `CSSStyleDeclaration` by index, the property name doesn’t include `counter`.
+const CSS_PROPERTIES_ADDED = ['counter-reset', 'counter-set', 'counter-increment'] as const;
+
 function getStyleTextDiff(targetStyle: CSSStyleDeclaration, originStyle: CSSStyleDeclaration) {
   let styleText = '';
-  for (let index = 0; index < originStyle.length; index++) {
-    const property = originStyle[index];
+  const properties = toArray(originStyle).concat(CSS_PROPERTIES_ADDED);
+  for (let index = 0; index < properties.length; index++) {
+    const property = properties[index];
     const value = originStyle.getPropertyValue(property);
     if (value && value !== targetStyle.getPropertyValue(property)) styleText += `${property}:${value};`;
   }
