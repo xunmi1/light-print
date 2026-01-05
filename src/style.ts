@@ -10,50 +10,66 @@ export function getStyle(element: Element, pseudoElt?: string) {
   return getOwnerWindow(element).getComputedStyle(element, pseudoElt);
 }
 
+function toCSSText(styles: Record<string, string>) {
+  let cssText = '';
+  const properties = Object.keys(styles);
+  for (let i = 0; i < properties.length; i++) {
+    const property = properties[i];
+    cssText += `${property}:${styles[property]};`;
+  }
+  return cssText;
+}
+
 // When accessing `CSSStyleDeclaration` by index, the property name doesn’t include `counter`.
 const CSS_PROPERTIES_ADDED = ['counter-reset', 'counter-set', 'counter-increment'] as const;
+const BORDER_PATTERN = /^border/;
+// Changing `padding`, `margin` or `border` alters the element’s size.
+const SIZE_PATTERN = /^(padding|margin|border)/;
 
-function diff(originStyle: CSSStyleDeclaration, targetStyle: CSSStyleDeclaration, property: string) {
-  const value = originStyle.getPropertyValue(property);
-  if (value && value !== targetStyle.getPropertyValue(property)) return `${property}:${value};`;
-}
-
-function getStyleTextDiff(targetStyle: CSSStyleDeclaration, originStyle: CSSStyleDeclaration) {
-  let styleText = '';
-  for (let index = 0; index < originStyle.length; index++) {
-    const rule = diff(originStyle, targetStyle, originStyle[index]);
-    if (rule) styleText += rule;
-  }
-  for (let index = 0; index < CSS_PROPERTIES_ADDED.length; index++) {
-    const rule = diff(originStyle, targetStyle, CSS_PROPERTIES_ADDED[index]);
-    if (rule) styleText += rule;
-  }
-  return styleText;
-}
-
-// Changing `padding` or `border-width` alters the element’s size.
-const SIZE_CHANGED_PATTERN = /padding-(top|right|bottom|left):|border-(top|right|bottom|left)-width:/;
-function isSizeChanged(styleText: string) {
-  return SIZE_CHANGED_PATTERN.test(styleText);
-}
-
-function fixEdgeCaseStyle(styleText: string, origin: ElementWithStyle, originStyle: CSSStyleDeclaration) {
+function getCSSText(targetStyle: CSSStyleDeclaration, originStyle: CSSStyleDeclaration, origin: Element) {
+  const styles: Record<string, string> = {};
+  // If `border-style` is neither `none` nor `hidden`, the browser falls back the corresponding border-width to its initial value—medium
+  // (3 px per spec, though engines variously resolve it to 2 px or 3 px).
+  let isBorderChanged = false;
   // For elements with an aspect ratio, always supply both width and height
   // to prevent incorrect auto-sizing based on that ratio.
-  if (hasIntrinsicAspectRatio(origin) || isSizeChanged(styleText)) {
-    styleText += `width:${originStyle.width};height:${originStyle.height};`;
+  let isSizeChanged = hasIntrinsicAspectRatio(origin as ElementWithStyle);
+
+  for (let index = 0; index < originStyle.length; index++) {
+    const property = originStyle[index];
+    const value = originStyle.getPropertyValue(property);
+    if (value && value !== targetStyle.getPropertyValue(property)) {
+      styles[property] = value;
+      isBorderChanged ||= BORDER_PATTERN.test(property);
+      isSizeChanged ||= isBorderChanged || SIZE_PATTERN.test(property);
+    }
   }
-  // The `table` layout is always influenced by content;
-  // whether `table-layout` is `auto` or `fixed`, we must give the table an explicit width to ensure accuracy.
-  else if (originStyle.display === 'table') {
-    styleText += `width:${originStyle.width};`;
+
+  for (let index = 0; index < CSS_PROPERTIES_ADDED.length; index++) {
+    const property = CSS_PROPERTIES_ADDED[index];
+    const value = originStyle.getPropertyValue(property);
+    if (value && value !== targetStyle.getPropertyValue(property)) {
+      styles[property] = value;
+    }
   }
-  return styleText;
+
+  if (isBorderChanged) {
+    styles['border-width'] = originStyle.borderWidth;
+  }
+  if (isSizeChanged) {
+    styles.width = originStyle.width;
+    styles.height = originStyle.height;
+  } else if (originStyle.display === 'table') {
+    // The `table` layout is always influenced by content;
+    // whether `table-layout` is `auto` or `fixed`, we must give the table an explicit width to ensure accuracy.
+    styles.width = originStyle.width;
+  }
+  return toCSSText(styles);
 }
 
 /** Clone element style; identical inline styles are omitted. */
 export function getElementStyle<T extends ElementWithStyle>(target: T, origin: T, originStyle: CSSStyleDeclaration) {
-  return fixEdgeCaseStyle(getStyleTextDiff(getStyle(target), originStyle), origin, originStyle);
+  return getCSSText(getStyle(target), originStyle, origin);
 }
 
 export const PSEUDO_ELECTORS = [
@@ -91,5 +107,5 @@ export function getPseudoElementStyle<T extends Element>(
     const content = pseudoOriginStyle.content;
     if (!content || content === 'normal' || content === 'none') return;
   }
-  return getStyleTextDiff(getStyle(target, pseudoElt), pseudoOriginStyle);
+  return getCSSText(getStyle(target, pseudoElt), pseudoOriginStyle, origin);
 }

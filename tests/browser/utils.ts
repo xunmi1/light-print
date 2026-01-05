@@ -93,7 +93,7 @@ export async function screenshot(
   // WebKit browsers do not support certain pseudo-elements.
   const maskSelectors =
     getBrowserName(page) === 'webkit'
-      ? ['input[placeholder]', 'textarea[placeholder]', 'input[type="file"]', 'details']
+      ? ['input[placeholder]', 'textarea[placeholder]', 'input[type="file"]', 'details', 'video']
       : [];
   const mergedMask = mask.concat(maskSelectors.map(v => target.locator(v)));
   // The screenshot dimensions from `element.screenshot()` are inconsistent,

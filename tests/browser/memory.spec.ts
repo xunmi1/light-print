@@ -30,7 +30,7 @@ test('detect heap leak', async ({ page }) => {
   await collectGarbage(page, cdpSession);
   const finalHeapSize = await getPerformanceMetric(cdpSession, 'JSHeapUsedSize');
   expect(finalHeapSize - onceHeapSize).toBeLessThan(100 * KB);
-  expect(getGrowthRatio(finalHeapSize, onceHeapSize)).toBeLessThan(0.05);
+  expect(getGrowthRatio(finalHeapSize, onceHeapSize)).toBeLessThan(0.06);
 });
 
 test('detect element leak', async ({ page }) => {

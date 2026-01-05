@@ -118,7 +118,7 @@ test.describe('aspectRatio', () => {
 test('padding/border affect size', async ({ page }) => {
   const size = 36;
   const padding = 8;
-  page.evaluate(
+  await page.evaluate(
     ({ size, padding }) => {
       document.body.innerHTML = `
         <style>
@@ -175,4 +175,22 @@ test('CSS counters', async ({ page }, testInfo) => {
   await screenshot(page.locator('#app'), { fileName: 'counters.png', testInfo });
   const buffer = await screenshot(container.contentFrame().locator('#app'));
   expect(buffer).toMatchSnapshot('counters.png');
+});
+
+test('border-width', async ({ page }) => {
+  await page.evaluate(() => {
+    document.body.innerHTML = `
+      <style> #app { border: 0px solid red; }</style>
+      <div id="app">
+        <button>default border</button>
+      </div>
+    `;
+  });
+  const lightPrint = await loadPrintScript(page);
+  await lightPrint('#app');
+  const frame = getPrintContainter(page).contentFrame();
+  let borderWidth = await frame.locator('#app').evaluate(el => getComputedStyle(el).borderWidth);
+  expect(borderWidth).toBe('0px');
+  borderWidth = await frame.locator('button').evaluate(el => getComputedStyle(el).borderWidth);
+  expect(borderWidth).not.toBe('0px');
 });

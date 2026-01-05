@@ -14,7 +14,7 @@ test.beforeEach(async ({ page, browserName }) => {
 test('Google Search', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 500, height: 1000 });
   await page.goto('https://www.google.com');
-  page.evaluate(() => {
+  await page.evaluate(() => {
     document.body.id = 'app';
     const style = document.createElement('style');
     // Speed up execution
@@ -38,7 +38,7 @@ test('GitHub Repository', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 1200, height: 1080 });
   test.setTimeout(120_000);
   await page.goto('https://github.com/xunmi1/light-print');
-  page.evaluate(() => {
+  await page.evaluate(() => {
     document.body.id = 'app';
     const style = document.createElement('style');
     style.textContent = `* { box-sizing: border-box }`;
@@ -58,10 +58,10 @@ test('Node.js Homepage', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 1500, height: 1080 });
   await page.goto('https://nodejs.org');
   await page.waitForTimeout(1000);
-  page.evaluate(() => {
+  await page.evaluate(() => {
     document.body.id = 'app';
     const style = document.createElement('style');
-    style.textContent = `*, ::after, ::before { box-sizing: border-box; border: 0 solid; margin: 0; padding: 0; }`;
+    style.textContent = `* { box-sizing: border-box }`;
     document.body.prepend(style);
   });
   await screenshot(page.locator('#app'), { fileName: 'nodejs.png', testInfo });

@@ -181,3 +181,15 @@ test('CSS counters', () => {
   expect(getStyle(context.document, '.set').counterSet).toBe('x 10');
   expect(getStyle(context.document, '.increment').counterIncrement).toBe('x 20');
 });
+
+test('border-width', () => {
+  document.body.innerHTML = `
+    <style> #app { border: 0px solid red; }</style>
+    <div id="app">
+      <button>default border</button>
+    </div>
+  `;
+  const context = clone('#app');
+  expect(getStyle(context.document, '#app').borderWidth).toBe('0px');
+  expect(getStyle(context.document, 'button').borderWidth).not.toBe('0px');
+});
