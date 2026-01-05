@@ -70,11 +70,9 @@ function lightPrint(containerOrSelector: Element | string, options: PrintOptions
     .then(() => {
       const doc = container.contentWindow!.document;
       context.bind(doc);
-
       doc.title = options.documentTitle ?? window.document.title;
-      setStyleProperty(doc.documentElement, 'zoom', options.zoom ?? 1);
       // remove the default margin.
-      setStyleProperty(doc.body, 'margin', 0);
+      context.appendStyle(`html{zoom:${options.zoom ?? 1}}body{margin:0;print-color-adjust:exact;}`);
 
       tryImportFonts(doc);
       cloneDocument(context, hostElement);
