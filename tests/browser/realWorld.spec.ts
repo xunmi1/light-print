@@ -61,7 +61,7 @@ test('Node.js Homepage', async ({ page }, testInfo) => {
   page.evaluate(() => {
     document.body.id = 'app';
     const style = document.createElement('style');
-    style.textContent = `*, :after, :before { box-sizing: border-box; border: 0 solid; margin: 0; padding: 0; }`;
+    style.textContent = `*, ::after, ::before { box-sizing: border-box; border: 0 solid; margin: 0; padding: 0; }`;
     document.body.prepend(style);
   });
   await screenshot(page.locator('#app'), { fileName: 'nodejs.png', testInfo });

@@ -1,6 +1,7 @@
 import type { Context } from './context';
 import {
   appendNode,
+  removeNode,
   whichElement,
   isMediaElement,
   isRenderingElement,
@@ -127,9 +128,13 @@ function cloneElement(target: Element, origin: Element, context: Context, should
 
 export function cloneDocument(context: Context, hostElement: Element) {
   const doc = context.document;
-  // clone the `hostElement` structure to `body`.
-  doc.importNode(hostElement, true);
-  appendNode(doc.body, doc.importNode(hostElement, true));
-  traverse((target, origin) => cloneElement(target, origin, context, true), doc.body.firstElementChild!, hostElement);
+  const clonedElement = doc.importNode(hostElement, true);
+  if (whichElement(hostElement, 'body')) {
+    removeNode(doc.body);
+    appendNode(doc.documentElement, clonedElement);
+  } else {
+    appendNode(doc.body, clonedElement);
+  }
+  traverse((target, origin) => cloneElement(target, origin, context, true), clonedElement, hostElement);
   context.flushTasks();
 }

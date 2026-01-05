@@ -205,3 +205,21 @@ describe('svg', () => {
     expect(targetStyle.height).toBe('56px');
   });
 });
+
+describe('body', () => {
+  test('body style', () => {
+    document.documentElement.innerHTML = `
+    <head>
+      <style>body { margin: 12px }</style>
+    </head>
+    <body></body>
+  `;
+    const context = clone('body');
+    expect(getStyle(context.document, 'body').margin).toBe('12px');
+  });
+
+  test('only one body', () => {
+    const context = clone('body');
+    expect(context.document.querySelectorAll('body').length).toBe(1);
+  });
+});

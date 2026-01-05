@@ -24,9 +24,14 @@ describe('print target', () => {
     await expect(lightPrint('#app')).resolves.toBeUndefined();
   });
 
-  test('target is an HTML element', async () => {
+  test('target is an normal element', async () => {
     await expect(lightPrint({})).rejects.toThrowError('Invalid HTML element');
     const element = document.querySelector('#app')!;
+    await expect(lightPrint(element)).resolves.toBeUndefined();
+  });
+
+  test('target is a body element', async () => {
+    const element = document.querySelector('body')!;
     await expect(lightPrint(element)).resolves.toBeUndefined();
   });
 
