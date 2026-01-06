@@ -1,6 +1,6 @@
 {
   "name": "light-print",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "description": "Lightweight HTML element printing for browsers.",
   "type": "module",
   "main": "dist/light-print.cjs",
