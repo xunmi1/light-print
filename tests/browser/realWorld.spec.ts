@@ -38,6 +38,7 @@ test('GitHub Repository', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 1200, height: 1080 });
   test.setTimeout(120_000);
   await page.goto('https://github.com/xunmi1/light-print');
+  await page.waitForTimeout(2000);
   await page.evaluate(() => {
     document.body.id = 'app';
     const style = document.createElement('style');
@@ -55,9 +56,9 @@ test('GitHub Repository', async ({ page }, testInfo) => {
 });
 
 test('Node.js Homepage', async ({ page }, testInfo) => {
-  await page.setViewportSize({ width: 1500, height: 1080 });
+  await page.setViewportSize({ width: 1600, height: 1080 });
   await page.goto('https://nodejs.org');
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(2000);
   await page.evaluate(() => {
     document.body.id = 'app';
     const style = document.createElement('style');
@@ -68,7 +69,7 @@ test('Node.js Homepage', async ({ page }, testInfo) => {
   const lightPrint = await loadPrintScript(page);
   await lightPrint('#app');
   const container = getPrintContainter(page);
-  await container.evaluate(element => (element.style = 'width: 100%; height: 2000px; border: none'));
+  await container.evaluate(element => (element.style = 'width: 100%; height: 1200px; border: none'));
   const buffer = await screenshot(container.contentFrame().locator('#app'));
   expect(buffer).toMatchSnapshot('nodejs.png', { maxDiffPixelRatio: 0.003 });
 });

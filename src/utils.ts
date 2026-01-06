@@ -54,7 +54,7 @@ export function isExternalStyleElement(el: Element): el is ExternalStyleElement 
  * @internal
  * Exporting this constant is solely for the convenience of testing.
  */
-export const BLOCK_CONTAINER_DISPLAY: readonly string[] = [
+export const BLOCK_CONTAINER_DISPLAY = [
   'block',
   'inline-block',
   'list-item',
@@ -63,7 +63,7 @@ export const BLOCK_CONTAINER_DISPLAY: readonly string[] = [
   'table-cell',
   'table-column',
   'table-column-group',
-];
+] as const;
 /** Block container
  * @see https://developer.mozilla.org/docs/Web/CSS/CSS_display/Visual_formatting_model#block_containers
  */
@@ -147,14 +147,6 @@ export function getOwnerWindow(element: Element) {
 
 // Equal to: HTMLElement | SVGElement | MathMLElement
 export type ElementWithStyle = Element & ElementCSSInlineStyle;
-const INVALID_ASPECT_RATIO = ['', 'auto', 'unset', 'initial'] as const;
-/** Whether the element has intrinsic aspect ratio */
-export function hasIntrinsicAspectRatio(el: ElementWithStyle) {
-  // SVG element’s aspect ratio is dictated by its `viewBox` by default.
-  if (whichElement(el, 'img') || whichElement(el, 'video') || (whichElement(el, 'svg') && el.getAttribute('viewBox')))
-    return true;
-  return !includes(el.style.aspectRatio, INVALID_ASPECT_RATIO);
-}
 
 export interface ElementWalker<Root extends Node> extends TreeWalker {
   currentNode: Element | Root;
