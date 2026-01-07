@@ -6,11 +6,11 @@ export function getStyle(element: Element, pseudoElt?: string): Style {
   return getOwnerWindow(element).getComputedStyle(element, pseudoElt);
 }
 
-export function compareRule(selector: string, text: string) {
-  return `${selector}{${text}}`;
+export function composeRule(selector: string, text: string) {
+  return selector + '{' + text + '}';
 }
 
-function compare(cssText: string, property: Lowercase<string>, value: string) {
+function merge(cssText: string, property: Lowercase<string>, value: string) {
   return value ? cssText + property + ': ' + value + ';' : cssText;
 }
 
@@ -40,7 +40,7 @@ function diff(cssText: string, properties: ArrayLike<string>, targetStyle: Style
     const property = properties[i] as Lowercase<string>;
     const value = originStyle.getPropertyValue(property);
     if (value && value !== targetStyle.getPropertyValue(property)) {
-      cssText = compare(cssText, property, value);
+      cssText = merge(cssText, property, value);
     }
   }
   return cssText;
@@ -56,18 +56,18 @@ function getCSSText(targetStyle: Style, originStyle: Style, origin: Element) {
   // If `border-style` is neither `none` nor `hidden`, the browser falls back the corresponding `border-width` to its initial value—medium
   // (3 px per spec, though engines variously resolve it to 2 px or 3 px).
   if (isBorderChanged(targetStyle, originStyle)) {
-    cssText = compare(cssText, 'border-width', originStyle.borderWidth);
+    cssText = merge(cssText, 'border-width', originStyle.borderWidth);
   }
   // For elements with an aspect ratio, always supply both width and height
   // to prevent incorrect auto-sizing based on that ratio.
   if (isSizeChanged(targetStyle, originStyle) || isIntrinsicAspectRatio(origin, originStyle)) {
-    cssText = compare(cssText, 'width', originStyle.width);
-    cssText = compare(cssText, 'height', originStyle.height);
+    cssText = merge(cssText, 'width', originStyle.width);
+    cssText = merge(cssText, 'height', originStyle.height);
   }
   // The `table` layout is always influenced by content;
   // whether `table-layout` is `auto` or `fixed`, we must give the table an explicit width to ensure accuracy.
   else if (originStyle.display === 'table') {
-    cssText = compare(cssText, 'width', originStyle.width);
+    cssText = merge(cssText, 'width', originStyle.width);
   }
   return cssText;
 }

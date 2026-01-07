@@ -10,7 +10,7 @@ import {
   traverse,
   type ElementWithStyle,
 } from './utils';
-import { getStyle, getElementStyle, getPseudoElementStyle, PSEUDO_ELECTORS, compareRule } from './style';
+import { getStyle, getElementStyle, getPseudoElementStyle, PSEUDO_ELECTORS, composeRule } from './style';
 import { isOpenShadowElement, cloneOpenShadowRoot, type ShadowElement } from './shadowDOM';
 
 /** clone element style */
@@ -29,7 +29,7 @@ function cloneElementStyle<T extends ElementWithStyle>(
   // The downside is their sky-high specificity: overriding them with mediaPrintStyle is painful,
   // We therefore strip the inline declarations once cloning finishes and hand the job over to a clean style sheet.
   target.setAttribute('style', cssText);
-  const styleRule = compareRule(context.getSelector(target), cssText);
+  const styleRule = composeRule(context.getSelector(target), cssText);
   context.addTask(() => {
     // Inline style carry higher specificity; strip them to let the `injectionStyle` (external style) prevail.
     target.removeAttribute('style');
@@ -50,7 +50,7 @@ function clonePseudoElementStyle<T extends Element>(
     const style = getPseudoElementStyle(target, origin, originStyle, pseudoElt);
     if (!style) continue;
     selector ??= context.getSelector(target);
-    styleRules += compareRule(selector + pseudoElt, style);
+    styleRules += composeRule(selector + pseudoElt, style);
   }
   context.appendStyle(styleRules);
 }
