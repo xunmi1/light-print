@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { getStyle, clone } from './utils';
 
-test('clone attributes', async () => {
+test('clone attributes', () => {
   document.body.innerHTML = `
     <style>* { display: block }</style>
     <div id="app">

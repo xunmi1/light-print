@@ -1,7 +1,7 @@
 import { expect, describe, test, vi } from 'vitest';
 import lightPrint from 'src';
 
-describe('compatibility', async () => {
+describe('compatibility', () => {
   test('Promise', async () => {
     // @ts-expect-error
     window.Promise.withResolvers = undefined;

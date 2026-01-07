@@ -22,7 +22,7 @@ function mockFontsAPI(doc: Document, fonts: string[] = []) {
 }
 
 describe('import fonts', () => {
-  test('has fonts API', async () => {
+  test('has fonts API', () => {
     const newDocument = new Window().document;
     mockFontsAPI(document, ['font1', 'font2']);
     mockFontsAPI(newDocument);
@@ -31,7 +31,7 @@ describe('import fonts', () => {
     expect(newDocument.fonts.size).toBe(2);
   });
 
-  test('no fonts API', async () => {
+  test('no fonts API', () => {
     const newDocument = new Window().document;
     tryImportFonts(newDocument);
     expect(newDocument.fonts?.size).toBeFalsy();
@@ -55,7 +55,7 @@ describe('wait fonts', () => {
     await expect(waitFonts(newDocument)).resolves.toBeUndefined();
   });
 
-  test('no fonts API', async () => {
+  test('no fonts API', () => {
     const newDocument = new Window().document;
     expect(waitFonts(newDocument)).toBeUndefined();
   });

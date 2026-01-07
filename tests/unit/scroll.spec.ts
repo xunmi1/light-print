@@ -14,7 +14,7 @@ describe('scroll', () => {
     `;
   });
 
-  test('element isn’t scrolling', async () => {
+  test('element isn’t scrolling', () => {
     const context = clone('#app');
 
     const target = context.document.querySelector('#outer')!;
@@ -22,7 +22,7 @@ describe('scroll', () => {
     expect(target.scrollLeft).toBe(0);
   });
 
-  test('element is now scrolling', async () => {
+  test('element is now scrolling', () => {
     const outer = document.querySelector('#outer')!;
     outer.scrollTo({ top: 50, left: 60 });
     const context = clone('#app');

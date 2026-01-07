@@ -1,0 +1,64 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "unicorn", "typescript", "oxc", "promise"],
+  "categories": {
+    "correctness": "error",
+    "perf": "error",
+    "suspicious": "warn",
+    "pedantic": "error"
+  },
+  "env": {
+    "browser": true
+  },
+  "rules": {
+    "no-var": "error",
+    "no-debugger": "error",
+    "eqeqeq": ["error", "always", { "null": "ignore" }],
+    "max-lines-per-function": "off",
+    "array-callback-return": "off",
+    "unicorn/no-lonely-if": "off",
+    "unicorn/prefer-dom-node-append": "off",
+    "unicorn/prefer-dom-node-remove": "off",
+    "oxc/no-this-in-exported-function": "off",
+    "typescript/no-import-type-side-effects": "error",
+    "typescript/ban-ts-comment": "off",
+    "promise/always-return": "off"
+  },
+  "overrides": [
+    {
+      "files": ["src/**/*.ts"],
+      "rules": {
+        "no-console": ["error", { "allow": ["warn", "error"] }],
+        "oxc/no-this-in-exported-function": "error",
+        "oxc/no-rest-spread-properties": "error",
+        "oxc/no-map-spread": "error",
+        "oxc/no-async-await": "error"
+      }
+    },
+    {
+      "files": ["vitest.config.ts", "playwright.config.ts", "tests/unit/**/*.ts"],
+      "plugins": ["eslint", "unicorn", "typescript", "oxc", "promise", "vitest"],
+      "env": {
+        "node": true
+      }
+    },
+    {
+      "files": ["tests/browser/**/*.ts"],
+      "env": {
+        "node": true,
+        "browser": true
+      }
+    },
+    {
+      "files": ["**/*.d.ts"],
+      "rules": {
+        "unicorn/require-module-specifiers": "off"
+      }
+    }
+  ],
+  "settings": {
+    "vitest": {
+      "typecheck": true
+    }
+  }
+}

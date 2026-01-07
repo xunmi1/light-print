@@ -25,14 +25,15 @@
   ],
   "scripts": {
     "start": "vite preview --port 3100 --outDir ./ --logLevel error",
-    "build": "npm run lint && npm run build-ts && npm run build-rollup && npm run build-dts && rimraf .cache",
+    "build": "npm run lint && npm run format && npm run build-ts && npm run build-rollup && npm run build-dts && rimraf .cache",
     "build-ts": "rimraf .cache && tsc --outDir .cache --project tsconfig.lib.json",
     "build-rollup": "rimraf dist && rollup -c scripts/rollup.config.js -i .cache/index.js",
     "build-dts": "rollup -c scripts/rollup.dts.config.js -i .cache/index.d.ts",
-    "lint": "prettier -w \"**/*\" -u",
     "test:unit": "vitest",
     "test:e2e": "rimraf tests/browser/__screenshots__ && playwright test",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "lint": "oxlint --fix -c oxlintrc.json",
+    "format": "prettier -w \"**/*\" -u"
   },
   "repository": {
     "type": "git",
@@ -62,6 +63,7 @@
     "@vitest/coverage-v8": "^4.0.16",
     "@xunmi/prettier-config": "^1.0.2",
     "happy-dom": "^20.0.11",
+    "oxlint": "^1.38.0",
     "prettier": "^3.7.4",
     "rimraf": "^6.1.2",
     "rollup": "^4.54.0",

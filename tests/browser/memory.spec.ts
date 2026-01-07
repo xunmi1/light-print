@@ -24,9 +24,7 @@ test('detect heap leak', async ({ page }) => {
   const onceHeapSize = await getPerformanceMetric(cdpSession, 'JSHeapUsedSize');
   expect(onceHeapSize - initialHeapSize).toBeLessThan(200 * KB);
 
-  for (let i = 0; i < 10; i++) {
-    await lightPrint('#app');
-  }
+  await Promise.all(Array.from({ length: 10 }, () => lightPrint('#app')));
   await collectGarbage(page, cdpSession);
   const finalHeapSize = await getPerformanceMetric(cdpSession, 'JSHeapUsedSize');
   expect(finalHeapSize - onceHeapSize).toBeLessThan(100 * KB);
@@ -38,9 +36,7 @@ test('detect element leak', async ({ page }) => {
   const lightPrint = await loadPrintScript(page);
   const initialSize = await getObjectSize(cdpSession, 'HTMLDivElement');
 
-  for (let i = 0; i < 10; i++) {
-    await lightPrint('#app');
-  }
+  await Promise.all(Array.from({ length: 10 }, () => lightPrint('#app')));
   const finalSize = await getObjectSize(cdpSession, 'HTMLDivElement');
   expect(finalSize).toBe(initialSize);
 });

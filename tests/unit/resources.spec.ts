@@ -37,7 +37,7 @@ describe('normal resources', () => {
     `;
     const result = waitResources(document);
     document.querySelector('.error')!.dispatchEvent(new Event('error'));
-    document.querySelector('.success')!?.dispatchEvent(new Event('load'));
+    document.querySelector('.success')!.dispatchEvent(new Event('load'));
     await expect(result).rejects.toThrowError('Failed to load resource');
   });
 

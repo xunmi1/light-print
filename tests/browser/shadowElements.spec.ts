@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { loadPrintScript, preventPrintDialog, preventDestroyContainer, getPrintContainter, screenshot } from './utils';
+import { loadPrintScript, preventPrintDialog, preventDestroyContainer, getPrintContainter } from './utils';
 
 test.beforeEach(async ({ page }) => {
   await preventPrintDialog(page);

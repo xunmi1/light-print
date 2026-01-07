@@ -1,4 +1,4 @@
-import type { Locator, Page, PageScreenshotOptions, Route, TestInfo } from '@playwright/test';
+import type { Locator, Page, PageScreenshotOptions, TestInfo } from '@playwright/test';
 
 export function round(number: number, precision = 0) {
   return Math.round(number * 10 ** precision) / 10 ** precision;
@@ -25,22 +25,22 @@ export async function loadPrintScript(page: Page) {
   const lightPrint: PrintType = (...params) => page.evaluate(args => window.lightPrint(...args), params);
   return lightPrint;
 }
+function replace() {
+  const replaced = '__replaced__';
+  const _removeChild = Node.prototype.removeChild;
 
+  // @ts-expect-error
+  if (_removeChild[replaced]) return;
+  function removeChild<T extends Node>(this: Node, child: T) {
+    if (child instanceof HTMLIFrameElement) return child;
+    return _removeChild.call<Node, [T], T>(this, child);
+  }
+  removeChild[replaced] = true;
+  // oxlint-disable-next-line no-extend-native
+  Node.prototype.removeChild = removeChild;
+}
 /** @HACK prevent destroy iframe container */
 export async function preventDestroyContainer(page: Page) {
-  function replace() {
-    const replaced = '__replaced__';
-    const _removeChild = Node.prototype.removeChild;
-
-    // @ts-expect-error
-    if (_removeChild[replaced]) return;
-    function removeChild<T extends Node>(this: Node, child: T) {
-      if (child instanceof HTMLIFrameElement) return child;
-      return _removeChild.call<Node, [T], T>(this, child);
-    }
-    removeChild[replaced] = true;
-    Node.prototype.removeChild = removeChild;
-  }
   await page.addInitScript(replace);
   await page.evaluate(replace);
 }

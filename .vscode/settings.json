@@ -18,7 +18,12 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.oxc": "explicit"
+  },
   "typescript.tsdk": "node_modules/typescript/lib",
   "prettier.configPath": "node_modules/@xunmi/prettier-config/index.json",
-  "cSpell.words": ["clonable"]
+  "cSpell.words": ["clonable", "oxlint"],
+  "oxc.configPath": "oxlintrc.json",
+  "oxc.requireConfig": false
 }

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, test } from 'vitest';
 import type { HTMLCanvasElement, HTMLOptionElement, HTMLVideoElement } from 'happy-dom';
 import { clone, getStyle } from './utils';
 
-test('iframe', async () => {
+test('iframe', () => {
   document.body.innerHTML = `
       <div id="app">
         <iframe src="https://example.com/other.html" style="display: block"></iframe>
@@ -14,7 +14,7 @@ test('iframe', async () => {
 });
 
 describe('canvas', () => {
-  test('normal', async () => {
+  test('normal', () => {
     document.body.innerHTML = `
       <div id="app">
         <!-- 'happy-dom' BUG: display is falsy -->
@@ -28,7 +28,7 @@ describe('canvas', () => {
     expect(target.height).toBe(60);
   });
 
-  test('zero size', async () => {
+  test('zero size', () => {
     document.body.innerHTML = `
       <div id="app" >
         <canvas id="zeroHeight" width="50" height="0" style="display: block"></canvas>
@@ -47,7 +47,7 @@ describe('canvas', () => {
 });
 
 describe('media', () => {
-  test('currentTime', async () => {
+  test('currentTime', () => {
     document.body.innerHTML = `
       <div id="app">
         <!-- when audio has controls, display isn't 'none', but 'happy-dom' has BUG -->
@@ -65,7 +65,7 @@ describe('media', () => {
     expect(target.currentTime).toBe(10);
   });
 
-  test('currentSrc', async () => {
+  test('currentSrc', () => {
     const src = 'https://example.com/video.mp4';
     document.body.innerHTML = `
       <div id="app">
@@ -89,7 +89,7 @@ describe('media', () => {
 });
 
 describe('form fields', () => {
-  test('input', async () => {
+  test('input', () => {
     document.body.innerHTML = `
       <div id="app">
         <input type="text" value="foo" />
@@ -100,7 +100,7 @@ describe('form fields', () => {
     expect(context.document.querySelector('input')!.value).toBe('bar');
   });
 
-  test('radio', async () => {
+  test('radio', () => {
     document.body.innerHTML = `
       <div id="app">
         <input type="radio" name="foo" value="bar" />
@@ -111,7 +111,7 @@ describe('form fields', () => {
     expect(context.document.querySelector('input')!.checked).toBe(true);
   });
 
-  describe('checkbox', async () => {
+  describe('checkbox', () => {
     beforeEach(() => {
       document.body.innerHTML = `
         <div id="app">
@@ -120,20 +120,20 @@ describe('form fields', () => {
       `;
     });
 
-    test('checked', async () => {
+    test('checked', () => {
       document.querySelector('input')!.checked = true;
       const context = clone('#app');
       expect(context.document.querySelector('input')!.checked).toBe(true);
     });
 
-    test('indeterminate', async () => {
+    test('indeterminate', () => {
       document.querySelector('input')!.indeterminate = true;
       const context = clone('#app');
       expect(context.document.querySelector('input')!.indeterminate).toBe(true);
     });
   });
 
-  describe('select', async () => {
+  describe('select', () => {
     beforeEach(() => {
       document.body.innerHTML = `
         <div id="app">
@@ -146,14 +146,14 @@ describe('form fields', () => {
       document.querySelector('select')!.value = 'bar';
     });
 
-    test('selectedIndex & value', async () => {
+    test('selectedIndex & value', () => {
       const context = clone('#app');
       let target = context.document.querySelector('select')!;
       expect(target.value).toBe('bar');
       expect(target.selectedIndex).toBe(1);
     });
 
-    test('selected', async () => {
+    test('selected', () => {
       const context = clone('#app');
       let target = context.document.querySelector('option[value="foo"]') as HTMLOptionElement;
       expect(target.selected).toBe(false);
@@ -162,7 +162,7 @@ describe('form fields', () => {
     });
   });
 
-  test('textarea', async () => {
+  test('textarea', () => {
     document.body.innerHTML = `
       <div id="app">
         <textarea>foo</textarea>
