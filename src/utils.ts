@@ -4,12 +4,12 @@ export const isString = (val: unknown): val is string => typeof val === 'string'
 
 export const isElement = <T extends Element>(target: unknown): target is T => target instanceof Element;
 
-export function includes<T>(value: T, array: readonly T[]) {
+export function includes<T, const Arr extends readonly T[]>(value: T, array: Arr) {
   // Need to be compatible with `IE`
   return array.indexOf(value) >= 0;
 }
 
-export function appendNode<T extends Node>(parent: T, child: T) {
+export function appendNode(parent: Node, child: Node) {
   parent.appendChild(child);
 }
 
