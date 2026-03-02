@@ -98,11 +98,11 @@ test.describe('aspectRatio', () => {
     const imageBuffer = await readFile('examples/assets/light-print-black.svg');
     const dataURL = `data:image/svg+xml;base64,${imageBuffer.toString('base64')}`;
 
-    await page.evaluate(dataURL => {
+    await page.evaluate(url => {
       document.body.innerHTML = `
         <style>img { display: block; width: 130px; height: 60px; } </style>
         <div id="app">
-          <img src="${dataURL}" height="40" />
+          <img src="${url}" height="40" />
         </div>
       `;
     }, dataURL);
@@ -119,13 +119,13 @@ test('padding/border affect size', async ({ page }) => {
   const size = 36;
   const padding = 8;
   await page.evaluate(
-    ({ size, padding }) => {
+    params => {
       document.body.innerHTML = `
         <style>
-          #app { padding: 0px !important; border: 0px !important; width: ${size}px; height: ${size}px; }
+          #app { padding: 0px !important; border: 0px !important; width: ${params.size}px; height: ${params.size}px; }
         </style>
-        <div id="app" style="padding: ${padding}px; border: ${padding}px solid black; display: inline-block; box-sizing: border-box;">
-          <div style="width: ${size - padding * 4}px; height: ${size - padding * 4}px; box-sizing: border-box;"></div>
+        <div id="app" style="padding: ${params.padding}px; border: ${params.padding}px solid black; display: inline-block; box-sizing: border-box;">
+          <div style="width: ${params.size - params.padding * 4}px; height: ${params.size - params.padding * 4}px; box-sizing: border-box;"></div>
         </div>
       `;
     },

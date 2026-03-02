@@ -52,7 +52,7 @@ describe('traverse', () => {
     origin.appendChild(nested).appendChild(document.createElement('div'));
     nested.id = 'nested';
     const target = origin.cloneNode(true);
-    const fn = vi.fn((target: Element) => target.id !== 'nested');
+    const fn = vi.fn((el: Element) => el.id !== 'nested');
     traverse(fn, target, origin);
     expect(fn).toBeCalledTimes(2);
     expect(target.querySelector('#nested')).toBeNull();

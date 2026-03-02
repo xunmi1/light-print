@@ -1,6 +1,4 @@
 import { expect, test } from 'vitest';
-import { CSSStyleSheet, HTMLElement } from 'happy-dom';
-
 import { clone } from './utils';
 
 test('open mode', () => {
@@ -44,7 +42,7 @@ test('contains inputs', () => {
 });
 
 test('custom element', () => {
-  class XElement extends HTMLElement {
+  class XElement extends window.HTMLElement {
     constructor() {
       super();
       const shadow = this.attachShadow({ mode: 'open' });
@@ -73,7 +71,7 @@ test('custom element', () => {
 test('adopted style sheets', () => {
   document.body.innerHTML = `<div id="app"></div>`;
   const shadow = document.querySelector('#app')!.attachShadow({ mode: 'open' });
-  const sheet = new CSSStyleSheet();
+  const sheet = new window.CSSStyleSheet();
   sheet.replaceSync(':host { padding: 10px; }');
   shadow.adoptedStyleSheets.push(sheet);
 
