@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Download build artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           # The name of the artifact needs to be the same as the name previously uploaded.
           name: build-artifact
@@ -41,7 +41,7 @@ jobs:
           verbose: true
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: './output'
 

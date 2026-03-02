@@ -1,4 +1,5 @@
 name: Cache playwright browsers
+description: 'Cache playwright browsers.'
 
 outputs:
   cache-hit:
@@ -25,7 +26,7 @@ runs:
 
     - name: Cache Playwright Browsers
       id: cache-playwright-browsers
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: '~/.cache/ms-playwright'
         key: ${{ runner.os }}-playwright-browsers-${{ steps.playwright-version.outputs.version }}
