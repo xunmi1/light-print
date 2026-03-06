@@ -3,11 +3,11 @@
   "version": "2.8.0",
   "description": "Lightweight HTML element printing for browsers.",
   "type": "module",
-  "main": "dist/light-print.cjs",
-  "module": "dist/light-print.js",
-  "types": "dist/light-print.d.ts",
-  "unpkg": "dist/light-print.global.min.js",
-  "jsdelivr": "dist/light-print.global.min.js",
+  "main": "./dist/light-print.cjs",
+  "module": "./dist/light-print.js",
+  "types": "./dist/light-print.d.ts",
+  "unpkg": "./dist/light-print.global.min.js",
+  "jsdelivr": "./dist/light-print.global.min.js",
   "exports": {
     ".": {
       "import": {
@@ -58,12 +58,12 @@
   "devDependencies": {
     "@playwright/test": "^1.58.2",
     "@rollup/plugin-replace": "^6.0.3",
-    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-terser": "^1.0.0",
     "@types/node": "^24.11.0",
     "@vitest/coverage-v8": "^4.0.18",
     "@xunmi/prettier-config": "^1.0.2",
-    "happy-dom": "^20.7.0",
-    "oxlint": "^1.50.0",
+    "happy-dom": "^20.8.3",
+    "oxlint": "^1.51.0",
     "prettier": "^3.8.1",
     "rimraf": "^6.1.3",
     "rollup": "^4.59.0",

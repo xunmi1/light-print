@@ -9,7 +9,7 @@ export function tryImportFonts(doc: Document) {
     while (true) {
       const font = iterator.next().value;
       if (!font) break;
-      // Can't add face to FontFaceSet that comes from `@font-face` rules for non-Chromium browsers.
+      // In non-Chromium browsers, fonts introduced via `@font-face` rules cannot be added to new windows.
       doc.fonts.add(font);
     }
   } catch {}

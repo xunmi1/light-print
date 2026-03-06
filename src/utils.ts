@@ -157,7 +157,7 @@ export interface ElementWalker<Root extends Node> extends TreeWalker {
 
 function createElementWalker<T extends Node>(root: T) {
   // `1` is `NodeFilter.SHOW_ELEMENT`
-  // IE requires four parameters (expandEntityReferences: false)
+  // 	In IE, `createTreeWalker` requires four arguments (expandEntityReferences: false).
   // @ts-expect-error
   return window.document.createTreeWalker(root, 1, null, false) as ElementWalker<T>;
 }

@@ -84,7 +84,7 @@ function lightPrint(containerOrSelector: Element | string, options: PrintOptions
     .then(() => waitResources(context.document))
     .then(() => emitPrint(context.document.defaultView!))
     .finally(() =>
-      // The container can only be destroyed after the printing process has been completed.
+      // The container can only be destroyed after the printing process has completed.
       removeNode(container)
     );
 }
