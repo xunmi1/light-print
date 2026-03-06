@@ -9,8 +9,9 @@
 
 🚀 View an online [**usage example**](https://xunmi1.github.io/light-print/examples/index.html).
 
-- **Lightweight**: Zero Dependencies & 3KB minzipped
+- **Universal**: Supports canvas, MathML, SVG, common pseudo-elements, Web Components and more
 - **Auto-Styled**: Preserves the existing styles without extra CSS setup
+- **Lightweight**: Zero Dependencies & 3KB minzipped
 - **Callback-Free**: Native promise handling for print workflows
 
 ## Install
