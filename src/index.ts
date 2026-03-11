@@ -5,11 +5,25 @@ import { cloneDocument } from './clone';
 import { createContext } from './context';
 
 export interface PrintOptions {
-  /** Document title */
+  /**
+   * Document title
+   * @default window.document.title
+   */
   documentTitle?: string;
-  /** Additional print styles */
+  /**
+   * Additional print styles
+   *
+   * @example
+   * ```js
+   * // A4 paper size, displayed in portrait mode.
+   * const mediaPrintStyle = '@page { size: A4 portrait }'
+   * ```
+   */
   mediaPrintStyle?: string;
-  /** Document zoom level */
+  /**
+   * Document zoom level
+   * @default 1
+   */
   zoom?: number | string;
 }
 
@@ -75,11 +89,7 @@ function lightPrint(containerOrSelector: Element | string, options: PrintOptions
       context.appendStyle(`html{zoom:${options.zoom ?? 1}}body{margin:0;print-color-adjust:exact;}`);
 
       tryImportFonts(doc);
-      cloneDocument(context, hostElement);
-      // style of highest priority.
-      context.appendStyle(options.mediaPrintStyle);
-      // mount after all styles have been generated.
-      context.mountStyle();
+      cloneDocument(context, hostElement, options.mediaPrintStyle);
     })
     .then(() => waitResources(context.document))
     .then(() => emitPrint(context.document.defaultView!))

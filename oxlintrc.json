@@ -19,7 +19,6 @@
     "unicorn/no-lonely-if": "off",
     "unicorn/prefer-dom-node-append": "off",
     "unicorn/prefer-dom-node-remove": "off",
-    "oxc/no-this-in-exported-function": "off",
     "typescript/no-import-type-side-effects": "error",
     "typescript/ban-ts-comment": "off",
     "promise/always-return": "off"
@@ -47,6 +46,9 @@
       "env": {
         "node": true,
         "browser": true
+      },
+      "rules": {
+        "oxc/no-this-in-exported-function": "off"
       }
     },
     {

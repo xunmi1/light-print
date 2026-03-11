@@ -46,6 +46,32 @@ describe('inline & external style', () => {
   });
 });
 
+describe('additional styles', () => {
+  test('override the original styles', () => {
+    document.body.innerHTML = `
+      <style>#app { color: red !important }</style>
+      <div id="app"></div>
+    `;
+    let context = clone('#app', `#app { color: blue }`);
+    expect(getStyle(context.document, '#app').color).toBe('blue');
+
+    context = clone('#app', `div { color: blue }`);
+    expect(getStyle(context.document, '#app').color).toBe('red');
+  });
+
+  test('minimum specificity: (0,1,0)', () => {
+    document.body.innerHTML = `
+      <style>div { color: red }</style>
+      <div id="app" class="test"></div>
+    `;
+    let context = clone('#app', `div { color: blue }`);
+    expect(getStyle(context.document, '#app').color).toBe('red');
+
+    context = clone('#app', `.test { color: blue }`);
+    expect(getStyle(context.document, '#app').color).toBe('blue');
+  });
+});
+
 describe('style position', () => {
   test('outside', () => {
     document.body.innerHTML = `

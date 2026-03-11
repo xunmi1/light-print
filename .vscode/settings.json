@@ -21,9 +21,8 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.oxc": "explicit"
   },
-  "typescript.tsdk": "node_modules/typescript/lib",
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
   "prettier.configPath": "node_modules/@xunmi/prettier-config/index.json",
   "cSpell.words": ["clonable", "oxlint"],
-  "oxc.configPath": "oxlintrc.json",
-  "oxc.requireConfig": false
+  "oxc.configPath": "oxlintrc.json"
 }

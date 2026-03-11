@@ -7,11 +7,10 @@ import { appendNode } from './utils';
  */
 export const SELECTOR_NAME = 'data-print-id';
 
-type Task = () => void;
+export type Task = () => void;
 
 export function createContext<T extends Document>() {
   let styleNode: HTMLStyleElement | undefined;
-  let isMountedStyle = false;
   let printId = 1;
   let doc: T;
 
@@ -39,9 +38,8 @@ export function createContext<T extends Document>() {
   }
 
   function mountStyle(parent?: Node) {
-    if (isMountedStyle || !styleNode) return;
+    if (!styleNode || styleNode.parentNode) return;
     appendNode(parent || doc.head, styleNode);
-    isMountedStyle = true;
   }
 
   const tasks: Task[] = [];

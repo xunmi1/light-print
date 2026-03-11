@@ -126,7 +126,7 @@ function cloneElement(target: Element, origin: Element, context: Context, should
   return true;
 }
 
-export function cloneDocument(context: Context, hostElement: Element) {
+export function cloneDocument(context: Context, hostElement: Element, styleRule?: string) {
   const doc = context.document;
   const clonedElement = doc.importNode(hostElement, true);
   if (whichElement(hostElement, 'body')) {
@@ -137,4 +137,8 @@ export function cloneDocument(context: Context, hostElement: Element) {
   }
   traverse((target, origin) => cloneElement(target, origin, context, true), clonedElement, hostElement);
   context.flushTasks();
+  // style of highest priority.
+  context.appendStyle(styleRule);
+  // mount after all styles have been generated.
+  context.mountStyle();
 }

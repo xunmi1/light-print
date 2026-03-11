@@ -40,10 +40,9 @@ function getAllPropertyNames<T extends object>(object: T) {
   return Array.from(props);
 }
 
-export function clone(selector: string) {
+export function clone(selector: string, styleRule?: string) {
   const context = createContext();
   context.bind(new Window().document);
-  cloneDocument(context, document.querySelector(selector)!);
-  context.mountStyle();
+  cloneDocument(context, document.querySelector(selector)!, styleRule);
   return context as Omit<Context, 'document'> & { readonly document: Document };
 }
