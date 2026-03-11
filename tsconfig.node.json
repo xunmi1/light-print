@@ -15,7 +15,10 @@
     "resolveJsonModule": true,
     "noEmit": true,
     "composite": true,
-    "baseUrl": "./",
+    "rootDir": ".",
+    "paths": {
+      "*": ["./*"]
+    },
 
     /* Linting */
     "strict": true,

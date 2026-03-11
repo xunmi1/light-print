@@ -1,7 +1,11 @@
 {
   "extends": "./tsconfig.lib.json",
   "compilerOptions": {
-    "composite": true
+    "composite": true,
+    "rootDir": ".",
+    "paths": {
+      "*": ["./*"]
+    }
   },
   "include": ["tests/unit/**/*.spec-d.ts", "src/**/*"]
 }

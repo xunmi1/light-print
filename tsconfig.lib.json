@@ -15,7 +15,7 @@
     "declaration": true,
     "sourceMap": false,
     "outDir": "./dist",
-    "baseUrl": "./",
+    "rootDir": "./src",
 
     "strict": true,
     "noUnusedParameters": true,
