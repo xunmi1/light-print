@@ -39,7 +39,7 @@ Print container elements and their descendants.
 
 After the browser displays the print dialog:
 
-- Select any printer to print
+- Select any printer to print.
 - Select the "Save as PDF" option to generate a PDF file.
 
 ```js

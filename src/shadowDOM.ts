@@ -2,10 +2,10 @@ import { createContext, type Context } from './context';
 import { getOwnerWindow, traverse } from './utils';
 
 export type ShadowElement<E extends Element = Element, Mode extends ShadowRoot['mode'] = ShadowRoot['mode']> = E & {
-  shadowRoot: Omit<ShadowRoot, 'mode'> & { mode: Mode };
+  shadowRoot: Omit<ShadowRoot, 'mode'> & { readonly mode: Mode };
 };
 
-function attachShadow(target: Element, origin: ShadowElement) {
+function attachShadow<T extends Element>(target: T, origin: ShadowElement<T, 'open'>) {
   return target.attachShadow({ mode: 'open', delegatesFocus: origin.shadowRoot.delegatesFocus });
 }
 
@@ -15,7 +15,7 @@ function cloneNode(ownerDocument: Document, shadowRoot: ShadowRoot) {
   return fragment;
 }
 
-function cloneSheets(target: ShadowElement, origin: ShadowElement) {
+function cloneSheets<T extends Element>(target: ShadowElement<T>, origin: ShadowElement<T>) {
   const cssText = origin.shadowRoot.adoptedStyleSheets
     .flatMap(sheet => Array.from(sheet.cssRules).map(rule => rule.cssText))
     .join('\n');
@@ -28,7 +28,7 @@ function cloneSheets(target: ShadowElement, origin: ShadowElement) {
 
 /**
  * Clone element with shadow root (mode: 'open').
- * Only modern browsers, not IE
+ * Only modern browsers, not IE, ES2015 can be used.
  */
 export function cloneOpenShadowRoot<T extends Element = Element>(
   target: T,

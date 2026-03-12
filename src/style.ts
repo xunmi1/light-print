@@ -53,8 +53,8 @@ function getCSSText(targetStyle: Style, originStyle: Style, origin: Element) {
   let cssText = '';
   cssText = diff(cssText, originStyle, targetStyle, originStyle);
   cssText = diff(cssText, CSS_PROPERTIES_ADDED, targetStyle, originStyle);
-  // If `border-style` is neither `none` nor `hidden`, the browser falls back the corresponding `border-width` to its initial value—medium
-  // (3 px per spec, though engines variously resolve it to 2 px or 3 px).
+  // When `border-style` is other than none or hidden,
+  // the corresponding `border-width` defaults to `medium` (exact value undefined by spec, browser-specific).
   if (isBorderChanged(targetStyle, originStyle)) {
     cssText = merge(cssText, 'border-width', originStyle.borderWidth);
   }
