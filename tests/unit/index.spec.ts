@@ -16,16 +16,16 @@ describe('print target', () => {
 
   test('no target', async () => {
     // @ts-expect-error
-    await expect(lightPrint()).rejects.toThrowError('Invalid HTML element');
+    await expect(lightPrint()).rejects.toThrow('Invalid HTML element');
   });
 
   test('target is a CSS selector', async () => {
-    await expect(lightPrint('#not-exist')).rejects.toThrowError('Invalid HTML element');
+    await expect(lightPrint('#not-exist')).rejects.toThrow('Invalid HTML element');
     await expect(lightPrint('#app')).resolves.toBeUndefined();
   });
 
   test('target is an normal element', async () => {
-    await expect(lightPrint({})).rejects.toThrowError('Invalid HTML element');
+    await expect(lightPrint({})).rejects.toThrow('Invalid HTML element');
     const element = document.querySelector('#app')!;
     await expect(lightPrint(element)).resolves.toBeUndefined();
   });
@@ -45,7 +45,7 @@ describe('print target', () => {
       }
       return originalAppendChild.call(this, node);
     };
-    await expect(lightPrint('body')).rejects.toThrowError();
+    await expect(lightPrint('body')).rejects.toThrow();
   });
 });
 

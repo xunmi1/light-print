@@ -14,9 +14,9 @@ test('bindOnceEvent', () => {
   const fn = vi.fn();
   bindOnceEvent(document.body, 'click', fn);
   document.body.click();
-  expect(fn).toBeCalledTimes(1);
+  expect(fn).toHaveBeenCalledTimes(1);
   document.body.click();
-  expect(fn).toBeCalledTimes(1);
+  expect(fn).toHaveBeenCalledTimes(1);
 });
 
 describe('isHidden', () => {
@@ -43,7 +43,7 @@ describe('traverse', () => {
     origin.appendChild(document.createElement('div')).appendChild(document.createElement('div'));
     const fn = vi.fn(() => true);
     traverse(fn, origin.cloneNode(true), origin);
-    expect(fn).toBeCalledTimes(3);
+    expect(fn).toHaveBeenCalledTimes(3);
   });
 
   test('prune children', () => {
@@ -54,7 +54,7 @@ describe('traverse', () => {
     const target = origin.cloneNode(true);
     const fn = vi.fn((el: Element) => el.id !== 'nested');
     traverse(fn, target, origin);
-    expect(fn).toBeCalledTimes(2);
+    expect(fn).toHaveBeenCalledTimes(2);
     expect(target.querySelector('#nested')).toBeNull();
     expect(origin.querySelector('#nested')).toBe(nested);
   });
@@ -74,7 +74,7 @@ describe('traverse', () => {
     origin.appendChild(document.createElement('div'));
     const fn = vi.fn(() => true);
     traverse(fn, origin.cloneNode(true), origin);
-    expect(fn).toBeCalledTimes(2);
+    expect(fn).toHaveBeenCalledTimes(2);
   });
 
   test('children must be element', () => {
@@ -82,7 +82,7 @@ describe('traverse', () => {
     origin.append(document.createTextNode('foo'), document.createElement('div'));
     const fn = vi.fn(() => true);
     traverse(fn, origin.cloneNode(true), origin);
-    expect(fn).toBeCalledTimes(2);
+    expect(fn).toHaveBeenCalledTimes(2);
   });
 
   test('root can be non-element', () => {
@@ -90,6 +90,6 @@ describe('traverse', () => {
     origin.appendChild(document.createElement('div'));
     const fn = vi.fn(() => true);
     traverse(fn, origin.cloneNode(true), origin);
-    expect(fn).toBeCalledTimes(2);
+    expect(fn).toHaveBeenCalledTimes(2);
   });
 });

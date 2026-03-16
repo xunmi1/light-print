@@ -145,7 +145,7 @@ describe('style', () => {
 describe('tasks', () => {
   test('addTask', () => {
     const context = createContext();
-    expect(() => context.addTask(() => {})).not.toThrowError();
+    expect(() => context.addTask(() => {})).not.toThrow();
     expect(context.addTask(() => {})).toBeUndefined();
   });
 
@@ -154,7 +154,7 @@ describe('tasks', () => {
     const task = vi.fn();
     context.addTask(task);
     context.flushTasks();
-    expect(task).toBeCalledTimes(1);
+    expect(task).toHaveBeenCalledTimes(1);
   });
 
   test('flushTasks should clear the tasks', () => {
@@ -165,7 +165,7 @@ describe('tasks', () => {
     const task2 = vi.fn();
     context.addTask(task2);
     context.flushTasks();
-    expect(task1).toBeCalledTimes(1);
-    expect(task2).toBeCalledTimes(1);
+    expect(task1).toHaveBeenCalledTimes(1);
+    expect(task2).toHaveBeenCalledTimes(1);
   });
 });

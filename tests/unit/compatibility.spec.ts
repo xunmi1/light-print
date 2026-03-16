@@ -10,13 +10,16 @@ describe('compatibility', () => {
   });
 
   test('mock IE', async () => {
-    const isIE = vi.hoisted(() => vi.fn(() => true));
-    vi.mock(import('src/utils'), async importOriginal => {
-      const original = await importOriginal();
-      return { ...original, isIE };
+    const mockIE = new Window({
+      settings: {
+        navigator: {
+          userAgent: 'Mozilla/5.0 (Windows NT 10.0; Trident/7.0; rv:11.0) like Gecko',
+        },
+      },
     });
-    document.body.innerHTML = '<div id="app"></div>';
+    vi.stubGlobal('navigator', mockIE.navigator);
+    window.document.body.innerHTML = '<div id="app"></div>';
     await expect(lightPrint('#app')).resolves.toBeUndefined();
-    expect(isIE).toBeCalled();
+    vi.unstubAllGlobals();
   });
 });
