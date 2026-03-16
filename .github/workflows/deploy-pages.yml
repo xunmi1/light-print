@@ -2,7 +2,7 @@ name: Deploy Pages
 
 on:
   workflow_run:
-    workflows: ['CI']
+    workflows: ['Release']
     types:
       - completed
 
