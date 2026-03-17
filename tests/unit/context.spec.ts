@@ -85,7 +85,7 @@ describe('style', () => {
     expect(getStyle(document, '.test').color).toBe('red');
   });
 
-  test('doesn’t affect the current window', () => {
+  test('doesn’t affect the current style', () => {
     const context = createContext();
     const newWindow = new Window();
     context.bind(newWindow.document);

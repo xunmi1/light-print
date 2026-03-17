@@ -1,5 +1,5 @@
 import { describe, test, expect, vi } from 'vitest';
-import { bindOnceEvent, isHidden, normalizeNode, traverse } from 'src/utils';
+import { bindOnceEvent, isDisplayed, normalizeNode, traverse } from 'src/utils';
 import { type Element, HTMLDivElement } from 'happy-dom';
 
 test('normalizeNode', () => {
@@ -19,21 +19,19 @@ test('bindOnceEvent', () => {
   expect(fn).toHaveBeenCalledTimes(1);
 });
 
-describe('isHidden', () => {
+describe('isDisplayed', () => {
   test('unconnected element', () => {
     const element = document.createElement('div');
-    expect(isHidden(element.style)).toBe(true);
-    element.style.display = 'none';
-    expect(isHidden(element.style)).toBe(true);
+    expect(isDisplayed(element.style)).toBe(false);
   });
 
   test('connected element', () => {
     const element = document.createElement('div');
     document.body.appendChild(element);
     element.style.display = 'none';
-    expect(isHidden(element.style)).toBe(true);
+    expect(isDisplayed(element.style)).toBe(false);
     element.style.display = 'block';
-    expect(isHidden(element.style)).toBe(false);
+    expect(isDisplayed(element.style)).toBe(true);
   });
 });
 

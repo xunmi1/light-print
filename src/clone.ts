@@ -5,7 +5,7 @@ import {
   whichElement,
   isMediaElement,
   isRenderingElement,
-  isHidden,
+  isDisplayed,
   isExternalStyleElement,
   traverse,
   type ElementWithStyle,
@@ -117,7 +117,7 @@ function cloneElement(target: Element, origin: Element, context: Context, should
   if (shouldCloneStyle) {
     const originStyle = getStyle(origin);
     // Remove hidden element.
-    if (isHidden(originStyle) && !isExternalStyleElement(origin)) return false;
+    if (!isDisplayed(originStyle) && !isExternalStyleElement(origin)) return false;
     cloneElementStyle(target as ElementWithStyle, origin as ElementWithStyle, originStyle, context);
     clonePseudoElementStyle(target, origin, originStyle, context);
   }

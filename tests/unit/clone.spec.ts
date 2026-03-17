@@ -38,6 +38,18 @@ describe('hidden elements', () => {
     });
   });
 
+  test('doesn’t affect the current document', () => {
+    const innerHTML = `
+      <style>.hidden { display: none }</style>
+      <div id="app" class="hidden">
+        <div class="hidden"></div>
+      </div>
+    `.trim();
+    document.body.innerHTML = innerHTML;
+    clone('#app');
+    expect(document.body.innerHTML).toBe(innerHTML);
+  });
+
   test('explicitly set to hidden', () => {
     document.body.innerHTML = `
       <style>.hidden { display: none }</style>
@@ -73,6 +85,9 @@ describe('hidden elements', () => {
       </div>
     `;
     const context = clone('#app');
+    ['style', 'link[rel="stylesheet"]'].forEach(type => {
+      expect(context.document.querySelector(type)).toBeTruthy();
+    });
     ['link[rel="preload"]', 'param', 'meta', 'base', 'template', 'script'].forEach(type => {
       expect(context.document.querySelector(type)).toBeFalsy();
     });

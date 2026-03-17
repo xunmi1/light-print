@@ -40,8 +40,8 @@ export function isRenderingElement(el: Element) {
   return !includes(el.localName, NON_RENDERING_ELEMENTS);
 }
 
-export function isHidden(style: CSSStyleDeclaration) {
-  return !style.display || style.display === 'none';
+export function isDisplayed(style: CSSStyleDeclaration) {
+  return style.display ? style.display !== 'none' : false;
 }
 
 type ExternalStyleElement = HTMLStyleElement | (HTMLLinkElement & { rel: 'stylesheet' });
@@ -162,6 +162,10 @@ function createElementWalker<T extends Node>(root: T) {
   return window.document.createTreeWalker(root, 1, null, false) as ElementWalker<T>;
 }
 
+/**
+ * Traverse the DOM tree.
+ * When the `visitor` returns `false`, the current element and its subtree will be skipped and removed.
+ */
 export function traverse<T extends ParentNode>(
   visitor: <U extends Element | T>(target: U, origin: U) => boolean,
   target: T,
