@@ -4,11 +4,6 @@ declare global {
       readonly PROD: boolean;
     };
   }
-
-  interface Document {
-    // `IE` does not support `Document.fonts`
-    fonts?: FontFaceSet;
-  }
 }
 
 export {};

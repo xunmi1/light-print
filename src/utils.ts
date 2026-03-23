@@ -148,6 +148,18 @@ export function getOwnerWindow(element: Element) {
 // Equal to: HTMLElement | SVGElement | MathMLElement
 export type ElementWithStyle = Element & ElementCSSInlineStyle;
 
+declare global {
+  interface Document {
+    // In IE, `createTreeWalker` requires four arguments
+    createTreeWalker(
+      root: Node,
+      whatToShow: number,
+      filter: NodeFilter | null,
+      expandEntityReferences: boolean
+    ): TreeWalker;
+  }
+}
+
 export interface ElementWalker<Root extends Node> extends TreeWalker {
   currentNode: Element | Root;
   nextNode(): Element | null;
@@ -157,8 +169,6 @@ export interface ElementWalker<Root extends Node> extends TreeWalker {
 
 function createElementWalker<T extends Node>(root: T) {
   // `1` is `NodeFilter.SHOW_ELEMENT`
-  // 	In IE, `createTreeWalker` requires four arguments (expandEntityReferences: false).
-  // @ts-expect-error
   return window.document.createTreeWalker(root, 1, null, false) as ElementWalker<T>;
 }
 
