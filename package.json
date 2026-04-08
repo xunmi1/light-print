@@ -56,21 +56,21 @@
   },
   "homepage": "https://xunmi1.github.io/light-print/",
   "devDependencies": {
-    "@playwright/test": "^1.58.2",
+    "@playwright/test": "^1.59.1",
     "@rollup/plugin-replace": "^6.0.3",
     "@rollup/plugin-terser": "^1.0.0",
     "@types/node": "^24.12.0",
-    "@vitest/coverage-v8": "^4.1.0",
+    "@vitest/coverage-v8": "^4.1.3",
     "@xunmi/prettier-config": "^1.0.2",
-    "happy-dom": "^20.8.4",
-    "oxlint": "^1.55.0",
+    "happy-dom": "^20.8.9",
+    "oxlint": "^1.59.0",
     "prettier": "^3.8.1",
     "rimraf": "^6.1.3",
-    "rollup": "^4.59.0",
-    "rollup-plugin-dts": "^6.4.0",
+    "rollup": "^4.60.1",
+    "rollup-plugin-dts": "^6.4.1",
     "typescript": "^5.9.3",
-    "vite": "^8.0.0",
-    "vitest": "^4.1.0"
+    "vite": "^8.0.7",
+    "vitest": "^4.1.3"
   },
   "prettier": "@xunmi/prettier-config"
 }

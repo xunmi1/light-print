@@ -57,7 +57,8 @@ describe('traverse', () => {
     expect(origin.querySelector('#nested')).toBe(nested);
   });
 
-  test('override children attribute', () => {
+  test('not rely on element-specific properties', () => {
+    // The custom element can override `children` and `childNodes`
     class XElement extends HTMLDivElement {
       get children(): HTMLDivElement['children'] {
         throw new Error('Not allowed');
@@ -75,7 +76,7 @@ describe('traverse', () => {
     expect(fn).toHaveBeenCalledTimes(2);
   });
 
-  test('children must be element', () => {
+  test('child must be element', () => {
     const origin = document.createElement('div');
     origin.append(document.createTextNode('foo'), document.createElement('div'));
     const fn = vi.fn(() => true);
