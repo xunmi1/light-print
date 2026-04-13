@@ -5,9 +5,9 @@
 [![npm](https://img.shields.io/npm/v/light-print?style=flat-square)](https://www.npmjs.com/package/light-print)
 [![license](https://img.shields.io/npm/l/light-print?style=flat-square)](https://www.npmjs.com/package/light-print)
 
-🖨️ Lightweight HTML element printing for browsers.
+🖨️ **Lightweight • Exceptional style fidelity • Modern DOM printing**
 
-🚀 View an online [**usage example**](https://xunmi1.github.io/light-print/examples/index.html).
+🚀 [**Live Demo →**](https://xunmi1.github.io/light-print/examples/index.html).
 
 - **Universal**: Supports canvas, MathML, SVG, common pseudo-elements, Web Components and more
 - **Auto-Styled**: Preserves the existing styles without extra CSS setup
@@ -115,7 +115,7 @@ function lightPrint(containerOrSelector: Element | string, options?: PrintOption
 
 1. Is this compatible with React/Vue/Angular?
 
-   Works with all frameworks! See our [framework examples](#usage-in-vue).
+   Works directly with DOM Element or framework refs (`useRef` in React, template ref in Vue, etc.). See our [framework examples](#usage-in-vue).
 
 2. How to handle page breaks?
 
@@ -136,7 +136,7 @@ function lightPrint(containerOrSelector: Element | string, options?: PrintOption
 
    Because those styles may be inherited from the parent; you need to restate them (e.g., `background`) directly on the print-element container.
 
-## Limitations
+## Suggestions
 
 - It is recommended to specify fixed dimensions (width and height) for the print-element container, as it cannot adapt to page dimensions when printing.
 - Automatic font loading is not supported for non-Chromium browsers. You can declare `@font-face` within the `mediaPrintStyle`, for example:
@@ -148,3 +148,9 @@ function lightPrint(containerOrSelector: Element | string, options?: PrintOption
     }
   `;
   ```
+
+---
+
+Feedback and contributions are welcome! Feel free to open an Issue or Pull Request.
+
+If you find it useful, a star ⭐ on [GitHub](https://github.com/xunmi1/light-print) would be much appreciated.
