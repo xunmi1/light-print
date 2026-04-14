@@ -21,7 +21,8 @@
     "unicorn/prefer-dom-node-remove": "off",
     "typescript/no-import-type-side-effects": "error",
     "typescript/ban-ts-comment": "off",
-    "promise/always-return": "off"
+    "promise/always-return": "off",
+    "no-inline-comments": ["error", { "ignorePattern": "HTML|CSS" }]
   },
   "overrides": [
     {

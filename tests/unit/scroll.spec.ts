@@ -3,8 +3,8 @@ import { clone } from './utils';
 
 describe('scroll', () => {
   beforeEach(() => {
-    document.body.innerHTML = `
-      <div id="app" >
+    document.body.innerHTML = /* HTML */ `
+      <div id="app">
         <div id="outer" style="width: 100px; height: 100px; overflow: auto">
           <div id="inner" style="width: 200px; height: 200px; overflow: auto">
             <div style="width: 300px; height: 300px"></div>

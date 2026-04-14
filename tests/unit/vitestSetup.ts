@@ -64,9 +64,17 @@ function getStyleBySelector(currentWindow: BrowserWindow, selector: string) {
   const cssRules = Array.from(currentWindow.document.styleSheets).flatMap(styleSheet =>
     Array.from(styleSheet.cssRules)
   );
-
+  const cssRule = cssRules.find(rule => {
+    // @ts-expect-error
+    const selectorText: string = rule?.selectorText;
+    return (
+      selectorText === selector ||
+      // Convert double quotes to single quotes for CSS attribute selectors.
+      selectorText === selector.replaceAll(/(?<=\[[^\]=]*=)"([^"]*)"/g, "'$1'")
+    );
+  });
   // @ts-expect-error
-  return cssRules.find(rule => rule?.selectorText === selector)?.style as CSSStyleDeclaration;
+  return cssRule?.style as CSSStyleDeclaration;
 }
 
 BrowserWindow.prototype.getComputedStyle = getComputedStyle;

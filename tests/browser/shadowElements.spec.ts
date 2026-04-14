@@ -8,10 +8,14 @@ test.beforeEach(async ({ page }) => {
 
 test('open mode', async ({ page }) => {
   await page.evaluate(() => {
-    document.body.innerHTML = `<div id="app"></div>`;
+    document.body.innerHTML = /* HTML */ `<div id="app"></div>`;
     const shadow = document.querySelector('#app')!.attachShadow({ mode: 'open' });
-    shadow.innerHTML = `
-      <style> #foo { color: rgb(2, 2, 2) !important; }</style>
+    shadow.innerHTML = /* HTML */ `
+      <style>
+        #foo {
+          color: rgb(2, 2, 2) !important;
+        }
+      </style>
       <div id="foo" style="color: rgb(1, 1, 1)"></div>
     `;
   });
@@ -23,10 +27,10 @@ test('open mode', async ({ page }) => {
 
 test('contains inputs', async ({ page }) => {
   await page.evaluate(() => {
-    document.body.innerHTML = `<div id="app"></div>`;
+    document.body.innerHTML = /* HTML */ `<div id="app"></div>`;
     const shadow = document.querySelector('#app')!.attachShadow({ mode: 'open' });
     const select = document.createElement('select');
-    select.innerHTML = `
+    select.innerHTML = /* HTML */ `
       <option value="foo">foo</option>
       <option value="bar">bar</option>
     `;
@@ -45,8 +49,15 @@ test('custom element', async ({ page }) => {
       constructor() {
         super();
         this.attachShadow({ mode: 'open' });
-        this.shadowRoot!.innerHTML = `
-          <style> :host { display: block } .content { color: rgb(204, 204, 204); }</style>
+        this.shadowRoot!.innerHTML = /* HTML */ `
+          <style>
+            :host {
+              display: block;
+            }
+            .content {
+              color: rgb(204, 204, 204);
+            }
+          </style>
           <div class="content"><slot></slot></div>
         `;
         this.id = 'custom';
@@ -54,7 +65,7 @@ test('custom element', async ({ page }) => {
     }
     window.customElements.define('x-element', XElement);
 
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <div id="app">
         <x-element>test</x-element>
       </div>
@@ -70,7 +81,7 @@ test('custom element', async ({ page }) => {
 
 test('shadow elements within shadow elements', async ({ page }) => {
   await page.evaluate(() => {
-    document.body.innerHTML = `<div id="app"></div>`;
+    document.body.innerHTML = /* HTML */ `<div id="app"></div>`;
     const internal = document.createElement('div');
     internal.id = 'internal';
     internal.attachShadow({ mode: 'open' }).appendChild(document.createElement('span'));
@@ -86,7 +97,7 @@ test('shadow elements within shadow elements', async ({ page }) => {
 
 test('nested shadow elements', async ({ page }) => {
   await page.evaluate(() => {
-    document.body.innerHTML = `<div id="app"></div>`;
+    document.body.innerHTML = /* HTML */ `<div id="app"></div>`;
     document.querySelector('#app')!.attachShadow({ mode: 'open' }).appendChild(document.createElement('slot'));
     const nested = document.createElement('div');
     nested.id = 'nested';
@@ -103,13 +114,21 @@ test('nested shadow elements', async ({ page }) => {
 
 test('part attribute', async ({ page }) => {
   await page.evaluate(() => {
-    document.body.innerHTML = `
-      <style> ::part(foo) { color: rgb(2, 2, 2) }</style>
+    document.body.innerHTML = /* HTML */ `
+      <style>
+        ::part(foo) {
+          color: rgb(2, 2, 2);
+        }
+      </style>
       <div id="app"></div>
     `;
     const shadow = document.querySelector('#app')!.attachShadow({ mode: 'open' });
-    shadow.innerHTML = `
-      <style> .test { color: rgb(1, 1, 1) }</style>
+    shadow.innerHTML = /* HTML */ `
+      <style>
+        .test {
+          color: rgb(1, 1, 1);
+        }
+      </style>
       <div part="foo" class="test"></div>
     `;
   });

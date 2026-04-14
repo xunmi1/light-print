@@ -46,7 +46,7 @@ test('visually consistent', async ({ page, browserName }, testInfo) => {
 });
 
 test('append style', async ({ page }, testInfo) => {
-  await page.evaluate(() => (document.body.innerHTML = `<div id="app">append style</div>`));
+  await page.evaluate(() => (document.body.innerHTML = /* HTML */ `<div id="app">append style</div>`));
   page.addStyleTag({ content: '#app { background: yellow; height: 10rem; width: 10rem; font-size: 2rem }' });
 
   const appendedStyle = '#app { background: blue }';

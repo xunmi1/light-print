@@ -5,7 +5,7 @@ import { waitResources } from 'src/resources';
 
 describe('normal resources', () => {
   test('successfully loaded', async () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <img src="https://example.com" loading="lazy" />
       <img src="demo-1.png" srcset="demo-1.png 100px, demo-2.png 200px" />
       <object data="https://example.com" type="image/svg+xml"></object>
@@ -31,7 +31,7 @@ describe('normal resources', () => {
   });
 
   test('failed to load', async () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <img class="error" src="1.png" />
       <img class="success" src="2.png" />
     `;
@@ -42,12 +42,14 @@ describe('normal resources', () => {
   });
 
   test('empty resource', async () => {
-    document.body.innerHTML = `<img srcset="" />`;
+    document.body.innerHTML = /* HTML */ `<img srcset="" />`;
     await expect(waitResources(document)).resolves.toBeUndefined();
   });
 
   test('image already loaded', async () => {
-    document.body.innerHTML = `<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=" />`;
+    document.body.innerHTML = /* HTML */ `<img
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
+    />`;
     const img = document.querySelector('img')!;
     // `happy-dom` doesn't support mocking image resource,
     Object.defineProperty(img, 'complete', { value: true });
@@ -55,7 +57,7 @@ describe('normal resources', () => {
   });
 
   test('media already have data', async () => {
-    document.body.innerHTML = `<audio src="https://example.com"></audio>`;
+    document.body.innerHTML = /* HTML */ `<audio src="https://example.com"></audio>`;
     const audio = document.querySelector('audio')!;
     // `happy-dom` doesn't support mocking media data
     // // `2` is `HTMLMediaElement.HAVE_CURRENT_DATA`
@@ -66,10 +68,10 @@ describe('normal resources', () => {
 
 describe('ignore link[ref="stylesheet"]', () => {
   test('ignore whether it has loaded', async () => {
-    document.body.innerHTML = `
-      <link rel="stylesheet" href="style.css">
-      <link rel="stylesheet" href="style.css" media="all">
-      <link rel="preload" as="style" href="style.css">
+    document.body.innerHTML = /* HTML */ `
+      <link rel="stylesheet" href="style.css" />
+      <link rel="stylesheet" href="style.css" media="all" />
+      <link rel="preload" as="style" href="style.css" />
     `;
     const result = waitResources(document);
     document.querySelectorAll('link').forEach(node => node.dispatchEvent(new Event('error')));

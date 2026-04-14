@@ -76,6 +76,10 @@ table {
     color: black;
   }
 
+  tr > td:first-child {
+    font-weight: bold;
+  }
+
   th,
   td {
     padding: 12px;

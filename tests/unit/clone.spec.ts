@@ -2,8 +2,12 @@ import { describe, expect, test } from 'vitest';
 import { getStyle, clone } from './utils';
 
 test('clone attributes', () => {
-  document.body.innerHTML = `
-    <style>* { display: block }</style>
+  document.body.innerHTML = /* HTML */ `
+    <style>
+      * {
+        display: block;
+      }
+    </style>
     <div id="app">
       <img src="" width="100" height="100" />
       <input type="file" placeholder="foo" />
@@ -23,8 +27,12 @@ test('clone attributes', () => {
 describe('hidden elements', () => {
   test('skip non-rendering element', () => {
     const size = 100;
-    document.body.innerHTML = `
-      <style>.ignore { font-size: ${size}px }</style>
+    document.body.innerHTML = /* HTML */ `
+      <style>
+        .ignore {
+          font-size: ${size}px;
+        }
+      </style>
       <div id="app">
         <source class="ignore" src="https://example.com/video.mp4" type="video/mp4" />
         <track class="ignore" src="https://example.com/captions.vtt" kind="captions" srclang="en" />
@@ -39,7 +47,7 @@ describe('hidden elements', () => {
   });
 
   test('doesn’t affect the current document', () => {
-    const innerHTML = `
+    const innerHTML = /* HTML */ `
       <style>.hidden { display: none }</style>
       <div id="app" class="hidden">
         <div class="hidden"></div>
@@ -51,8 +59,12 @@ describe('hidden elements', () => {
   });
 
   test('explicitly set to hidden', () => {
-    document.body.innerHTML = `
-      <style>.hidden { display: none }</style>
+    document.body.innerHTML = /* HTML */ `
+      <style>
+        .hidden {
+          display: none;
+        }
+      </style>
       <div id="app">
         <div id="start" class="hidden"></div>
         <div>
@@ -72,14 +84,14 @@ describe('hidden elements', () => {
   });
 
   test('hidden by default', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <div id="app">
         <style></style>
-        <link rel="stylesheet" href="style.css">
-        <link rel="preload" as="style">
-        <param>
-        <meta>
-        <base>
+        <link rel="stylesheet" href="style.css" />
+        <link rel="preload" as="style" />
+        <param />
+        <meta />
+        <base />
         <template></template>
         <script></script>
       </div>
@@ -94,13 +106,18 @@ describe('hidden elements', () => {
   });
 
   test('made visible again via styling', () => {
-    document.body.innerHTML = `
-      <style>.visible { display: block; height: 10px }</style>
+    document.body.innerHTML = /* HTML */ `
+      <style>
+        .visible {
+          display: block;
+          height: 10px;
+        }
+      </style>
       <div id="app">
-        <link class="visible">
-        <param class="visible">
-        <meta class="visible">
-        <base class="visible">
+        <link class="visible" />
+        <param class="visible" />
+        <meta class="visible" />
+        <base class="visible" />
         <template class="visible"></template>
         <script class="visible"></script>
       </div>

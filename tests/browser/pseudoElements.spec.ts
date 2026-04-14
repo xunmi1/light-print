@@ -8,11 +8,20 @@ test.beforeEach(async ({ page }) => {
 
 test('::before & ::after', async ({ page }, testInfo) => {
   await page.evaluate(() => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        #app { width: 100px; height: 50px; }
-        #app::before { content: 'before'; color: red; }
-        #app::after { content: 'after'; color: blue; }
+        #app {
+          width: 100px;
+          height: 50px;
+        }
+        #app::before {
+          content: 'before';
+          color: red;
+        }
+        #app::after {
+          content: 'after';
+          color: blue;
+        }
       </style>
       <div id="app"></div>
     `;
@@ -30,12 +39,15 @@ test('::before & ::after', async ({ page }, testInfo) => {
 test('::marker', async ({ page, browserName }, testInfo) => {
   test.skip(browserName === 'webkit', 'WebKit does not support `::marker`');
   await page.evaluate(() => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
         .marker {
           height: 50px;
           list-style-position: inside;
-          &::marker { content: '❤️'; font-size: 30px; }
+          &::marker {
+            content: '❤️';
+            font-size: 30px;
+          }
         }
       </style>
       <div id="app" style="width: 100px;">
@@ -56,10 +68,16 @@ test('::marker', async ({ page, browserName }, testInfo) => {
 
 test('::first-letter & ::first-line', async ({ page }, testInfo) => {
   await page.evaluate(() => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        #app::first-letter { font-size: 2rem; color: red; float: left; }
-        #app::first-line { color: blue; }
+        #app::first-letter {
+          font-size: 2rem;
+          color: red;
+          float: left;
+        }
+        #app::first-line {
+          color: blue;
+        }
       </style>
       <div id="app" style="width: 150px">
         <p>First letter and first line</p>
@@ -80,10 +98,18 @@ test('::first-letter & ::first-line', async ({ page }, testInfo) => {
 test('::placeholder', async ({ page, browserName }, testInfo) => {
   test.skip(browserName === 'webkit', 'WebKit does not support `::placeholder`');
   await page.evaluate(() => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        #app { width: 200px; display: flex; flex-direction: column; gap: 1rem; }
-        *::placeholder { background: darkblue; color: white; }
+        #app {
+          width: 200px;
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+        *::placeholder {
+          background: darkblue;
+          color: white;
+        }
       </style>
       <div id="app">
         <input placeholder="placeholder" />
@@ -107,10 +133,18 @@ test('::placeholder', async ({ page, browserName }, testInfo) => {
 test('::file-selector-button', async ({ page, browserName }, testInfo) => {
   test.skip(browserName === 'webkit', 'WebKit does not support `::file-selector-button`');
   await page.evaluate(() => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        #app { width: 200px; display: flex; flex-direction: column; gap: 1rem; }
-        input::file-selector-button { background: darkblue; color: white; }
+        #app {
+          width: 200px;
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+        input::file-selector-button {
+          background: darkblue;
+          color: white;
+        }
       </style>
       <div id="app">
         <input type="file" />
@@ -131,7 +165,7 @@ test('::file-selector-button', async ({ page, browserName }, testInfo) => {
 test('::details-content', async ({ page, browserName }, testInfo) => {
   test.skip(browserName === 'webkit', 'WebKit does not support `::details-content`');
   await page.evaluate(() => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
         details::details-content { background: blue; color: white; }
         summary { font-size: 2rem; }

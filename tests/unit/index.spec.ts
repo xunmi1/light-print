@@ -11,7 +11,7 @@ describe('return value', () => {
 
 describe('print target', () => {
   beforeEach(() => {
-    document.body.innerHTML = '<div id="app"></div>';
+    document.body.innerHTML = /* HTML */ `<div id="app"></div>`;
   });
 
   test('no target', async () => {
@@ -51,7 +51,10 @@ describe('print target', () => {
 
 describe('destroy', () => {
   test('restore the original state after printing', async () => {
-    const innerHTML = '<head></head><body><div id="app"></div></body>';
+    const innerHTML = /* HTML */ `<head></head>
+      <body>
+        <div id="app"></div>
+      </body>`.trim();
     document.documentElement.innerHTML = innerHTML;
     await lightPrint('#app');
     expect(document.documentElement.innerHTML).toBe(innerHTML);

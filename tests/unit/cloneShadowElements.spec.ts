@@ -2,10 +2,14 @@ import { expect, test } from 'vitest';
 import { clone } from './utils';
 
 test('open mode', () => {
-  document.body.innerHTML = `<div id="app"></div>`;
+  document.body.innerHTML = /* HTML */ `<div id="app"></div>`;
   const shadow = document.querySelector('#app')!.attachShadow({ mode: 'open' });
-  shadow.innerHTML = `
-    <style> #foo { color: rgb(2, 2, 2) !important; }</style>
+  shadow.innerHTML = /* HTML */ `
+    <style>
+      #foo {
+        color: rgb(2, 2, 2) !important;
+      }
+    </style>
     <div id="foo" style="color: rgb(1, 1, 1)"></div>
   `;
 
@@ -17,7 +21,7 @@ test('open mode', () => {
 });
 
 test('closed mode', () => {
-  document.body.innerHTML = `<div id="app"></div>`;
+  document.body.innerHTML = /* HTML */ `<div id="app"></div>`;
   document.querySelector('#app')!.attachShadow({ mode: 'closed' });
 
   const context = clone('#app');
@@ -26,10 +30,10 @@ test('closed mode', () => {
 });
 
 test('contains inputs', () => {
-  document.body.innerHTML = `<div id="app"></div>`;
+  document.body.innerHTML = /* HTML */ `<div id="app"></div>`;
   const shadow = document.querySelector('#app')!.attachShadow({ mode: 'open' });
   const select = document.createElement('select');
-  select.innerHTML = `
+  select.innerHTML = /* HTML */ `
     <option value="foo">foo</option>
     <option value="bar">bar</option>
   `;
@@ -46,8 +50,15 @@ test('custom element', () => {
     constructor() {
       super();
       const shadow = this.attachShadow({ mode: 'open' });
-      shadow.innerHTML = `
-        <style> :host { display: block } .content { color: #ccc; }</style>
+      shadow.innerHTML = /* HTML */ `
+        <style>
+          :host {
+            display: block;
+          }
+          .content {
+            color: #ccc;
+          }
+        </style>
         <div class="content"><slot></slot></div>
       `;
       this.id = 'custom';
@@ -55,7 +66,7 @@ test('custom element', () => {
   }
   window.customElements.define('x-element', XElement);
 
-  document.body.innerHTML = `
+  document.body.innerHTML = /* HTML */ `
     <div id="app">
       <x-element>test</x-element>
     </div>
@@ -69,7 +80,7 @@ test('custom element', () => {
 });
 
 test('adopted style sheets', () => {
-  document.body.innerHTML = `<div id="app"></div>`;
+  document.body.innerHTML = /* HTML */ `<div id="app"></div>`;
   const shadow = document.querySelector('#app')!.attachShadow({ mode: 'open' });
   const sheet = new window.CSSStyleSheet();
   sheet.replaceSync(':host { padding: 10px; }');
@@ -81,7 +92,7 @@ test('adopted style sheets', () => {
 });
 
 test('shadow root is clonable', () => {
-  document.body.innerHTML = `<div id="app"></div>`;
+  document.body.innerHTML = /* HTML */ `<div id="app"></div>`;
   const shadow = document.querySelector('#app')!.attachShadow({ mode: 'open', clonable: true });
   const span = document.createElement('span');
   shadow.appendChild(span);
@@ -92,7 +103,7 @@ test('shadow root is clonable', () => {
 });
 
 test('shadow elements within shadow elements', () => {
-  document.body.innerHTML = `<div id="app"></div>`;
+  document.body.innerHTML = /* HTML */ `<div id="app"></div>`;
   const internal = document.createElement('div');
   internal.id = 'internal';
   internal.attachShadow({ mode: 'open' }).appendChild(document.createElement('span'));
@@ -106,7 +117,7 @@ test('shadow elements within shadow elements', () => {
 });
 
 test('nested shadow elements', () => {
-  document.body.innerHTML = `<div id="app"></div>`;
+  document.body.innerHTML = /* HTML */ `<div id="app"></div>`;
   document.querySelector('#app')!.attachShadow({ mode: 'open' }).appendChild(document.createElement('slot'));
   const nested = document.createElement('div');
   nested.id = 'nested';
@@ -120,12 +131,16 @@ test('nested shadow elements', () => {
 });
 
 test('part attribute', () => {
-  document.body.innerHTML = `
-    <style> ::part(foo) { color: red; }</style>
+  document.body.innerHTML = /* HTML */ `
+    <style>
+      ::part(foo) {
+        color: red;
+      }
+    </style>
     <div id="app"></div>
   `;
   const shadow = document.querySelector('#app')!.attachShadow({ mode: 'open' });
-  shadow.innerHTML = `
+  shadow.innerHTML = /* HTML */ `
     <div id="foo" style="display: block" part="foo"></div>
     <div style="display: none" part="foo"></div>
   `;

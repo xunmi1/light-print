@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { preventPrintDialog, loadPrintScript, mockPrint } from './utils';
 
 test('emit print', async ({ page }) => {
-  await page.evaluate(() => (document.body.innerHTML = '<div id="app">empty</div>'));
+  await page.evaluate(() => (document.body.innerHTML = /* HTML */ `<div id="app">empty</div>`));
   const { promise, resolve } = Promise.withResolvers<void>();
   await page.exposeBinding('print', ({ frame }) => {
     resolve();
@@ -14,7 +14,7 @@ test('emit print', async ({ page }) => {
 });
 
 test('destroy', async ({ page }) => {
-  const innerHTML = `<div id="app">empty</div>`;
+  const innerHTML = /* HTML */ `<div id="app">empty</div>`;
   await page.evaluate(html => (document.body.innerHTML = html), innerHTML);
 
   const lightPrint = await loadPrintScript(page);

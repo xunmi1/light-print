@@ -3,11 +3,11 @@ import type { HTMLCanvasElement, HTMLOptionElement, HTMLVideoElement } from 'hap
 import { clone, getStyle } from './utils';
 
 test('iframe', () => {
-  document.body.innerHTML = `
-      <div id="app">
-        <iframe src="https://example.com/other.html" style="display: block"></iframe>
-      </div>
-    `;
+  document.body.innerHTML = /* HTML */ `
+    <div id="app">
+      <iframe src="https://example.com/other.html" style="display: block"></iframe>
+    </div>
+  `;
   const context = clone('#app');
   const target = context.document.querySelector('iframe')!;
   expect(target.src).toBe('https://example.com/other.html');
@@ -15,7 +15,7 @@ test('iframe', () => {
 
 describe('canvas', () => {
   test('normal', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <div id="app">
         <!-- 'happy-dom' BUG: display is falsy -->
         <canvas width="50" height="60" style="display: block"></canvas>
@@ -29,8 +29,8 @@ describe('canvas', () => {
   });
 
   test('zero size', () => {
-    document.body.innerHTML = `
-      <div id="app" >
+    document.body.innerHTML = /* HTML */ `
+      <div id="app">
         <canvas id="zeroHeight" width="50" height="0" style="display: block"></canvas>
         <canvas id="zeroWidth" width="0" height="50" style="display: block"></canvas>
       </div>
@@ -48,7 +48,7 @@ describe('canvas', () => {
 
 describe('media', () => {
   test('currentTime', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <div id="app">
         <!-- when audio has controls, display isn't 'none', but 'happy-dom' has BUG -->
         <audio src="https://example.com/audio.mp3" controls style="display: block"></audio>
@@ -67,7 +67,7 @@ describe('media', () => {
 
   test('currentSrc', () => {
     const src = 'https://example.com/video.mp4';
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <div id="app">
         <video id="selfSrc" src="${src}" style="display: block"></video>
         <video id="sourceSrc" style="display: block">
@@ -90,7 +90,7 @@ describe('media', () => {
 
 describe('form fields', () => {
   test('input', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <div id="app">
         <input type="text" value="foo" />
       </div>
@@ -101,7 +101,7 @@ describe('form fields', () => {
   });
 
   test('radio', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <div id="app">
         <input type="radio" name="foo" value="bar" />
       </div>
@@ -113,9 +113,9 @@ describe('form fields', () => {
 
   describe('checkbox', () => {
     beforeEach(() => {
-      document.body.innerHTML = `
+      document.body.innerHTML = /* HTML */ `
         <div id="app">
-          <input type="checkbox" name="foo" value="foo">
+          <input type="checkbox" name="foo" value="foo" />
         </div>
       `;
     });
@@ -135,7 +135,7 @@ describe('form fields', () => {
 
   describe('select', () => {
     beforeEach(() => {
-      document.body.innerHTML = `
+      document.body.innerHTML = /* HTML */ `
         <div id="app">
           <select>
             <option value="foo">foo</option>
@@ -163,7 +163,7 @@ describe('form fields', () => {
   });
 
   test('textarea', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <div id="app">
         <textarea>foo</textarea>
       </div>
@@ -176,11 +176,19 @@ describe('form fields', () => {
 
 describe('svg', () => {
   test('size with viewBox', () => {
-    document.body.innerHTML = `
-      <style>svg { display: block; width: 48px; height: 24px }</style>
+    document.body.innerHTML = /* HTML */ `
+      <style>
+        svg {
+          display: block;
+          width: 48px;
+          height: 24px;
+        }
+      </style>
       <div id="app" style="width: 24px">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+          <path
+            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+          ></path>
         </svg>
       </div>
     `;
@@ -191,11 +199,19 @@ describe('svg', () => {
   });
 
   test('size without viewBox', () => {
-    document.body.innerHTML = `
-      <style>svg { display: block; width: 48px; height: 56px }</style>
+    document.body.innerHTML = /* HTML */ `
+      <style>
+        svg {
+          display: block;
+          width: 48px;
+          height: 56px;
+        }
+      </style>
       <div id="app">
         <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+          <path
+            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+          ></path>
         </svg>
       </div>
     `;
@@ -208,12 +224,16 @@ describe('svg', () => {
 
 describe('body', () => {
   test('body style', () => {
-    document.documentElement.innerHTML = `
-    <head>
-      <style>body { margin: 12px }</style>
-    </head>
-    <body></body>
-  `;
+    document.documentElement.innerHTML = /* HTML */ `
+      <head>
+        <style>
+          body {
+            margin: 12px;
+          }
+        </style>
+      </head>
+      <body></body>
+    `;
     const context = clone('body');
     expect(getStyle(context.document, 'body').margin).toBe('12px');
   });

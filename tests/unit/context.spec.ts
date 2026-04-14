@@ -1,6 +1,7 @@
 import { describe, expect, test, vi } from 'vitest';
 
 import { createContext } from 'src/context';
+import type { Document } from 'happy-dom';
 import { getStyle } from './utils';
 
 test('create context', () => {
@@ -24,7 +25,7 @@ describe('getSelector', () => {
   test('doesn’t affect common attributes', () => {
     const context = createContext();
     context.bind(document);
-    document.body.innerHTML = `<div id="app" class="foo"></div>`;
+    document.body.innerHTML = /* HTML */ `<div id="app" class="foo"></div>`;
     const app = document.querySelector('#app')!;
     context.getSelector(app);
     expect(app.id).toBe('app');
@@ -34,7 +35,8 @@ describe('getSelector', () => {
   test('different elements, different selectors', () => {
     const context = createContext();
     context.bind(document);
-    document.body.innerHTML = `<div class="a">a</div><div class="b">b</div>`;
+    document.body.innerHTML = /* HTML */ `<div class="a">a</div>
+      <div class="b">b</div>`;
     const selector1 = context.getSelector(document.querySelector('.a')!);
     const selector2 = context.getSelector(document.querySelector('.b')!);
     expect(selector1).not.toBe(selector2);
@@ -43,7 +45,7 @@ describe('getSelector', () => {
   test('same elements, same selectors', () => {
     const context = createContext();
     context.bind(document);
-    document.body.innerHTML = `<div class="a">a</div>`;
+    document.body.innerHTML = /* HTML */ `<div class="a">a</div>`;
     const selector1 = context.getSelector(document.querySelector('.a')!);
     const selector2 = context.getSelector(document.querySelector('.a')!);
     expect(selector1).toBe(selector2);
@@ -52,9 +54,9 @@ describe('getSelector', () => {
 
 describe('style', () => {
   test('must be mounted to take effect', () => {
-    const context = createContext();
+    const context = createContext<Document>();
     context.bind(new Window().document);
-    context.document.body.innerHTML = `<div class="test"></div>`;
+    context.document.body.innerHTML = /* HTML */ `<div class="test"></div>`;
 
     context.appendStyle('.test { color: red; }');
     expect(getStyle(context.document, '.test').color).toBeFalsy();
@@ -64,9 +66,9 @@ describe('style', () => {
   });
 
   test('must be appended before mounting', () => {
-    const context = createContext();
+    const context = createContext<Document>();
     context.bind(new Window().document);
-    context.document.body.innerHTML = `<div class="test"></div>`;
+    context.document.body.innerHTML = /* HTML */ `<div class="test"></div>`;
 
     context.mountStyle();
     expect(getStyle(context.document, '.test').color).toBeFalsy();
@@ -79,7 +81,7 @@ describe('style', () => {
   test('change mount location', () => {
     const context = createContext();
     context.bind(document);
-    document.body.innerHTML = `<div class="test"></div>`;
+    document.body.innerHTML = /* HTML */ `<div class="test"></div>`;
     context.appendStyle('.test { color: red; }');
     context.mountStyle(document.body);
     expect(getStyle(document, '.test').color).toBe('red');
@@ -89,7 +91,7 @@ describe('style', () => {
     const context = createContext();
     const newWindow = new Window();
     context.bind(newWindow.document);
-    window.document.body.innerHTML = `<div class="test"></div>`;
+    window.document.body.innerHTML = /* HTML */ `<div class="test"></div>`;
 
     context.appendStyle('.test { color: red; }');
     context.mountStyle();
@@ -97,9 +99,9 @@ describe('style', () => {
   });
 
   test('empty styles should not be appended', () => {
-    const context = createContext();
+    const context = createContext<Document>();
     context.bind(new Window().document);
-    context.document.body.innerHTML = `<div class="test"></div>`;
+    context.document.body.innerHTML = /* HTML */ `<div class="test"></div>`;
 
     context.appendStyle();
     context.mountStyle();
@@ -131,12 +133,12 @@ describe('style', () => {
   });
 
   test('isolation', () => {
-    const context1 = createContext();
+    const context1 = createContext<Document>();
     context1.bind(document);
     context1.appendStyle('body { color: red; }');
     context1.mountStyle();
 
-    const context2 = createContext();
+    const context2 = createContext<Document>();
     context2.bind(new Window().document);
     expect(getStyle(context2.document, 'body').color).toBeFalsy();
   });
@@ -144,7 +146,7 @@ describe('style', () => {
 
 describe('tasks', () => {
   test('addTask', () => {
-    const context = createContext();
+    const context = createContext<Document>();
     expect(() => context.addTask(() => {})).not.toThrow();
     expect(context.addTask(() => {})).toBeUndefined();
   });

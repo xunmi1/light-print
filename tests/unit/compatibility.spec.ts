@@ -5,7 +5,7 @@ describe('compatibility', () => {
   test('Promise', async () => {
     // @ts-expect-error
     window.Promise.withResolvers = undefined;
-    document.body.innerHTML = '<div id="app"></div>';
+    document.body.innerHTML = /* HTML */ `<div id="app"></div>`;
     await expect(lightPrint('#app')).resolves.toBeUndefined();
   });
 
@@ -18,7 +18,7 @@ describe('compatibility', () => {
       },
     });
     vi.stubGlobal('navigator', mockIE.navigator);
-    window.document.body.innerHTML = '<div id="app"></div>';
+    window.document.body.innerHTML = /* HTML */ `<div id="app"></div>`;
     await expect(lightPrint('#app')).resolves.toBeUndefined();
     vi.unstubAllGlobals();
   });

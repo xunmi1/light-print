@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
 test.describe('canvas', () => {
   test('2d', async ({ page }, testInfo) => {
     await page.evaluate(() => {
-      document.body.innerHTML = `<canvas width="120" height="50"></canvas>`;
+      document.body.innerHTML = /* HTML */ `<canvas width="120" height="50"></canvas>`;
       const ctx = document.querySelector('canvas')!.getContext('2d')!;
       ctx.font = '2rem system-ui';
       ctx.fillStyle = 'black';
@@ -30,7 +30,7 @@ test.describe('canvas', () => {
     // @see https://bugzilla.mozilla.org/show_bug.cgi?id=1375585
     test.skip(browserName === 'firefox' && headless, 'Firefox does not support WebGL in headless mode');
     await page.evaluate(() => {
-      document.body.innerHTML = `<canvas width="50" height="50"></canvas>`;
+      document.body.innerHTML = /* HTML */ `<canvas width="50" height="50"></canvas>`;
       const gl = document.querySelector('canvas')!.getContext('webgl2', { preserveDrawingBuffer: true })!;
       gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
       gl.clearColor(1, 0, 1, 1);
@@ -48,11 +48,11 @@ test.describe('canvas', () => {
 
   test('zero size', async ({ page }) => {
     await page.evaluate(() => {
-      document.body.innerHTML = `
+      document.body.innerHTML = /* HTML */ `
         <div id="app">
-           <canvas width="50" height="0"></canvas>
-           <canvas width="0" height="50"></canvas>
-           <canvas width="50" height="50" style="display: none"></canvas>
+          <canvas width="50" height="0"></canvas>
+          <canvas width="0" height="50"></canvas>
+          <canvas width="50" height="50" style="display: none"></canvas>
         </div>
       `;
     });
@@ -64,11 +64,19 @@ test.describe('canvas', () => {
 test.describe('svg', () => {
   test('size with viewBox', async ({ page }) => {
     await page.evaluate(() => {
-      document.body.innerHTML = `
-        <style>svg { display: block; width: 48px; height: 24px }</style>
+      document.body.innerHTML = /* HTML */ `
+        <style>
+          svg {
+            display: block;
+            width: 48px;
+            height: 24px;
+          }
+        </style>
         <div id="app" style="width: 24px">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+            <path
+              d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+            ></path>
           </svg>
         </div>
       `;
@@ -85,11 +93,19 @@ test.describe('svg', () => {
 
   test('size without viewBox', async ({ page }) => {
     await page.evaluate(() => {
-      document.body.innerHTML = `
-        <style>svg { display: block; width: 48px; height: 56px }</style>
+      document.body.innerHTML = /* HTML */ `
+        <style>
+          svg {
+            display: block;
+            width: 48px;
+            height: 56px;
+          }
+        </style>
         <div id="app">
           <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+            <path
+              d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+            ></path>
           </svg>
         </div>
       `;
@@ -106,7 +122,7 @@ test.describe('svg', () => {
 test.describe('form fields', () => {
   test('input', async ({ page }) => {
     await page.evaluate(() => {
-      document.body.innerHTML = `
+      document.body.innerHTML = /* HTML */ `
         <div id="app">
           <input type="text" value="foo" />
           <input type="radio" />
@@ -133,7 +149,7 @@ test.describe('form fields', () => {
 
   test('select & option', async ({ page }) => {
     await page.evaluate(() => {
-      document.body.innerHTML = `
+      document.body.innerHTML = /* HTML */ `
         <select>
           <option value="foo">foo</option>
           <option value="bar">bar</option>
@@ -154,7 +170,7 @@ test.describe('form fields', () => {
 
   test('textarea', async ({ page }) => {
     await page.evaluate(() => {
-      document.body.innerHTML = `<textarea>foo</textarea>`;
+      document.body.innerHTML = /* HTML */ `<textarea>foo</textarea>`;
       document.querySelector('textarea')!.value = 'bar';
     });
     const lightPrint = await loadPrintScript(page);
@@ -169,8 +185,14 @@ test.describe('media', () => {
     test.skip(browserName === 'webkit', 'WebKit browser video tests are flaky');
     await page.goto('/examples/nest.html');
     await page.evaluate(() => {
-      document.body.innerHTML = `
-        <style>video { display: block; width: 240px; height: 80px; } </style>
+      document.body.innerHTML = /* HTML */ `
+        <style>
+          video {
+            display: block;
+            width: 240px;
+            height: 80px;
+          }
+        </style>
         <div id="app">
           <video src="./assets/video.mp4" muted></video>
         </div>
@@ -189,8 +211,8 @@ test.describe('media', () => {
 
 test('scroll state', async ({ page }) => {
   await page.evaluate(() => {
-    document.body.innerHTML = `
-      <div id="app" >
+    document.body.innerHTML = /* HTML */ `
+      <div id="app">
         <div id="outer" style="width: 100px; height: 100px; overflow: auto">
           <div id="inner" style="width: 200px; height: 200px; overflow: auto">
             <div style="width: 300px; height: 300px"></div>

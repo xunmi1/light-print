@@ -4,7 +4,7 @@ class TimeNow extends HTMLElement {
   constructor() {
     super();
     const shadowRoot = this.attachShadow({ mode: 'open' });
-    shadowRoot.innerHTML = `
+    shadowRoot.innerHTML = /* HTML */ `
       <style>
         :host { display: block } .time { font-family: sans-serif }
         ::slotted([slot="label"])::after { content: ':'; margin: 0 4px 0 2px; }

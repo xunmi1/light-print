@@ -11,9 +11,12 @@ import { BLOCK_CONTAINER_DISPLAY } from 'src/utils';
 
 describe.each([{ type: '::before' }, { type: '::after' }])('$type', ({ type }) => {
   test('"content" is required', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        [${SELECTOR_NAME}="1"]${type} { content: 'before'; color: red; }
+        [${SELECTOR_NAME}='1']${type} {
+          content: 'before';
+          color: red;
+        }
       </style>
       <div id="app">
         <div ${SELECTOR_NAME}="1"></div>
@@ -24,9 +27,11 @@ describe.each([{ type: '::before' }, { type: '::after' }])('$type', ({ type }) =
   });
 
   test('no "content"', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        [${SELECTOR_NAME}="1"]${type} { color: red; }
+        [${SELECTOR_NAME}='1']${type} {
+          color: red;
+        }
       </style>
       <div id="app">
         <div ${SELECTOR_NAME}="1"></div>
@@ -39,9 +44,11 @@ describe.each([{ type: '::before' }, { type: '::after' }])('$type', ({ type }) =
 
 describe('::marker', () => {
   test('element’s display should be "list-item"', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        [${SELECTOR_NAME}="1"]::marker { color: red; }
+        [${SELECTOR_NAME}='1']::marker {
+          color: red;
+        }
       </style>
       <div id="app">
         <div ${SELECTOR_NAME}="1" style="display: list-item"></div>
@@ -52,9 +59,11 @@ describe('::marker', () => {
   });
 
   test('element’s display is not "list-item"', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        [${SELECTOR_NAME}="1"]::marker { color: red; }
+        [${SELECTOR_NAME}='1']::marker {
+          color: red;
+        }
       </style>
       <div id="app">
         <div ${SELECTOR_NAME}="1"></div>
@@ -70,7 +79,7 @@ describe.each([{ type: '::first-letter' }, { type: '::first-line' }])('$type', (
   test('element’s display should be "block"', () => {
     const displays = BLOCK_CONTAINER_DISPLAY;
 
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
         ${displays.map((_, i) => `[${SELECTOR_NAME}="${i + 1}"]${type} { color: red; }`).join('')}
       </style>
@@ -86,9 +95,11 @@ describe.each([{ type: '::first-letter' }, { type: '::first-line' }])('$type', (
   });
 
   test('element’s display is not "block"', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        [${SELECTOR_NAME}="1"]${type} { color: red; }
+        [${SELECTOR_NAME}='1']${type} {
+          color: red;
+        }
       </style>
       <div id="app">
         <div ${SELECTOR_NAME}="1" style="display: inline"></div>
@@ -101,10 +112,14 @@ describe.each([{ type: '::first-letter' }, { type: '::first-line' }])('$type', (
 
 describe('::placeholder', () => {
   test('input && textarea', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        [${SELECTOR_NAME}="1"]::placeholder { color: red; }
-        [${SELECTOR_NAME}="2"]::placeholder { color: blue; }
+        [${SELECTOR_NAME}='1']::placeholder {
+          color: red;
+        }
+        [${SELECTOR_NAME}='2']::placeholder {
+          color: blue;
+        }
       </style>
       <div id="app">
         <input ${SELECTOR_NAME}="1" placeholder="foo" />
@@ -117,9 +132,11 @@ describe('::placeholder', () => {
   });
 
   test('no placeholder', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        [${SELECTOR_NAME}="1"]::placeholder { color: red; }
+        [${SELECTOR_NAME}='1']::placeholder {
+          color: red;
+        }
       </style>
       <div id="app">
         <input ${SELECTOR_NAME}="1" />
@@ -130,9 +147,11 @@ describe('::placeholder', () => {
   });
 
   test('neither input nor textarea', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        [${SELECTOR_NAME}="1"]::placeholder { color: red; }
+        [${SELECTOR_NAME}='1']::placeholder {
+          color: red;
+        }
       </style>
       <div id="app">
         <div ${SELECTOR_NAME}="1"></div>
@@ -145,9 +164,11 @@ describe('::placeholder', () => {
 
 describe('::file-selector-button', () => {
   test('input type="file"', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        [${SELECTOR_NAME}="1"]::file-selector-button { color: red; }
+        [${SELECTOR_NAME}='1']::file-selector-button {
+          color: red;
+        }
       </style>
       <div id="app">
         <input type="file" ${SELECTOR_NAME}="1" />
@@ -158,9 +179,11 @@ describe('::file-selector-button', () => {
   });
 
   test('input’s type is not "file"', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        [${SELECTOR_NAME}="1"]::file-selector-button { color: red; }
+        [${SELECTOR_NAME}='1']::file-selector-button {
+          color: red;
+        }
       </style>
       <div id="app">
         <input ${SELECTOR_NAME}="1" type="text" />
@@ -171,9 +194,11 @@ describe('::file-selector-button', () => {
   });
 
   test('no input element', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        [${SELECTOR_NAME}="1"]::file-selector-button { color: red; }
+        [${SELECTOR_NAME}='1']::file-selector-button {
+          color: red;
+        }
       </style>
       <div id="app">
         <div ${SELECTOR_NAME}="1"></div>
@@ -186,9 +211,11 @@ describe('::file-selector-button', () => {
 
 describe('::details-content', () => {
   test('details', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        [${SELECTOR_NAME}="1"]::details-content { color: red; }
+        [${SELECTOR_NAME}='1']::details-content {
+          color: red;
+        }
       </style>
       <div id="app">
         <details ${SELECTOR_NAME}="1">
@@ -201,9 +228,11 @@ describe('::details-content', () => {
   });
 
   test('no details element', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        [${SELECTOR_NAME}="1"]::details-content { color: red; }
+        [${SELECTOR_NAME}='1']::details-content {
+          color: red;
+        }
       </style>
       <div id="app">
         <div ${SELECTOR_NAME}="1"></div>

@@ -3,10 +3,19 @@ import { getStyle, clone } from './utils';
 
 describe('inline & external style', () => {
   test('basic', () => {
-    document.body.innerHTML = `
-      <style>.test { color: white; display: flex; }</style>
+    document.body.innerHTML = /* HTML */ `
+      <style>
+        .test {
+          color: white;
+          display: flex;
+        }
+      </style>
       <div id="app">
-        <style>.test { padding: 8px }</style>
+        <style>
+          .test {
+            padding: 8px;
+          }
+        </style>
         <div class="only-inline" style="height: 10rem">style</div>
         <div class="no-inline test">style</div>
         <div class="has-inline test" style="color: red; font-size: 2rem">style</div>
@@ -28,8 +37,12 @@ describe('inline & external style', () => {
   });
 
   test('external style !important', () => {
-    document.body.innerHTML = `
-      <style>#app { color: blue !important }</style>
+    document.body.innerHTML = /* HTML */ `
+      <style>
+        #app {
+          color: blue !important;
+        }
+      </style>
       <div id="app" style="color: red"></div>
     `;
     const context = clone('#app');
@@ -37,8 +50,12 @@ describe('inline & external style', () => {
   });
 
   test('inline style !important', () => {
-    document.body.innerHTML = `
-      <style>#app { color: blue }</style>
+    document.body.innerHTML = /* HTML */ `
+      <style>
+        #app {
+          color: blue;
+        }
+      </style>
       <div id="app" style="color: red !important"></div>
     `;
     const context = clone('#app');
@@ -48,8 +65,12 @@ describe('inline & external style', () => {
 
 describe('additional styles', () => {
   test('override the original styles', () => {
-    document.body.innerHTML = `
-      <style>#app { color: red !important }</style>
+    document.body.innerHTML = /* HTML */ `
+      <style>
+        #app {
+          color: red !important;
+        }
+      </style>
       <div id="app"></div>
     `;
     let context = clone('#app', `#app { color: blue }`);
@@ -60,8 +81,12 @@ describe('additional styles', () => {
   });
 
   test('minimum specificity: (0,1,0)', () => {
-    document.body.innerHTML = `
-      <style>div { color: red }</style>
+    document.body.innerHTML = /* HTML */ `
+      <style>
+        div {
+          color: red;
+        }
+      </style>
       <div id="app" class="test"></div>
     `;
     let context = clone('#app', `div { color: blue }`);
@@ -74,12 +99,20 @@ describe('additional styles', () => {
 
 describe('style position', () => {
   test('outside', () => {
-    document.body.innerHTML = `
-      <style>.test { color: red }</style>
+    document.body.innerHTML = /* HTML */ `
+      <style>
+        .test {
+          color: red;
+        }
+      </style>
       <div id="app">
         <div class="test">style</div>
       </div>
-      <style>.test { background: red }</style>
+      <style>
+        .test {
+          background: red;
+        }
+      </style>
     `;
     const context = clone('#app');
     const targetStyle = getStyle(context.document, '.test');
@@ -88,11 +121,19 @@ describe('style position', () => {
   });
 
   test('inside', () => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <div id="app">
-        <style>.test { color: red }</style>
+        <style>
+          .test {
+            color: red;
+          }
+        </style>
         <div class="test">style</div>
-        <style>.test { background: red }</style>
+        <style>
+          .test {
+            background: red;
+          }
+        </style>
       </div>
     `;
     const context = clone('#app');
@@ -104,11 +145,18 @@ describe('style position', () => {
 
 // Accurate testing is impossible in a mock environment; precise validation happens in E2E tests.
 test('table width', () => {
-  document.body.innerHTML = `
-    <style>table { table-layout: fixed; width: 20px }</style>
+  document.body.innerHTML = /* HTML */ `
+    <style>
+      table {
+        table-layout: fixed;
+        width: 20px;
+      }
+    </style>
     <div id="app" style="width: 100px">
       <table>
-        <tr><td class="test">light-print</td></tr>
+        <tr>
+          <td class="test">light-print</td>
+        </tr>
       </table>
     </div>
   `;
@@ -119,10 +167,15 @@ test('table width', () => {
 
 // Accurate testing is impossible in a mock environment; precise validation happens in E2E tests.
 test('style: aspect-ratio', () => {
-  document.body.innerHTML = `
+  document.body.innerHTML = /* HTML */ `
     <style>
-      #ratio1 { width: 20px !important; height: 10px }
-      #ratio2 { width: 20px !important }
+      #ratio1 {
+        width: 20px !important;
+        height: 10px;
+      }
+      #ratio2 {
+        width: 20px !important;
+      }
     </style>
     <div id="app">
       <div id="ratio1" style="aspect-ratio: 1; width: 10px;"></div>
@@ -144,9 +197,13 @@ describe('effect box size', () => {
   test('padding', () => {
     const size = 36;
     const padding = 8;
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        #app { padding: 0px !important; width: ${size}px; height: ${size}px; }
+        #app {
+          padding: 0px !important;
+          width: ${size}px;
+          height: ${size}px;
+        }
       </style>
       <div id="app" style="padding: ${padding}px; display: inline-block; box-sizing: border-box;">
         <div style="width: ${size - padding * 2}px; height: ${size - padding * 2}px; box-sizing: border-box;"></div>
@@ -162,12 +219,18 @@ describe('effect box size', () => {
   test('border-width', () => {
     const size = 36;
     const borderWidth = 8;
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
-        #app { border: none !important; width: ${size}px; height: ${size}px; }
+        #app {
+          border: none !important;
+          width: ${size}px;
+          height: ${size}px;
+        }
       </style>
       <div id="app" style="border: ${borderWidth}px solid black; display: inline-block; box-sizing: border-box;">
-        <div style="width: ${size - borderWidth * 2}px; height: ${size - borderWidth * 2}px; box-sizing: border-box;"></div>
+        <div
+          style="width: ${size - borderWidth * 2}px; height: ${size - borderWidth * 2}px; box-sizing: border-box;"
+        ></div>
       </div>
     `;
 
@@ -179,7 +242,7 @@ describe('effect box size', () => {
 });
 
 test('CSS counters', () => {
-  document.body.innerHTML = `
+  document.body.innerHTML = /* HTML */ `
     <style>
       #app {
         list-style-type: none;
@@ -209,8 +272,12 @@ test('CSS counters', () => {
 });
 
 test('border-width', () => {
-  document.body.innerHTML = `
-    <style> #app { border: 0px solid red; }</style>
+  document.body.innerHTML = /* HTML */ `
+    <style>
+      #app {
+        border: 0px solid red;
+      }
+    </style>
     <div id="app">
       <button>default border</button>
     </div>

@@ -10,10 +10,17 @@ test.beforeEach(async ({ page }) => {
 test.describe('display: table', () => {
   test('table-layout: fixed', async ({ page }) => {
     await page.evaluate(() => {
-      document.body.innerHTML = `
+      document.body.innerHTML = /* HTML */ `
         <style>
-          table { table-layout: fixed; width: 100%; }
-          .ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+          table {
+            table-layout: fixed;
+            width: 100%;
+          }
+          .ellipsis {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
         </style>
         <div id="app" style="width: 50px;">
           <table>
@@ -39,10 +46,15 @@ test.describe('display: table', () => {
 
   test('table-layout: auto', async ({ page }) => {
     await page.evaluate(() => {
-      document.body.innerHTML = `
+      document.body.innerHTML = /* HTML */ `
         <style>
-          table { table-layout: auto; width: 100px; }
-          .box { width: 50px !important; }
+          table {
+            table-layout: auto;
+            width: 100px;
+          }
+          .box {
+            width: 50px !important;
+          }
         </style>
         <div id="app">
           <table style="border-spacing: 0">
@@ -70,10 +82,15 @@ test.describe('display: table', () => {
 test.describe('aspectRatio', () => {
   test('style: aspect-ratio', async ({ page }) => {
     await page.evaluate(() => {
-      document.body.innerHTML = `
+      document.body.innerHTML = /* HTML */ `
         <style>
-          #ratio1 { width: 20px !important; height: 10px }
-          #ratio2 { width: 20px !important; }
+          #ratio1 {
+            width: 20px !important;
+            height: 10px;
+          }
+          #ratio2 {
+            width: 20px !important;
+          }
         </style>
         <div id="app">
           <div id="ratio1" style="aspect-ratio: 1; width: 10px;"></div>
@@ -99,8 +116,14 @@ test.describe('aspectRatio', () => {
     const dataURL = `data:image/svg+xml;base64,${imageBuffer.toString('base64')}`;
 
     await page.evaluate(url => {
-      document.body.innerHTML = `
-        <style>img { display: block; width: 130px; height: 60px; } </style>
+      document.body.innerHTML = /* HTML */ `
+        <style>
+          img {
+            display: block;
+            width: 130px;
+            height: 60px;
+          }
+        </style>
         <div id="app">
           <img src="${url}" height="40" />
         </div>
@@ -120,12 +143,23 @@ test('padding/border affect size', async ({ page }) => {
   const padding = 8;
   await page.evaluate(
     params => {
-      document.body.innerHTML = `
+      document.body.innerHTML = /* HTML */ `
         <style>
-          #app { padding: 0px !important; border: 0px !important; width: ${params.size}px; height: ${params.size}px; }
+          #app {
+            padding: 0px !important;
+            border: 0px !important;
+            width: ${params.size}px;
+            height: ${params.size}px;
+          }
         </style>
-        <div id="app" style="padding: ${params.padding}px; border: ${params.padding}px solid black; display: inline-block; box-sizing: border-box;">
-          <div style="width: ${params.size - params.padding * 4}px; height: ${params.size - params.padding * 4}px; box-sizing: border-box;"></div>
+        <div
+          id="app"
+          style="padding: ${params.padding}px; border: ${params.padding}px solid black; display: inline-block; box-sizing: border-box;"
+        >
+          <div
+            style="width: ${params.size - params.padding * 4}px; height: ${params.size -
+            params.padding * 4}px; box-sizing: border-box;"
+          ></div>
         </div>
       `;
     },
@@ -141,7 +175,7 @@ test('padding/border affect size', async ({ page }) => {
 
 test('CSS counters', async ({ page }, testInfo) => {
   await page.evaluate(() => {
-    document.body.innerHTML = `
+    document.body.innerHTML = /* HTML */ `
       <style>
         #app {
           list-style-type: none;
@@ -179,8 +213,12 @@ test('CSS counters', async ({ page }, testInfo) => {
 
 test('border-width', async ({ page }) => {
   await page.evaluate(() => {
-    document.body.innerHTML = `
-      <style> #app { border: 0px solid red; }</style>
+    document.body.innerHTML = /* HTML */ `
+      <style>
+        #app {
+          border: 0px solid red;
+        }
+      </style>
       <div id="app">
         <button>default border</button>
       </div>

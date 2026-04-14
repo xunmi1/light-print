@@ -18,7 +18,7 @@ test('Google Search', async ({ page }, testInfo) => {
     document.body.id = 'app';
     const style = document.createElement('style');
     // Speed up execution
-    style.textContent = `* { box-sizing: border-box }`;
+    style.textContent = /* CSS */ `* { box-sizing: border-box }`;
     document.body.prepend(style);
   });
   // Hide `Choose Chrome` popup
@@ -42,7 +42,7 @@ test('GitHub Repository', async ({ page }, testInfo) => {
   await page.evaluate(() => {
     document.body.id = 'app';
     const style = document.createElement('style');
-    style.textContent = `* { box-sizing: border-box }`;
+    style.textContent = /* CSS */ `* { box-sizing: border-box }`;
     document.body.prepend(style);
   });
   await screenshot(page.locator('#app'), { fileName: 'github.png', testInfo });
@@ -62,7 +62,7 @@ test('Node.js Homepage', async ({ page }, testInfo) => {
   await page.evaluate(() => {
     document.body.id = 'app';
     const style = document.createElement('style');
-    style.textContent = `* { box-sizing: border-box }`;
+    style.textContent = /* CSS */ `* { box-sizing: border-box }`;
     document.body.prepend(style);
   });
   await screenshot(page.locator('#app'), { fileName: 'nodejs.png', testInfo });

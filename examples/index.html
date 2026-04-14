@@ -125,8 +125,8 @@
   <script type="module">
     import lightPrint from '../dist/light-print.js';
 
-    const pageSize = `@page { size: A4 portrait; margin: 10mm }`;
-    const fontFaceSet = `
+    const pageSize = /* CSS */ `@page { size: A4 portrait; margin: 10mm }`;
+    const fontFaceSet = /* CSS */ `
       @font-face {
         font-family: 'Bitcount Grid Double';
         font-weight: 400;
