@@ -7,9 +7,9 @@ import {
   isRenderingElement,
   isDisplayed,
   isExternalStyleElement,
-  traverse,
   type ElementWithStyle,
 } from './utils';
+import { traverse } from './traverse';
 import { getStyle, getElementStyle, getPseudoElementStyle, PSEUDO_ELECTORS, composeRule } from './style';
 import { isOpenShadowElement, cloneOpenShadowRoot, type ShadowElement } from './shadowDOM';
 

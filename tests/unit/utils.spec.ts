@@ -1,6 +1,5 @@
 import { describe, test, expect, vi } from 'vitest';
-import { bindOnceEvent, isDisplayed, normalizeNode, traverse } from 'src/utils';
-import { type Element, HTMLDivElement } from 'happy-dom';
+import { bindOnceEvent, isDisplayed, normalizeNode } from 'src/utils';
 
 test('normalizeNode', () => {
   const element = document.createElement('div');
@@ -32,63 +31,5 @@ describe('isDisplayed', () => {
     expect(isDisplayed(element.style)).toBe(false);
     element.style.display = 'block';
     expect(isDisplayed(element.style)).toBe(true);
-  });
-});
-
-describe('traverse', () => {
-  test('visitor', () => {
-    const origin = document.createElement('div');
-    origin.appendChild(document.createElement('div')).appendChild(document.createElement('div'));
-    const fn = vi.fn(() => true);
-    traverse(fn, origin.cloneNode(true), origin);
-    expect(fn).toHaveBeenCalledTimes(3);
-  });
-
-  test('prune children', () => {
-    const origin = document.createElement('div');
-    const nested = document.createElement('div');
-    origin.appendChild(nested).appendChild(document.createElement('div'));
-    nested.id = 'nested';
-    const target = origin.cloneNode(true);
-    const fn = vi.fn((el: Element) => el.id !== 'nested');
-    traverse(fn, target, origin);
-    expect(fn).toHaveBeenCalledTimes(2);
-    expect(target.querySelector('#nested')).toBeNull();
-    expect(origin.querySelector('#nested')).toBe(nested);
-  });
-
-  test('not rely on element-specific properties', () => {
-    // The custom element can override `children` and `childNodes`
-    class XElement extends HTMLDivElement {
-      get children(): HTMLDivElement['children'] {
-        throw new Error('Not allowed');
-      }
-
-      get childNodes(): HTMLDivElement['childNodes'] {
-        throw new Error('Not allowed');
-      }
-    }
-    window.customElements.define('x-element', XElement);
-    const origin = document.createElement('x-element');
-    origin.appendChild(document.createElement('div'));
-    const fn = vi.fn(() => true);
-    traverse(fn, origin.cloneNode(true), origin);
-    expect(fn).toHaveBeenCalledTimes(2);
-  });
-
-  test('child must be element', () => {
-    const origin = document.createElement('div');
-    origin.append(document.createTextNode('foo'), document.createElement('div'));
-    const fn = vi.fn(() => true);
-    traverse(fn, origin.cloneNode(true), origin);
-    expect(fn).toHaveBeenCalledTimes(2);
-  });
-
-  test('root can be non-element', () => {
-    const origin = document.createDocumentFragment();
-    origin.appendChild(document.createElement('div'));
-    const fn = vi.fn(() => true);
-    traverse(fn, origin.cloneNode(true), origin);
-    expect(fn).toHaveBeenCalledTimes(2);
   });
 });

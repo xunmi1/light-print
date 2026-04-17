@@ -1,5 +1,6 @@
 import { createContext, type Context } from './context';
-import { getOwnerWindow, traverse } from './utils';
+import { getOwnerWindow } from './utils';
+import { traverse } from './traverse';
 
 export type ShadowElement<E extends Element = Element, Mode extends ShadowRoot['mode'] = ShadowRoot['mode']> = E & {
   shadowRoot: Omit<ShadowRoot, 'mode'> & { readonly mode: Mode };
