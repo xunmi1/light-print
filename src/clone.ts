@@ -13,14 +13,13 @@ import {
 import { getStyle, getElementStyle, getPseudoElementStyle, PSEUDO_ELECTORS, composeRule } from './style';
 import { isOpenShadowElement, cloneOpenShadowRoot, type ShadowElement } from './shadowDOM';
 
-/** clone element style */
 function cloneElementStyle<T extends ElementWithStyle>(
   target: T,
   origin: T,
   originStyle: CSSStyleDeclaration,
   context: Context
 ) {
-  // identical inline styles are omitted.
+  // Identical inline styles are omitted.
   const injectionStyle = getElementStyle(target, origin, originStyle);
   if (!injectionStyle) return;
   const cssText = origin.style.cssText + injectionStyle;
@@ -55,7 +54,6 @@ function clonePseudoElementStyle<T extends Element>(
   context.appendStyle(styleRules);
 }
 
-/** clone canvas */
 function cloneCanvas<T extends HTMLCanvasElement>(target: T, origin: T) {
   if (origin.width === 0 || origin.height === 0) return;
   target.getContext('2d')!.drawImage(origin, 0, 0);
@@ -63,13 +61,13 @@ function cloneCanvas<T extends HTMLCanvasElement>(target: T, origin: T) {
 
 function cloneMedia<T extends HTMLMediaElement>(target: T, origin: T) {
   if (!origin.currentSrc) return;
-  // In the new document, currentSrc isn’t populated right away and is read-only,
+  // In the new document, currentSrc isn't populated right away and is read-only,
   // so we explicitly assign src here.
   target.src = origin.currentSrc;
   // The precision of `video.currentTime` might get rounded depending on browser settings.
   // @see https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/currentTime#reduced_time_precision
   target.currentTime = origin.currentTime;
-  // Printing doesn’t need to play anything.
+  // Printing doesn't need to play anything.
   target.autoplay = false;
 }
 
@@ -82,9 +80,8 @@ function setScrollState(target: Element, origin: Element) {
   }
 }
 
-// clone element properties
 function cloneElementProperties(target: Element, origin: Element) {
-  // The only thing that doesn’t get copied is the `<select> / <option>` ’s current state.
+  // The only thing that doesn't get copied is the `<select> / <option>` 's current state.
   // To be safe, we also set the state of some other elements.
   if (whichElement(target, 'select') || whichElement(target, 'textarea')) {
     target.value = (origin as HTMLTextAreaElement | HTMLSelectElement).value;
@@ -137,8 +134,8 @@ export function cloneDocument(context: Context, hostElement: Element, styleRule?
   }
   traverse((target, origin) => cloneElement(target, origin, context, true), clonedElement, hostElement);
   context.flushTasks();
-  // style of highest priority.
+  // Style of highest priority.
   context.appendStyle(styleRule);
-  // mount after all styles have been generated.
+  // Mount after all styles have been generated.
   context.mountStyle();
 }

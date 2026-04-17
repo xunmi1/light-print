@@ -10,7 +10,7 @@ export function getStyle(doc: Document, selector: string, pseudoElt?: string) {
 }
 
 /**
- * The `happy-dom`’s CSSStyleDeclaration implementation is incorrect
+ * The `happy-dom`'s CSSStyleDeclaration implementation is incorrect
  * and fails to iterate over properties.
  */
 function toStyleRecord(style: CSSStyleDeclaration) {

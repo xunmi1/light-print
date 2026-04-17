@@ -2,7 +2,7 @@ import { NOOP } from './utils';
 
 declare global {
   interface Document {
-    // `IE` does not support `Document.fonts`
+    // `IE` does not support `Document.fonts`.
     fonts?: FontFaceSet;
   }
 }

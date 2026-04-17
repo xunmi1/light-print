@@ -62,7 +62,7 @@ lightPrint('#id', {
 <script setup>
 import { useTemplateRef } from 'vue';
 import lightPrint from 'light-print';
-// Prior to Vue v3.5, we could declare a `ref` matching the name of the template’s ref attribute value.
+// Prior to Vue v3.5, we could declare a `ref` matching the name of the template's ref attribute value.
 const targetRef = useTemplateRef('target');
 
 async function print() {
@@ -119,7 +119,7 @@ function lightPrint(containerOrSelector: Element | string, options?: PrintOption
 
 2. How to handle page breaks?
 
-   Use CSS page break properties, e.g.
+   Use CSS page break properties, e.g.,
 
    ```css
    .page-break {
@@ -139,6 +139,7 @@ function lightPrint(containerOrSelector: Element | string, options?: PrintOption
 ## Suggestions
 
 - It is recommended to specify fixed dimensions (width and height) for the print-element container, as it cannot adapt to page dimensions when printing.
+- To print hidden elements, hide the parent of the container element (e.g., `display: none`) instead of hiding the container element itself.
 - Automatic font loading is not supported for non-Chromium browsers. You can declare `@font-face` within the `mediaPrintStyle`, for example:
   ```js
   const mediaPrintStyle = `

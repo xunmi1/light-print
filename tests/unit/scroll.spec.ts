@@ -14,7 +14,7 @@ describe('scroll', () => {
     `;
   });
 
-  test('element isn’t scrolling', () => {
+  test("element isn't scrolling", () => {
     const context = clone('#app');
 
     const target = context.document.querySelector('#outer')!;

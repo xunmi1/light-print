@@ -47,9 +47,9 @@ function mount(container: HTMLIFrameElement, parent: Element) {
 
 function emitPrint(contentWindow: Window) {
   const { promise, resolve } = withResolvers<void>();
-  // required for IE
+  // Required for IE.
   contentWindow.focus();
-  // When the browser’s network cache is disabled,
+  // When the browser's network cache is disabled,
   // the execution end time of `print()` will be later than the `afterprint` event.
   // Conversely, the 'afterprint' event will be fired later.
   // Thus, both need to be completed to indicate that the printing process has ended.
@@ -74,18 +74,18 @@ function emitPrint(contentWindow: Window) {
  */
 function lightPrint(containerOrSelector: Element | string, options: PrintOptions = {}): Promise<void> {
   const hostElement = normalizeNode(containerOrSelector);
-  // ensure to return a rejected promise.
+  // Ensure to return a rejected promise.
   if (!hostElement) return Promise.reject(new Error('Invalid HTML element.'));
 
   const container = createContainer();
   const context = createContext();
-  // must be mounted and loaded before using `contentWindow` for Firefox.
+  // Must be mounted and loaded before using `contentWindow` for Firefox.
   return mount(container, window.document.body)
     .then(() => {
       const doc = container.contentWindow!.document;
       context.bind(doc);
       doc.title = options.documentTitle ?? window.document.title;
-      // remove the default margin.
+      // Remove the default margin.
       context.appendStyle(`html{zoom:${options.zoom ?? 1}}body{margin:0;print-color-adjust:exact;}`);
 
       tryImportFonts(doc);

@@ -46,7 +46,7 @@ describe('hidden elements', () => {
     });
   });
 
-  test('doesn’t affect the current document', () => {
+  test("doesn't affect the current document", () => {
     const innerHTML = /* HTML */ `
       <style>.hidden { display: none }</style>
       <div id="app" class="hidden">

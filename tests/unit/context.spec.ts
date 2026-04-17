@@ -22,7 +22,7 @@ describe('getSelector', () => {
     expect(document.querySelector(context.getSelector(app))).toBe(app);
   });
 
-  test('doesn’t affect common attributes', () => {
+  test("doesn't affect common attributes", () => {
     const context = createContext();
     context.bind(document);
     document.body.innerHTML = /* HTML */ `<div id="app" class="foo"></div>`;
@@ -87,7 +87,7 @@ describe('style', () => {
     expect(getStyle(document, '.test').color).toBe('red');
   });
 
-  test('doesn’t affect the current style', () => {
+  test("doesn't affect the current style", () => {
     const context = createContext();
     const newWindow = new Window();
     context.bind(newWindow.document);

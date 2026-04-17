@@ -6,7 +6,7 @@ import { BLOCK_CONTAINER_DISPLAY } from 'src/utils';
 
 // `happy-dom` doesn't support pseudo element.
 // https://github.com/capricorn86/happy-dom/issues/1836
-// Due to `happy-dom`’s lack of pseudo-element support in getComputedStyle,
+// Due to `happy-dom`'s lack of pseudo-element support in getComputedStyle,
 // we manually implemented it with the limitation of requiring `SELECTOR_NAME` style targeting.
 
 describe.each([{ type: '::before' }, { type: '::after' }])('$type', ({ type }) => {
@@ -43,7 +43,7 @@ describe.each([{ type: '::before' }, { type: '::after' }])('$type', ({ type }) =
 });
 
 describe('::marker', () => {
-  test('element’s display should be "list-item"', () => {
+  test('display should be "list-item"', () => {
     document.body.innerHTML = /* HTML */ `
       <style>
         [${SELECTOR_NAME}='1']::marker {
@@ -58,7 +58,7 @@ describe('::marker', () => {
     expect(getStyle(context.document, `[${SELECTOR_NAME}="1"]`, '::marker')?.color).toBe('red');
   });
 
-  test('element’s display is not "list-item"', () => {
+  test('display is not "list-item"', () => {
     document.body.innerHTML = /* HTML */ `
       <style>
         [${SELECTOR_NAME}='1']::marker {
@@ -76,7 +76,7 @@ describe('::marker', () => {
 });
 
 describe.each([{ type: '::first-letter' }, { type: '::first-line' }])('$type', ({ type }) => {
-  test('element’s display should be "block"', () => {
+  test('display should be "block"', () => {
     const displays = BLOCK_CONTAINER_DISPLAY;
 
     document.body.innerHTML = /* HTML */ `
@@ -94,7 +94,7 @@ describe.each([{ type: '::first-letter' }, { type: '::first-line' }])('$type', (
     });
   });
 
-  test('element’s display is not "block"', () => {
+  test('display is not "block"', () => {
     document.body.innerHTML = /* HTML */ `
       <style>
         [${SELECTOR_NAME}='1']${type} {
@@ -178,7 +178,7 @@ describe('::file-selector-button', () => {
     expect(getStyle(context.document, `[${SELECTOR_NAME}="1"]`, '::file-selector-button')?.color).toBe('red');
   });
 
-  test('input’s type is not "file"', () => {
+  test('input\'s type is not "file"', () => {
     document.body.innerHTML = /* HTML */ `
       <style>
         [${SELECTOR_NAME}='1']::file-selector-button {

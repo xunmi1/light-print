@@ -20,7 +20,7 @@ function isBorderChanged(targetStyle: Style, originStyle: Style) {
 }
 
 function isSizeChanged(targetStyle: Style, originStyle: Style) {
-  // Changing `padding`, `margin` or `border` alters the element’s size.
+  // Changing `padding`, `margin` or `border` alters the element's size.
   return (
     originStyle.boxSizing === 'border-box' &&
     (originStyle.padding !== targetStyle.padding || originStyle.borderWidth !== targetStyle.borderWidth)
@@ -30,7 +30,7 @@ function isSizeChanged(targetStyle: Style, originStyle: Style) {
 /** Whether the element has intrinsic aspect ratio */
 function isIntrinsicAspectRatio(el: Element, style: Style) {
   if (whichElement(el, 'img') || whichElement(el, 'video')) return true;
-  // SVG element’s aspect ratio is dictated by its `viewBox` by default.
+  // SVG element's aspect ratio is dictated by its `viewBox` by default.
   if (whichElement(el, 'svg') && el.getAttribute('viewBox')) return true;
   return !!style.aspectRatio && style.aspectRatio !== 'auto';
 }
@@ -46,7 +46,7 @@ function diff(cssText: string, properties: ArrayLike<string>, targetStyle: Style
   return cssText;
 }
 
-// When accessing `CSSStyleDeclaration` by index, the property name doesn’t include `counter`.
+// When accessing `CSSStyleDeclaration` by index, the property name doesn't include `counter`.
 const CSS_PROPERTIES_ADDED = ['counter-reset', 'counter-set', 'counter-increment'] as const;
 
 function getCSSText(targetStyle: Style, originStyle: Style, origin: Element) {

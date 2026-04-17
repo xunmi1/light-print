@@ -111,7 +111,7 @@ test.describe('aspectRatio', () => {
   });
 
   test('image with intrinsic aspect ratio', async ({ page }) => {
-    // The image’s intrinsic aspect ratio: 13 / 4
+    // The image's intrinsic aspect ratio: 13 / 4
     const imageBuffer = await readFile('examples/assets/light-print-black.svg');
     const dataURL = `data:image/svg+xml;base64,${imageBuffer.toString('base64')}`;
 
