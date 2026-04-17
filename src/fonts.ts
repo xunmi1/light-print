@@ -22,6 +22,6 @@ export function tryImportFonts(doc: Document) {
   } catch {}
 }
 
-export function waitFonts(doc: Document): Promise<void> | void {
+export function waitForFonts(doc: Document): Promise<void> | void {
   return doc.fonts?.ready.then(NOOP);
 }

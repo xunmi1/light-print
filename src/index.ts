@@ -1,6 +1,6 @@
 import { isIE, appendNode, removeNode, normalizeNode, setStyleProperty, bindOnceEvent, withResolvers } from './utils';
 import { tryImportFonts } from './fonts';
-import { waitResources } from './resources';
+import { waitForResources } from './resources';
 import { cloneDocument } from './clone';
 import { createContext } from './context';
 
@@ -91,7 +91,7 @@ function lightPrint(containerOrSelector: Element | string, options: PrintOptions
       tryImportFonts(doc);
       cloneDocument(context, hostElement, options.mediaPrintStyle);
     })
-    .then(() => waitResources(context.document))
+    .then(() => waitForResources(context.document))
     .then(() => emitPrint(context.document.defaultView!))
     .finally(() =>
       // The container can only be destroyed after the printing process has completed.

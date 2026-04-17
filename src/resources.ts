@@ -1,41 +1,50 @@
 import { whichElement, bindOnceEvent, withResolvers, type ElementNameMap, NOOP, isMediaElement } from './utils';
-import { waitFonts } from './fonts';
+import { waitForFonts } from './fonts';
 
 // `source` element is not needed because it depends on other elements.
 const RESOURCE_ELECTORS = ['img', 'audio', 'video', 'iframe', 'object', 'embed', 'image'] as const;
 
 type ResourceElement = ElementNameMap[(typeof RESOURCE_ELECTORS)[number]];
 
-function getResourceURL(node: ResourceElement) {
-  if (whichElement(node, 'object')) return node.data;
-  if (whichElement(node, 'iframe') || whichElement(node, 'embed')) return node.src;
-  if (whichElement(node, 'image')) return node.href.baseVal;
-  return node.currentSrc || node.src;
+function getResourceElements(doc: Document) {
+  const selectors = RESOURCE_ELECTORS.join(',');
+  return Array.from(doc.querySelectorAll<ResourceElement>(selectors)).filter(el => !!getResourceURL(el));
 }
 
-function checkLoaded(node: ResourceElement): Promise<void> | void {
-  if (whichElement(node, 'img') && node.complete) return;
-  // load the resource as soon as possible.
-  if (whichElement(node, 'img') || whichElement(node, 'iframe')) node.loading = 'eager';
+function getResourceURL(el: ResourceElement) {
+  if (whichElement(el, 'object')) return el.data;
+  if (whichElement(el, 'iframe') || whichElement(el, 'embed')) return el.src;
+  if (whichElement(el, 'image')) return el.href.baseVal;
+  return el.currentSrc || el.src;
+}
+
+function waitForElement(el: ResourceElement): Promise<void> | void {
+  if (whichElement(el, 'img') && el.complete) return;
   const { promise, resolve, reject } = withResolvers<void>();
-  if (isMediaElement(node)) {
+  if (isMediaElement(el)) {
     // `2` is `HTMLMediaElement.HAVE_CURRENT_DATA`
-    if (node.readyState >= 2) resolve();
-    bindOnceEvent(node, 'canplay', () => resolve());
+    if (el.readyState >= 2) resolve();
+    else bindOnceEvent(el, 'canplay', () => resolve());
   } else {
-    bindOnceEvent(node, 'load', () => resolve());
+    bindOnceEvent(el, 'load', () => resolve());
   }
-  bindOnceEvent(node, 'error', () =>
-    reject(new Error(`Failed to load resource (${node.localName}: ${getResourceURL(node)}).`))
+  bindOnceEvent(el, 'error', () =>
+    reject(new Error(`Failed to load resource (${el.localName}: ${getResourceURL(el)}).`))
   );
   return promise;
 }
 
-/** wait for resources loaded */
-export function waitResources(doc: Document) {
-  const selectors = RESOURCE_ELECTORS.join(',');
-  const resourceNodes = Array.from(doc.querySelectorAll<ResourceElement>(selectors));
-  const tasks = resourceNodes.filter(node => !!getResourceURL(node)).map(node => checkLoaded(node));
-  tasks.push(waitFonts(doc));
+function forceEagerLoad(el: Element) {
+  // `HTMLMediaElement.loading` is supported in Chrome v148.
+  // @ts-expect-error
+  if (whichElement(el, 'img') || whichElement(el, 'iframe') || isMediaElement(el)) el.loading = 'eager';
+}
+
+/** Wait for resources to finish loading. */
+export function waitForResources(doc: Document) {
+  const elements = getResourceElements(doc);
+  elements.forEach(el => forceEagerLoad(el));
+  const tasks = elements.map(el => waitForElement(el));
+  tasks.push(waitForFonts(doc));
   return Promise.all(tasks).then(NOOP);
 }

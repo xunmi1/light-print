@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { Event } from 'happy-dom';
 
-import { waitResources } from 'src/resources';
+import { waitForResources } from 'src/resources';
 
 describe('normal resources', () => {
   test('successfully loaded', async () => {
@@ -21,7 +21,7 @@ describe('normal resources', () => {
       </svg>
     `;
 
-    const result = waitResources(document);
+    const result = waitForResources(document);
     // `happy-dom` doesn't actually load resources, so manually dispatch `load` and `canplay` events
     document
       .querySelectorAll('img, object, iframe, embed, image')
@@ -35,7 +35,7 @@ describe('normal resources', () => {
       <img class="error" src="1.png" />
       <img class="success" src="2.png" />
     `;
-    const result = waitResources(document);
+    const result = waitForResources(document);
     document.querySelector('.error')!.dispatchEvent(new Event('error'));
     document.querySelector('.success')!.dispatchEvent(new Event('load'));
     await expect(result).rejects.toThrow('Failed to load resource');
@@ -43,7 +43,7 @@ describe('normal resources', () => {
 
   test('empty resource', async () => {
     document.body.innerHTML = /* HTML */ `<img srcset="" />`;
-    await expect(waitResources(document)).resolves.toBeUndefined();
+    await expect(waitForResources(document)).resolves.toBeUndefined();
   });
 
   test('image already loaded', async () => {
@@ -53,7 +53,7 @@ describe('normal resources', () => {
     const img = document.querySelector('img')!;
     // `happy-dom` doesn't support mocking image resource,
     Object.defineProperty(img, 'complete', { value: true });
-    await expect(waitResources(document)).resolves.toBeUndefined();
+    await expect(waitForResources(document)).resolves.toBeUndefined();
   });
 
   test('media already have data', async () => {
@@ -62,7 +62,7 @@ describe('normal resources', () => {
     // `happy-dom` doesn't support mocking media data
     // // `2` is `HTMLMediaElement.HAVE_CURRENT_DATA`
     Object.defineProperty(audio, 'readyState', { value: 2 });
-    await expect(waitResources(document)).resolves.toBeUndefined();
+    await expect(waitForResources(document)).resolves.toBeUndefined();
   });
 });
 
@@ -73,7 +73,7 @@ describe('ignore link[ref="stylesheet"]', () => {
       <link rel="stylesheet" href="style.css" media="all" />
       <link rel="preload" as="style" href="style.css" />
     `;
-    const result = waitResources(document);
+    const result = waitForResources(document);
     document.querySelectorAll('link').forEach(node => node.dispatchEvent(new Event('error')));
     await expect(result).resolves.toBeUndefined();
   });

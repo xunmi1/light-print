@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import type { Document } from 'happy-dom';
-import { tryImportFonts, waitFonts } from 'src/fonts';
+import { tryImportFonts, waitForFonts } from 'src/fonts';
 
 // `happy-dom` doesn't support `FontFaceSet` API
 // https://github.com/capricorn86/happy-dom/issues/1478
@@ -52,11 +52,11 @@ describe('wait fonts', () => {
     mockFontsAPI(document, ['font1', 'font2']);
     mockFontsAPI(newDocument);
     tryImportFonts(newDocument);
-    await expect(waitFonts(newDocument)).resolves.toBeUndefined();
+    await expect(waitForFonts(newDocument)).resolves.toBeUndefined();
   });
 
   test('no fonts API', () => {
     const newDocument = new Window().document;
-    expect(waitFonts(newDocument)).toBeUndefined();
+    expect(waitForFonts(newDocument)).toBeUndefined();
   });
 });
