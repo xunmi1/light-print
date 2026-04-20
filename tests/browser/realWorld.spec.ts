@@ -1,7 +1,13 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Locator } from '@playwright/test';
 import { preventDestroyContainer, preventPrintDialog, getPrintContainter, screenshot, loadPrintScript } from './utils';
 
 test.use({ bypassCSP: true });
+
+async function hideElement(locator: Locator) {
+  if ((await locator.count()) > 0) {
+    await locator.evaluateAll(elements => elements.forEach(el => (el.style.opacity = '0')));
+  }
+}
 
 test.beforeEach(async ({ page, browserName }) => {
   // To cut test time, run tests only in `Chromium`.
@@ -21,9 +27,10 @@ test('Google Search', async ({ page }, testInfo) => {
     style.textContent = /* CSS */ `* { box-sizing: border-box }`;
     document.body.prepend(style);
   });
-  // Hide `Choose Chrome` popup
-  const popupLocator = page.locator('div', { hasText: 'Choose Chrome' });
-  if ((await popupLocator.count()) > 0) await popupLocator.first().evaluate(el => (el.style.opacity = '0'));
+  // Hide `Choose Chrome` dialog
+  await hideElement(page.getByRole('dialog'));
+  // Hide Google doodles
+  await hideElement(page.locator('[src*="doodles"]'));
 
   await screenshot(page.locator('#app'), { fileName: 'google.png', testInfo });
   const lightPrint = await loadPrintScript(page);

@@ -5,8 +5,9 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   test: {
-    include: ['tests/unit/**/*.{test,spec}.ts'],
     name: 'unit',
+    reporters: process.env.GITHUB_ACTIONS ? ['dot', 'github-actions'] : ['default'],
+    include: ['tests/unit/**/*.{test,spec}.ts'],
     environment: 'happy-dom',
     typecheck: {
       enabled: true,

@@ -6,7 +6,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: [['list'], ['html', { open: 'never' }]],
+  reporter: process.env.GITHUB_ACTIONS ? [['github'], ['dot'], ['html']] : [['list'], ['html', { open: 'never' }]],
   snapshotPathTemplate: '{testDir}/__screenshots__/{arg}-{platform}-{projectName}{ext}',
   /* Run your local dev server before starting the tests */
   webServer: {
