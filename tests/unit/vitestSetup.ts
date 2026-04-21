@@ -94,13 +94,13 @@ Object.defineProperty(Element.prototype, 'part', {
   },
 });
 
-// `happy-dom` doesn't support `part` attribute
+// `happy-dom` doesn't support `compatMode` attribute
 declare module 'happy-dom' {
   interface Document {
     compatMode: 'CSS1Compat' | 'BackCompat';
   }
 }
 // Mock `compatMode`
-if (document.compatMode !== 'CSS1Compat') {
+if (!document.compatMode) {
   Object.defineProperty(document, 'compatMode', { value: 'CSS1Compat', configurable: true });
 }
