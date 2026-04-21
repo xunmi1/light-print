@@ -27,9 +27,15 @@ export interface PrintOptions {
   zoom?: number | string;
 }
 
-function createContainer() {
+interface Container extends HTMLElement {
+  readonly contentDocument: Document | null;
+  readonly contentWindow: Window | null;
+}
+
+function createContainer(): Container {
   const container = window.document.createElement('iframe');
-  container.srcdoc = '<!DOCTYPE html>';
+  if (window.document.compatMode === 'CSS1Compat') container.srcdoc = '<!DOCTYPE html>';
+  // Hide the element while preserving its layout space.
   setStyleProperty(container, 'position', 'absolute', 'important');
   setStyleProperty(container, 'top', '-9999px', 'important');
   setStyleProperty(container, 'visibility', 'hidden', 'important');
@@ -37,7 +43,7 @@ function createContainer() {
   return container;
 }
 
-function mount(container: HTMLIFrameElement, parent: Element) {
+function mount(container: Container, parent: Element) {
   const { promise, resolve, reject } = withResolvers<void>();
   bindOnceEvent(container, 'load', () => resolve());
   bindOnceEvent(container, 'error', () => reject(new Error('Failed to mount document.')));
@@ -51,7 +57,7 @@ function emitPrint(contentWindow: Window) {
   contentWindow.focus();
   // When the browser's network cache is disabled,
   // the execution end time of `print()` will be later than the `afterprint` event.
-  // Conversely, the 'afterprint' event will be fired later.
+  // Conversely, the `afterprint` event will be fired later.
   // Thus, both need to be completed to indicate that the printing process has ended.
   bindOnceEvent(contentWindow, 'afterprint', () => resolve());
 
@@ -79,10 +85,10 @@ function lightPrint(containerOrSelector: Element | string, options: PrintOptions
 
   const container = createContainer();
   const context = createContext();
-  // Must be mounted and loaded before using `contentWindow` for Firefox.
+  // Must be mounted and loaded before using `contentWindow` or `contentDocument`.
   return mount(container, window.document.body)
     .then(() => {
-      const doc = container.contentWindow!.document;
+      const doc = container.contentDocument!;
       context.bind(doc);
       doc.title = options.documentTitle ?? window.document.title;
       // Remove the default margin.

@@ -93,3 +93,14 @@ Object.defineProperty(Element.prototype, 'part', {
     return (this[partKey] ??= new DOMTokenList(illegalConstructor, this, 'part'));
   },
 });
+
+// `happy-dom` doesn't support `part` attribute
+declare module 'happy-dom' {
+  interface Document {
+    compatMode: 'CSS1Compat' | 'BackCompat';
+  }
+}
+// Mock `compatMode`
+if (document.compatMode !== 'CSS1Compat') {
+  Object.defineProperty(document, 'compatMode', { value: 'CSS1Compat', configurable: true });
+}

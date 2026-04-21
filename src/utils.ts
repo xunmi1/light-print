@@ -73,11 +73,11 @@ export function isBlockContainer(style: CSSStyleDeclaration) {
 
 export function setStyleProperty(
   target: ElementCSSInlineStyle,
-  propertyName: string,
+  property: Lowercase<string>,
   value: number | string,
-  priority?: string
+  priority?: 'important'
 ) {
-  target.style.setProperty(propertyName, String(value), priority);
+  target.style.setProperty(property, String(value), priority);
 }
 
 export function normalizeNode<T extends Element>(target: unknown) {

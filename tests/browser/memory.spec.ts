@@ -62,7 +62,7 @@ async function getObjectSize(cdpSession: CDPSession, objectName: string) {
     returnByValue: false,
   });
   const { objects } = await cdpSession.send('Runtime.queryObjects', { prototypeObjectId: prototypeResult.objectId! });
-  // get `queryObjects()` result size
+  // Get `queryObjects()` result size.
   const { result } = await cdpSession.send('Runtime.callFunctionOn', {
     objectId: objects.objectId,
     functionDeclaration: 'function() { return this.length; }',

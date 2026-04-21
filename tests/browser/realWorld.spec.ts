@@ -20,6 +20,7 @@ test.beforeEach(async ({ page, browserName }) => {
 test('Google Search', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 500, height: 1000 });
   await page.goto('https://www.google.com');
+  await page.waitForTimeout(2000);
   await page.evaluate(() => {
     document.body.id = 'app';
     const style = document.createElement('style');

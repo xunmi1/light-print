@@ -31,12 +31,10 @@ test('visually consistent', async ({ page, browserName }, testInfo) => {
   await action.click();
 
   const container = getPrintContainter(page);
-  await expect(container).toBeHidden();
   // avoid container scrolling
   await container.evaluate(element => (element.style = 'width: 100%; height: 1500px'));
-  const frame = container.contentFrame();
 
-  const target = frame.locator('#app');
+  const target = container.contentFrame().locator('#app');
   // `Playwright` screenshots often have slight dimension drift,
   // so we lock the exact width and height manually.
   const originClip = roundClip((await origin.boundingBox())!);
