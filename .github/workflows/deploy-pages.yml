@@ -21,11 +21,11 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      - name: Download build artifact
+      - name: Download artifact
         uses: actions/download-artifact@v8
         with:
           # The name of the artifact needs to be the same as the name previously uploaded.
-          name: build-artifact
+          name: release-artifact
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: './'

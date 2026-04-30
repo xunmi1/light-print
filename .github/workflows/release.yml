@@ -31,3 +31,12 @@ jobs:
 
       - name: Publish Packages
         run: npm publish
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-artifact
+          path: |
+            dist
+            examples
+            README.md
