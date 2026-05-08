@@ -11,6 +11,7 @@ export type Task = () => void;
 
 export function createContext<T extends Document>() {
   let styleNode: HTMLStyleElement | undefined;
+  let styleBuffer = '';
   let printId = 1;
   let doc: T;
 
@@ -32,14 +33,13 @@ export function createContext<T extends Document>() {
   }
 
   function appendStyle(text?: string) {
-    if (!text) return;
-    styleNode ??= doc.createElement('style');
-    styleNode.textContent += text;
+    if (text) styleBuffer += text;
   }
 
   function mountStyle(parent?: Node) {
-    if (!styleNode || styleNode.parentNode) return;
-    appendNode(parent || doc.head, styleNode);
+    styleNode ||= doc.createElement('style');
+    if (styleNode.textContent !== styleBuffer) styleNode.textContent = styleBuffer;
+    if (!styleNode.parentNode) appendNode(parent ?? doc.head, styleNode);
   }
 
   const tasks: Task[] = [];
