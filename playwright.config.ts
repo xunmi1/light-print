@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: './tests/browser',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
+  retries: 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.GITHUB_ACTIONS ? [['github'], ['dot'], ['html']] : [['list'], ['html', { open: 'never' }]],
   snapshotPathTemplate: '{testDir}/__screenshots__/{arg}-{platform}-{projectName}{ext}',
