@@ -64,23 +64,38 @@ describe('inline & external style', () => {
 });
 
 describe('additional styles', () => {
-  test('override the original styles', () => {
+  test('override inline style', () => {
+    document.body.innerHTML = /* HTML */ `<div id="app" style="color: red; font-size: 14px !important"></div>`;
+
+    let context = clone('#app', /* CSS */ `#app { color: blue; font-size: 20px }`);
+    expect(getStyle(context.document, '#app').color).toBe('red');
+    expect(getStyle(context.document, '#app').fontSize).toBe('14px');
+
+    context = clone('#app', /* CSS */ `#app { color: blue !important; font-size: 20px !important }`);
+    expect(getStyle(context.document, '#app').color).toBe('blue');
+    expect(getStyle(context.document, '#app').fontSize).toBe('14px');
+  });
+
+  test('override internal style', () => {
     document.body.innerHTML = /* HTML */ `
       <style>
         #app {
-          color: red !important;
+          color: red;
+          font-size: 14px !important;
         }
       </style>
       <div id="app"></div>
     `;
-    let context = clone('#app', `#app { color: blue }`);
+    let context = clone('#app', /* CSS */ `#app { color: blue; font-size: 20px }`);
     expect(getStyle(context.document, '#app').color).toBe('blue');
+    expect(getStyle(context.document, '#app').fontSize).toBe('20px');
 
-    context = clone('#app', `div { color: blue }`);
-    expect(getStyle(context.document, '#app').color).toBe('red');
+    context = clone('#app', /* CSS */ `#app { color: blue !important; font-size: 20px !important }`);
+    expect(getStyle(context.document, '#app').color).toBe('blue');
+    expect(getStyle(context.document, '#app').fontSize).toBe('20px');
   });
 
-  test('minimum specificity: (0,1,0)', () => {
+  test('minimum specificity (0,1,0)', () => {
     document.body.innerHTML = /* HTML */ `
       <style>
         div {
@@ -89,10 +104,10 @@ describe('additional styles', () => {
       </style>
       <div id="app" class="test"></div>
     `;
-    let context = clone('#app', `div { color: blue }`);
+    let context = clone('#app', /* CSS */ `div { color: blue }`);
     expect(getStyle(context.document, '#app').color).toBe('red');
 
-    context = clone('#app', `.test { color: blue }`);
+    context = clone('#app', /* CSS */ `.test { color: blue }`);
     expect(getStyle(context.document, '#app').color).toBe('blue');
   });
 });
@@ -143,6 +158,21 @@ describe('style position', () => {
   });
 });
 
+test('invalid style', () => {
+  document.body.innerHTML = /* HTML */ `
+    <style>
+      #app {
+        width: 10px;
+      }
+    </style>
+    <div id="app" style="border-"></div>
+  `;
+  const context = clone('#app');
+  const targetStyle = getStyle(context.document, '#app');
+  expect(targetStyle.width).toBe('10px');
+  expect(targetStyle.borderWidth).toBeFalsy();
+});
+
 // Accurate testing is impossible in a mock environment; precise validation happens in E2E tests.
 test('table width', () => {
   document.body.innerHTML = /* HTML */ `
@@ -166,7 +196,7 @@ test('table width', () => {
 });
 
 // Accurate testing is impossible in a mock environment; precise validation happens in E2E tests.
-test('style: aspect-ratio', () => {
+test('aspect-ratio', () => {
   document.body.innerHTML = /* HTML */ `
     <style>
       #ratio1 {

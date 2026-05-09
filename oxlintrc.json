@@ -17,6 +17,7 @@
     "no-underscore-dangle": "off",
     "max-lines-per-function": "off",
     "array-callback-return": "off",
+    "max-lines": "off",
     "unicorn/no-lonely-if": "off",
     "unicorn/prefer-dom-node-append": "off",
     "unicorn/prefer-dom-node-remove": "off",
