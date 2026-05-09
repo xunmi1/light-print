@@ -71,18 +71,9 @@ export function isBlockContainer(style: CSSStyleDeclaration) {
   return includes(style.display, BLOCK_CONTAINER_DISPLAY);
 }
 
-export function setStyleProperty(
-  target: ElementCSSInlineStyle,
-  property: Lowercase<string>,
-  value: number | string,
-  priority?: 'important'
-) {
-  target.style.setProperty(property, String(value), priority);
-}
-
 export function normalizeNode<T extends Element>(target: unknown) {
   if (isElement<T>(target)) return target;
-  if (isString(target)) return window.document.querySelector<T>(target) ?? undefined;
+  if (isString(target)) return window.document.querySelector<T>(target);
 }
 
 type Registry = readonly (readonly [unknown, unknown])[];

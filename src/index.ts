@@ -1,4 +1,4 @@
-import { isIE, appendNode, removeNode, normalizeNode, setStyleProperty, bindOnceEvent, withResolvers } from './utils';
+import { isIE, appendNode, removeNode, normalizeNode, bindOnceEvent, withResolvers } from './utils';
 import { tryImportFonts } from './fonts';
 import { waitForResources } from './resources';
 import { cloneDocument } from './clone';
@@ -36,10 +36,8 @@ function createContainer(): Container {
   const container = window.document.createElement('iframe');
   if (window.document.compatMode === 'CSS1Compat') container.srcdoc = '<!DOCTYPE html>';
   // Hide the element while preserving its layout space.
-  setStyleProperty(container, 'position', 'absolute', 'important');
-  setStyleProperty(container, 'top', '-9999px', 'important');
-  setStyleProperty(container, 'visibility', 'hidden', 'important');
-  setStyleProperty(container, 'transform', 'scale(0)', 'important');
+  const hiddenStyle = 'position: fixed !important; top: -9999px !important; visibility: hidden !important;';
+  container.setAttribute('style', hiddenStyle);
   return container;
 }
 
@@ -92,7 +90,7 @@ function lightPrint(containerOrSelector: Element | string, options: PrintOptions
       context.bind(doc);
       doc.title = options.documentTitle ?? window.document.title;
       // Remove the default margin.
-      context.appendStyle(`html{zoom:${options.zoom ?? 1}}body{margin:0;print-color-adjust:exact;}`);
+      context.appendStyle(/* CSS */ `html{zoom:${options.zoom ?? 1}}body{margin:0;print-color-adjust:exact;}`);
 
       tryImportFonts(doc);
       cloneDocument(context, hostElement, options.mediaPrintStyle);

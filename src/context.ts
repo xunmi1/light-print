@@ -39,7 +39,7 @@ export function createContext<T extends Document>() {
   function mountStyle(parent?: Node) {
     styleNode ||= doc.createElement('style');
     if (styleNode.textContent !== styleBuffer) styleNode.textContent = styleBuffer;
-    if (!styleNode.parentNode) appendNode(parent ?? doc.head, styleNode);
+    if (!styleNode.parentNode) appendNode(parent || doc.head, styleNode);
   }
 
   const tasks: Task[] = [];

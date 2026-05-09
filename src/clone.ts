@@ -10,7 +10,7 @@ import {
   type ElementWithStyle,
 } from './utils';
 import { traverse } from './traverse';
-import { getStyle, getElementStyle, getPseudoElementStyle, PSEUDO_ELECTORS, composeRule } from './style';
+import { getStyle, getInjectedStyle, getPseudoElementStyle, PSEUDO_ELECTORS, composeRule } from './style';
 import { isOpenShadowElement, cloneOpenShadowRoot, type ShadowElement } from './shadowDOM';
 
 function cloneElementStyle<T extends ElementWithStyle>(
@@ -19,20 +19,18 @@ function cloneElementStyle<T extends ElementWithStyle>(
   originStyle: CSSStyleDeclaration,
   context: Context
 ) {
-  // Identical inline styles are omitted.
-  const injectionStyle = getElementStyle(target, origin, originStyle);
-  if (!injectionStyle) return;
-  const cssText = origin.style.cssText + injectionStyle;
+  const injectedStyle = getInjectedStyle(target, origin, originStyle);
+  if (!injectedStyle) return;
+  const style = origin.style.cssText + injectedStyle;
   // Inline style trigger an immediate layout reflow,
   // after which fewer and correct rules have to be resolved for the children; in practice this is measurably faster.
   // The downside is their sky-high specificity: overriding them with mediaPrintStyle is painful,
   // We therefore strip the inline declarations once cloning finishes and hand the job over to a clean style sheet.
-  target.setAttribute('style', cssText);
-  const styleRule = composeRule(context.getSelector(target), cssText);
+  target.setAttribute('style', style);
+  context.appendStyle(composeRule(context.getSelector(target), style));
   context.addTask(() => {
-    // Inline style carry higher specificity; strip them to let the `injectionStyle` (external style) prevail.
+    // Inline style carry higher specificity; strip them to let the `injectedStyle` prevail.
     target.removeAttribute('style');
-    context.appendStyle(styleRule);
   });
 }
 

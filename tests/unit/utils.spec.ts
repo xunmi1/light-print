@@ -6,7 +6,7 @@ test('normalizeNode', () => {
   expect(normalizeNode(element)).toBe(element);
 
   expect(normalizeNode('body')).toBe(document.body);
-  expect(normalizeNode('#not-exist')).toBeUndefined();
+  expect(normalizeNode('#not-exist')).toBeNullable();
 });
 
 test('bindOnceEvent', () => {

@@ -72,8 +72,8 @@ function getCSSText(targetStyle: Style, originStyle: Style, origin: Element) {
   return cssText;
 }
 
-/** Clone element style; identical inline styles are omitted. */
-export function getElementStyle<T extends Element>(target: T, origin: T, originStyle: Style) {
+/** Get the style to be injected (internal style + external style), omitting the inline style. */
+export function getInjectedStyle<T extends Element>(target: T, origin: T, originStyle: Style) {
   return getCSSText(getStyle(target), originStyle, origin);
 }
 
