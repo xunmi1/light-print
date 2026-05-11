@@ -1,7 +1,6 @@
 import type { Context } from './context';
 import {
   appendNode,
-  removeNode,
   whichElement,
   isMediaElement,
   isRenderingElement,
@@ -90,10 +89,11 @@ function cloneElementProperties(target: Element, origin: Element) {
     target.value = _origin.value;
     target.checked = _origin.checked;
     target.indeterminate = _origin.indeterminate;
+  } else if (whichElement(target, 'canvas')) {
+    cloneCanvas(target, origin as HTMLCanvasElement);
+  } else if (isMediaElement(target)) {
+    cloneMedia(target, origin as HTMLMediaElement);
   }
-
-  if (whichElement(target, 'canvas')) cloneCanvas(target, origin as HTMLCanvasElement);
-  if (isMediaElement(target)) cloneMedia(target, origin as HTMLMediaElement);
 
   setScrollState(target, origin);
 }
@@ -124,9 +124,8 @@ function cloneElement(target: Element, origin: Element, context: Context, should
 export function cloneDocument(context: Context, hostElement: Element, styleRule?: string) {
   const doc = context.document;
   const clonedElement = doc.importNode(hostElement, true);
-  if (whichElement(hostElement, 'body')) {
-    removeNode(doc.body);
-    appendNode(doc.documentElement, clonedElement);
+  if (whichElement(clonedElement, 'body')) {
+    doc.documentElement.replaceChild(clonedElement, doc.body);
   } else {
     appendNode(doc.body, clonedElement);
   }

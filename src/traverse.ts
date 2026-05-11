@@ -21,7 +21,7 @@ export interface ElementWalker<Root extends Node> extends TreeWalker {
 
 function createElementWalker<T extends Node>(root: T) {
   // `1` is `NodeFilter.SHOW_ELEMENT`
-  return window.document.createTreeWalker(root, 1, null, false) as ElementWalker<T>;
+  return root.ownerDocument!.createTreeWalker(root, 1, null, false) as ElementWalker<T>;
 }
 
 /**

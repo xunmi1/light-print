@@ -76,14 +76,14 @@ describe('media', () => {
         <video id="emptySrc" style="display: block"></video>
       </div>
     `;
-    const context = clone('#app');
-    let target = context.document.querySelector('#selfSrc') as HTMLVideoElement;
+    const doc = clone('#app').document;
+    let target = doc.querySelector('#selfSrc') as HTMLVideoElement;
     expect(target.currentSrc).toBe(src);
 
-    target = context.document.querySelector('#sourceSrc') as HTMLVideoElement;
+    target = doc.querySelector('#sourceSrc') as HTMLVideoElement;
     expect(target.currentSrc).toBe(src);
 
-    target = context.document.querySelector('#emptySrc') as HTMLVideoElement;
+    target = doc.querySelector('#emptySrc') as HTMLVideoElement;
     expect(target.currentSrc).toBeFalsy();
   });
 });
@@ -154,10 +154,10 @@ describe('form fields', () => {
     });
 
     test('selected', () => {
-      const context = clone('#app');
-      let target = context.document.querySelector('option[value="foo"]') as HTMLOptionElement;
+      const doc = clone('#app').document;
+      let target = doc.querySelector('option[value="foo"]') as HTMLOptionElement;
       expect(target.selected).toBe(false);
-      target = context.document.querySelector('option[value="bar"]') as HTMLOptionElement;
+      target = doc.querySelector('option[value="bar"]') as HTMLOptionElement;
       expect(target.selected).toBe(true);
     });
   });
@@ -174,12 +174,15 @@ describe('form fields', () => {
   });
 });
 
+// `happy-dom` BUG: svg `display` is falsy
 describe('svg', () => {
   test('size with viewBox', () => {
     document.body.innerHTML = /* HTML */ `
       <style>
-        svg {
+        * {
           display: block;
+        }
+        svg {
           width: 48px;
           height: 24px;
         }
@@ -219,6 +222,37 @@ describe('svg', () => {
     const targetStyle = getStyle(context.document, 'svg');
     expect(targetStyle.width).toBe('48px');
     expect(targetStyle.height).toBe('56px');
+  });
+
+  test('defs', () => {
+    document.body.innerHTML = /* HTML */ `
+      <style>
+        * {
+          display: block;
+        }
+        .start {
+          stop-color: #ff0;
+        }
+        .end {
+          stop-color: #f00;
+        }
+      </style>
+      <div id="app">
+        <svg xmlns="https://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="linear" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" class="start" />
+              <stop offset="100%" class="end" />
+            </linearGradient>
+          </defs>
+          <ellipse cx="200" cy="70" rx="85" ry="55" fill="url(#linear)" />
+        </svg>
+      </div>
+    `;
+    const doc = clone('#app').document;
+    expect(doc.querySelector('defs')).toBeTruthy();
+    expect(getStyle(doc, 'stop.start').stopColor).toBe('#ff0');
+    expect(getStyle(doc, 'stop.end').stopColor).toBe('#f00');
   });
 });
 

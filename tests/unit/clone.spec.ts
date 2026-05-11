@@ -34,13 +34,12 @@ describe('hidden elements', () => {
         }
       </style>
       <div id="app">
-        <source class="ignore" src="https://example.com/video.mp4" type="video/mp4" />
-        <track class="ignore" src="https://example.com/captions.vtt" kind="captions" srclang="en" />
+        <noscript class="ignore">111</noscript>
         <wbr class="ignore" />
       </div>
     `;
     const context = clone('#app');
-    ['source', 'track', 'wbr'].forEach(type => {
+    ['noscript', 'wbr'].forEach(type => {
       expect(context.document.querySelector(type)).toBeTruthy();
       expect(getStyle(context.document, type).fontSize).not.toBe(size);
     });

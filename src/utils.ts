@@ -35,7 +35,7 @@ export function isMediaElement(el: Element) {
 }
 
 // `slot`, `style`, etc. default to `display: none` but can still be rendered if override their display.
-const NON_RENDERING_ELEMENTS = ['source', 'track', 'wbr'] as const;
+const NON_RENDERING_ELEMENTS = ['noscript', 'wbr'] as const;
 export function isRenderingElement(el: Element) {
   return !includes(el.localName, NON_RENDERING_ELEMENTS);
 }
@@ -132,8 +132,8 @@ export function withResolvers<T>() {
 
 export function NOOP() {}
 
-export function getOwnerWindow(element: Element) {
-  return element.ownerDocument.defaultView!;
+export function getOwnerWindow(node: Node) {
+  return node.ownerDocument!.defaultView!;
 }
 
 // Equal to: HTMLElement | SVGElement | MathMLElement

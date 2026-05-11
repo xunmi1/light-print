@@ -2,13 +2,12 @@ import { whichElement, bindOnceEvent, withResolvers, type ElementNameMap, NOOP, 
 import { waitForFonts } from './fonts';
 
 // `source` element is not needed because it depends on other elements.
-const RESOURCE_ELECTORS = ['img', 'audio', 'video', 'iframe', 'object', 'embed', 'image'] as const;
-
-type ResourceElement = ElementNameMap[(typeof RESOURCE_ELECTORS)[number]];
+const RESOURCES = ['img', 'audio', 'video', 'iframe', 'object', 'embed', 'image'] as const;
+const RESOURCE_SELECTORS = RESOURCES.join(',');
+type ResourceElement = ElementNameMap[(typeof RESOURCES)[number]];
 
 function getResourceElements(doc: Document) {
-  const selectors = RESOURCE_ELECTORS.join(',');
-  return Array.from(doc.querySelectorAll<ResourceElement>(selectors)).filter(el => !!getResourceURL(el));
+  return Array.from(doc.querySelectorAll<ResourceElement>(RESOURCE_SELECTORS)).filter(el => !!getResourceURL(el));
 }
 
 function getResourceURL(el: ResourceElement) {
