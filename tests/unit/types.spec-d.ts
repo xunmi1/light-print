@@ -1,5 +1,5 @@
 import { test, expectTypeOf } from 'vitest';
-import lightPrint from 'src';
+import lightPrint from '/src';
 
 test('parameters', () => {
   expectTypeOf(lightPrint).toBeFunction();
@@ -12,8 +12,9 @@ test('parameters', () => {
       }
     | undefined
   >();
+  expectTypeOf(lightPrint).parameter(2).toEqualTypeOf<undefined>();
 });
 
 test('returns', () => {
-  expectTypeOf(lightPrint).returns.resolves.toBeVoid();
+  expectTypeOf(lightPrint).returns.toEqualTypeOf<Promise<void>>();
 });
