@@ -21,9 +21,7 @@ type SafeGet<Key, Map> = Key extends keyof Map ? Map[Key] : never;
 
 export type ElementNameMap = {
   [K in keyof (HTMLElementTagNameMap & SVGElementTagNameMap & MathMLElementTagNameMap)]:
-    | SafeGet<K, HTMLElementTagNameMap>
-    | SafeGet<K, SVGElementTagNameMap>
-    | SafeGet<K, MathMLElementTagNameMap>;
+    SafeGet<K, HTMLElementTagNameMap> | SafeGet<K, SVGElementTagNameMap> | SafeGet<K, MathMLElementTagNameMap>;
 };
 
 export function whichElement<T extends keyof ElementNameMap>(el: Element, name: T): el is ElementNameMap[T] {

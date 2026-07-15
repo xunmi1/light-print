@@ -1,16 +1,18 @@
 import { beforeEach, describe, expect, test } from 'vitest';
 import type { HTMLCanvasElement, HTMLOptionElement, HTMLVideoElement } from 'happy-dom';
 import { clone, getStyle } from './utils';
+import { waitForResources } from 'src/resources';
 
-test('iframe', () => {
+test('iframe', async () => {
   document.body.innerHTML = /* HTML */ `
     <div id="app">
-      <iframe src="https://example.com/other.html" style="display: block"></iframe>
+      <iframe src="/nest.html" style="display: block"></iframe>
     </div>
   `;
   const context = clone('#app');
+  await Promise.allSettled([waitForResources(document), waitForResources(context.document)]);
   const target = context.document.querySelector('iframe')!;
-  expect(target.src).toBe('https://example.com/other.html');
+  expect(target.src).toBe('/nest.html');
 });
 
 describe('canvas', () => {

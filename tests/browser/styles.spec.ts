@@ -157,8 +157,9 @@ test('padding/border affect size', async ({ page }) => {
           style="padding: ${params.padding}px; border: ${params.padding}px solid black; display: inline-block; box-sizing: border-box;"
         >
           <div
-            style="width: ${params.size - params.padding * 4}px; height: ${params.size -
-            params.padding * 4}px; box-sizing: border-box;"
+            style="width: ${params.size - params.padding * 4}px; height: ${
+              params.size - params.padding * 4
+            }px; box-sizing: border-box;"
           ></div>
         </div>
       `;

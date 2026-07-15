@@ -6,6 +6,7 @@ import {
   Event,
   type Document,
   type CSSStyleDeclaration,
+  type ICanvasRenderingContext2D,
 } from 'happy-dom';
 import DOMTokenList from 'happy-dom/lib/dom/DOMTokenList';
 import { illegalConstructor } from 'happy-dom/lib/PropertySymbol';
@@ -41,8 +42,8 @@ window.print = print;
 // mock `drawImage`
 const _getContext = HTMLCanvasElement.prototype.getContext;
 function getContext(this: BrowserWindow, ...args: Parameters<HTMLCanvasElement['getContext']>) {
-  const context = _getContext.call(this, ...args) ?? {};
-  context.drawImage = () => {};
+  const context = _getContext.call(this, ...args) ?? ({} as ICanvasRenderingContext2D);
+  context.drawImage ??= () => {};
   return context;
 }
 HTMLCanvasElement.prototype.getContext = getContext;
@@ -70,7 +71,7 @@ function getStyleBySelector(currentWindow: BrowserWindow, selector: string) {
     return (
       selectorText === selector ||
       // Convert double quotes to single quotes for CSS attribute selectors.
-      selectorText === selector.replaceAll(/(?<=\[[^\]=]*=)"([^"]*)"/g, "'$1'")
+      selectorText === selector.replaceAll(/(?<=\[[^\]=]*=)"([^"]*)"/gv, "'$1'")
     );
   });
   // @ts-expect-error

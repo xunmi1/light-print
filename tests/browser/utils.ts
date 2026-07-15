@@ -69,7 +69,7 @@ export function getScreenshotPath(name: string, testInfo: TestInfo) {
   return `tests/browser/__screenshots__/${name}-${process.platform}-${testInfo.project.name}.png`;
 }
 
-const FILE_PATTERN = /^(?<name>.*?)(?:\.(?<type>[^.]+))?$/;
+const FILE_PATTERN = /^(?<name>.*?)(?:\.(?<type>[^.]+))?$/v;
 
 type ScreenshotType = PageScreenshotOptions['type'];
 type FileName = `${string}.${NonNullable<ScreenshotType>}`;

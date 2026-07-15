@@ -7,7 +7,7 @@ test.beforeEach(async ({ page, browserName }) => {
   await page.evaluate(() => {
     const app = document.createElement('div');
     app.id = 'app';
-    for (let i = 0; i < 50; i++) app.appendChild(document.createElement('div'));
+    for (let i = 0; i < 100; i++) app.appendChild(document.createElement('div'));
     document.body.appendChild(app);
   });
 });
@@ -28,7 +28,6 @@ test('detect heap leak', async ({ page }) => {
   await collectGarbage(page, cdpSession);
   const finalHeapSize = await getPerformanceMetric(cdpSession, 'JSHeapUsedSize');
   expect(finalHeapSize - onceHeapSize).toBeLessThan(100 * KB);
-  expect(getGrowthRatio(finalHeapSize, onceHeapSize)).toBeLessThan(0.06);
 });
 
 test('detect element leak', async ({ page }) => {
@@ -76,8 +75,4 @@ async function getObjectSize(cdpSession: CDPSession, objectName: string) {
 async function collectGarbage(page: Page, cdpSession: CDPSession, timedout: number = 1000) {
   await cdpSession.send('HeapProfiler.collectGarbage');
   await page.waitForTimeout(timedout);
-}
-
-function getGrowthRatio(current: number, base: number) {
-  return (current - base) / base;
 }

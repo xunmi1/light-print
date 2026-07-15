@@ -6,38 +6,33 @@ import { waitForResources } from 'src/resources';
 describe('normal resources', () => {
   test('successfully loaded', async () => {
     document.body.innerHTML = /* HTML */ `
-      <img src="https://example.com" loading="lazy" />
-      <img src="demo-1.png" srcset="demo-1.png 100px, demo-2.png 200px" />
-      <object data="https://example.com" type="image/svg+xml"></object>
-      <iframe src="https://example.com"></iframe>
-      <embed src="https://example.com"></embed>
-      <audio src="https://example.com"></audio>
-      <video src="https://example.com"></video>
+      <img src="/assets/light-print-black.svg" loading="lazy" />
+      <object data="/assets/light-print-black.svg" type="image/svg+xml"></object>
+      <iframe src="/nest.html"></iframe>
+      <embed src="/assets/light-print-black.svg" type="image/svg+xml" />
+      <audio src="/assets/video.mp4"></audio>
+      <video src="/assets/video.mp4"></video>
       <video width="250" height="200" muted>
-        <source src="https://example.com/video.mp4" type="video/mp4" />
+        <source src="/assets/video.mp4" type="video/mp4" />
       </video>
       <svg viewBox="0 0 100 100">
-        <image href="https://example.com"></image>
+        <image href="/assets/light-print-black.svg"></image>
       </svg>
     `;
 
     const result = waitForResources(document);
     // `happy-dom` doesn't actually load resources, so manually dispatch `load` and `canplay` events
-    document
-      .querySelectorAll('img, object, iframe, embed, image')
-      .forEach(node => node.dispatchEvent(new Event('load')));
+    document.querySelectorAll('object, embed, image').forEach(node => node.dispatchEvent(new Event('load')));
     document.querySelectorAll('video, audio').forEach(node => node.dispatchEvent(new Event('canplay')));
     await expect(result).resolves.toBeUndefined();
   });
 
   test('failed to load', async () => {
     document.body.innerHTML = /* HTML */ `
-      <img class="error" src="1.png" />
-      <img class="success" src="2.png" />
+      <img class="error" src="/assets/not-found.png" />
+      <img class="success" src="/assets/light-print-black.svg" />
     `;
     const result = waitForResources(document);
-    document.querySelector('.error')!.dispatchEvent(new Event('error'));
-    document.querySelector('.success')!.dispatchEvent(new Event('load'));
     await expect(result).rejects.toThrow('Failed to load resource');
   });
 
@@ -50,9 +45,6 @@ describe('normal resources', () => {
     document.body.innerHTML = /* HTML */ `<img
       src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
     />`;
-    const img = document.querySelector('img')!;
-    // `happy-dom` doesn't support mocking image resource,
-    Object.defineProperty(img, 'complete', { value: true });
     await expect(waitForResources(document)).resolves.toBeUndefined();
   });
 
@@ -69,9 +61,9 @@ describe('normal resources', () => {
 describe('ignore link[ref="stylesheet"]', () => {
   test('ignore whether it has loaded', async () => {
     document.body.innerHTML = /* HTML */ `
-      <link rel="stylesheet" href="style.css" />
-      <link rel="stylesheet" href="style.css" media="all" />
-      <link rel="preload" as="style" href="style.css" />
+      <link rel="stylesheet" href="/assets/index.css" />
+      <link rel="stylesheet" href="/assets/index.css" media="all" />
+      <link rel="preload" as="style" href="/assets/index.css" />
     `;
     const result = waitForResources(document);
     document.querySelectorAll('link').forEach(node => node.dispatchEvent(new Event('error')));

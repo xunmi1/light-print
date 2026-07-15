@@ -26,7 +26,7 @@ function toStyleRecord(style: CSSStyleDeclaration) {
 }
 
 function isNumberLike(value: string) {
-  return /^[+-]?\d*\.?\d+$/.test(value);
+  return /^[+\-]?\d*\.?\d+$/v.test(value);
 }
 
 function getAllPropertyNames<T extends object>(object: T) {

@@ -31,6 +31,7 @@
       "files": ["src/**/*.ts"],
       "rules": {
         "no-console": ["error", { "allow": ["warn", "error"] }],
+        "require-unicode-regexp": "off",
         "oxc/no-this-in-exported-function": "error",
         "oxc/no-rest-spread-properties": "error",
         "oxc/no-map-spread": "error",

@@ -86,7 +86,7 @@ describe('hidden elements', () => {
     document.body.innerHTML = /* HTML */ `
       <div id="app">
         <style></style>
-        <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" href="/assets/index.css" />
         <link rel="preload" as="style" />
         <param />
         <meta />
