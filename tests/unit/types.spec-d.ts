@@ -9,6 +9,7 @@ test('parameters', () => {
         documentTitle?: string;
         mediaPrintStyle?: string;
         zoom?: number | string;
+        signal?: AbortSignal;
       }
     | undefined
   >();

@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 import { Event } from 'happy-dom';
 
 import { waitForResources } from 'src/resources';
+import lightPrint from 'src';
 
 describe('normal resources', () => {
   test('successfully loaded', async () => {
@@ -29,11 +30,12 @@ describe('normal resources', () => {
 
   test('failed to load', async () => {
     document.body.innerHTML = /* HTML */ `
-      <img class="error" src="/assets/not-found.png" />
+      <img class="error" style="display: block" src="/assets/not-found.png" />
       <img class="success" src="/assets/light-print-black.svg" />
     `;
-    const result = waitForResources(document);
-    await expect(result).rejects.toThrow('Failed to load resource');
+    await expect(waitForResources(document)).rejects.toThrow('Failed to load resource');
+    await expect(lightPrint('.error')).rejects.toThrow('Failed to load resource');
+    await expect(lightPrint('.success')).resolves.toBeUndefined();
   });
 
   test('empty resource', async () => {

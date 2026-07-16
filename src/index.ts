@@ -25,6 +25,15 @@ export interface PrintOptions {
    * @default 1
    */
   zoom?: number | string;
+  /**
+   * Abort signal, which can be used to abort printing.
+   * @example
+   * ```js
+   * // Abort printing after 5 seconds
+   * await lightPrint('#app', { signal: AbortSignal.timeout(5000) });
+   * ```
+   */
+  signal?: AbortSignal;
 }
 
 interface Container extends HTMLElement {
@@ -71,6 +80,10 @@ function emitPrint(contentWindow: Window) {
   return promise;
 }
 
+function getAbortError(): Error {
+  return new DOMException('Printing has been aborted.', 'AbortError');
+}
+
 /**
  * Print the HTML element.
  * @param containerOrSelector An actual HTML element or a CSS selector.
@@ -80,11 +93,22 @@ function lightPrint(containerOrSelector: Element | string, options: PrintOptions
   const hostElement = normalizeNode(containerOrSelector);
   // Ensure to return a rejected promise.
   if (!hostElement) return Promise.reject(new Error('Invalid HTML element.'));
+  const signal = options.signal;
+  if (signal?.aborted) return Promise.reject(getAbortError());
 
   const container = createContainer();
   const context = createContext();
+
+  const { promise, resolve, reject } = withResolvers<void>();
+  const onAbort = () => reject(getAbortError());
+  const cleanup = () => {
+    removeNode(container);
+    signal?.removeEventListener('abort', onAbort);
+  };
+  signal?.addEventListener('abort', onAbort);
+
   // Must be mounted and loaded before using `contentWindow` or `contentDocument`.
-  return mount(container, window.document.body)
+  mount(container, window.document.body)
     .then(() => {
       const doc = container.contentDocument!;
       context.bind(doc);
@@ -97,10 +121,9 @@ function lightPrint(containerOrSelector: Element | string, options: PrintOptions
     })
     .then(() => waitForResources(context.document))
     .then(() => emitPrint(context.document.defaultView!))
-    .finally(() =>
-      // The container can only be destroyed after the printing process has completed.
-      removeNode(container)
-    );
+    .then(resolve, reject);
+
+  return promise.finally(cleanup);
 }
 
 export default lightPrint;

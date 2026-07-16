@@ -107,8 +107,8 @@ export function bindOnceEvent<Target extends EventTarget | GlobalEventHandlers, 
   options?: AddEventListenerOptions | boolean
 ) {
   const wrappedListener: EventListener = event => {
-    listener(event as EventFor<Target, Name>);
     target.removeEventListener(eventName, wrappedListener);
+    listener(event as EventFor<Target, Name>);
   };
   target.addEventListener(eventName, wrappedListener, options);
 }
