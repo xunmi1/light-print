@@ -41,4 +41,5 @@ runs:
     # See https://github.com/microsoft/playwright/issues/30538
     - name: Install WebKit dependencies
       shell: bash
+      if: steps.cache-playwright-browsers.outputs.cache-hit == 'true'
       run: npx playwright install-deps webkit

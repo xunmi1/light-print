@@ -31,7 +31,7 @@ jobs:
           path: './'
 
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Build markdown
         uses: actions/jekyll-build-pages@v1
@@ -41,7 +41,7 @@ jobs:
           verbose: true
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: './output'
 
@@ -55,6 +55,6 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
         with:
           timeout: 60_000
