@@ -61,7 +61,7 @@ describe('destroy', () => {
   });
 });
 
-describe('abort', () => {
+describe('abort signal', () => {
   test('abort before printing', async () => {
     const promise = lightPrint('body', { signal: AbortSignal.abort() });
     await expect(promise).rejects.toThrow(Error);
@@ -77,7 +77,7 @@ describe('abort', () => {
     await expect(promise).rejects.toThrow(expect.objectContaining({ name: 'AbortError' }));
   });
 
-  test('abort after printing is completed', async () => {
+  test('abort after printing', async () => {
     document.body.innerHTML = /* HTML */ `<div id="app"></div>`;
     await expect(lightPrint('#app', { signal: AbortSignal.timeout(1000) })).resolves.toBeUndefined();
     document.body.innerHTML = /* HTML */ `<img src="/examples/assets/not-found.png" style="display: block" />`;

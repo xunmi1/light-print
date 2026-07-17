@@ -5,7 +5,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? '50%' : undefined,
   reporter: process.env.GITHUB_ACTIONS ? [['github'], ['dot'], ['html']] : [['list'], ['html', { open: 'never' }]],
   snapshotPathTemplate: '{testDir}/__screenshots__/{arg}-{platform}-{projectName}{ext}',
   /* Run your local dev server before starting the tests */
