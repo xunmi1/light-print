@@ -29,7 +29,7 @@ export interface PrintOptions {
    * Abort signal, which can be used to abort printing.
    * @example
    * ```js
-   * // Abort printing after 5 seconds
+   * // Abort printing after 5 seconds.
    * await lightPrint('#app', { signal: AbortSignal.timeout(5000) });
    * ```
    */

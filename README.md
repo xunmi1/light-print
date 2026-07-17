@@ -56,6 +56,30 @@ lightPrint('#id', {
 - Accepts either a CSS selector or an actual element.
 - Returns a Promise that resolves when the print dialog closes.
 
+### Printed pages
+
+The different aspects of printed pages can be customized using the `mediaPrintStyle` option. See [@page at-rule](https://developer.mozilla.org/docs/Web/CSS/@page).
+
+```ts
+const mediaPrintStyle = /* CSS */ `@page {
+  size: A4 landscape;
+  margin: 2cm;
+}`;
+```
+
+### Aborting and timeout
+
+The print job can be aborted using the `signal` option since v2.9.
+
+```ts
+const abortController = new AbortController();
+await lightPrint('#id', { signal: abortController.signal });
+// Abort printing immediately.
+abortController.abort();
+// Abort printing after 5 seconds.
+await lightPrint('#id', { signal: AbortSignal.timeout(5000) });
+```
+
 ### Usage in Vue
 
 ```vue
@@ -100,12 +124,14 @@ The same approach works with other frameworks/libraries.
 
 ```ts
 interface PrintOptions {
-  /** Document title */
+  /** Document title. */
   documentTitle?: string;
-  /** Additional print styles */
+  /** Additional print styles. */
   mediaPrintStyle?: string;
-  /** Document zoom level */
+  /** Document zoom level. */
   zoom?: number | string;
+  /** Abort signal, which can be used to abort printing. */
+  signal?: AbortSignal;
 }
 
 function lightPrint(containerOrSelector: Element | string, options?: PrintOptions): Promise<void>;
