@@ -43,8 +43,8 @@ test('Google Search', async ({ page }, testInfo) => {
 });
 
 test('GitHub Repository', async ({ page }, testInfo) => {
-  await page.setViewportSize({ width: 1200, height: 1080 });
-  test.setTimeout(120_000);
+  await page.setViewportSize({ width: 1360, height: 1080 });
+  test.setTimeout(180_000);
   await page.goto('https://github.com/xunmi1/light-print');
   await page.waitForTimeout(2000);
   await page.evaluate(() => {
@@ -58,14 +58,14 @@ test('GitHub Repository', async ({ page }, testInfo) => {
   // `.markdown-heading` has margin collapse problem.
   await lightPrint('#app', { mediaPrintStyle: '.markdown-heading { height: unset }' });
   const container = getPrintContainter(page);
-  await container.evaluate(el => (el.style = 'width: 100%; height: 5000px; border: none'));
+  await container.evaluate(el => (el.style = 'width: 100%; height: 6000px; border: none'));
   const buffer = await screenshot(container.contentFrame().locator('#app'));
   expect(buffer).toMatchSnapshot('github.png', { maxDiffPixelRatio: 0.001 });
 });
 
 test('Node.js Homepage', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 1600, height: 1080 });
-  await page.goto('https://nodejs.org');
+  await page.goto('https://nodejs.org/en');
   await page.waitForTimeout(2000);
   await page.evaluate(() => {
     document.body.id = 'app';

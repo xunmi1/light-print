@@ -6,7 +6,7 @@ describe('visitor', () => {
   test('parameters', () => {
     const origin = document.createElement('div');
     const target = origin.cloneNode(true);
-    const fn = vi.fn((_: Element, __: Element) => true);
+    const fn = vi.fn<(_: Element, __: Element) => boolean>(() => true);
     traverse(fn, target, origin);
     expect(fn).toHaveBeenLastCalledWith(target, origin);
   });
@@ -21,7 +21,7 @@ describe('visitor', () => {
       </div>
       <div id="5"></div>
     `;
-    const fn = vi.fn((_: Element, __: Element) => true);
+    const fn = vi.fn<(_: Element, __: Element) => boolean>(() => true);
     traverse(fn, origin.cloneNode(true), origin);
     expect(fn).toHaveBeenCalledTimes(5);
     const order = fn.mock.calls.map(params => params[0].id);
